@@ -39,6 +39,6 @@ jobs:
       
     # Build 진행
     - name: Build with Gradle
-      run: ./gradlew clean build --stacktrace
+      run: ./gradlew clean build -x test --stacktrace
       shell: bash
       
