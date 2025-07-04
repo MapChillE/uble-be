@@ -1,5 +1,6 @@
 package com.ureca.uble.entity;
 
+import com.ureca.uble.entity.enums.Period;
 import com.ureca.uble.entity.enums.Rank;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -26,10 +27,18 @@ public class Benefit extends BaseEntity {
     @Column(nullable = false)
     private String content;
 
+    @Column(nullable = false)
+    private Period period;
+
+    @Column
+    private Integer number;
+
     @Builder(access = PRIVATE)
-    private Benefit(Brand brand, Rank rank, String content) {
+    private Benefit(Brand brand, Rank rank, String content, Period period, Integer number) {
         this.brand = brand;
         this.rank = rank;
         this.content = content;
+        this.period = period;
+        this.number = number;
     }
 }
