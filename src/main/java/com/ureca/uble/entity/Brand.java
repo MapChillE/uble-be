@@ -49,9 +49,6 @@ public class Brand extends BaseEntity {
     @Column(name = "is_online", nullable = false)
     private Boolean isOnline;
 
-    @Column(name = "is_local", nullable = false)
-    private Boolean isLocal;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Rank rank;
@@ -62,7 +59,7 @@ public class Brand extends BaseEntity {
     @Builder(access = PRIVATE)
     private Brand(String name, String csrNumber, String benefit, String description, String provideCount,
                   String manual, String imageUrl, Season season, Category category, Boolean isOnline,
-                  Boolean isLocal, Rank rank, String reservationUrl) {
+                  Rank rank, String reservationUrl) {
         this.name = name;
         this.csrNumber = csrNumber;
         this.benefit = benefit;
@@ -73,7 +70,6 @@ public class Brand extends BaseEntity {
         this.season = season;
         this.category = category;
         this.isOnline = isOnline;
-        this.isLocal = isLocal;
         this.rank = rank;
         this.reservationUrl = reservationUrl;
     }
