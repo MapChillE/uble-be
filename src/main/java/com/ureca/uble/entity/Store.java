@@ -1,6 +1,5 @@
 package com.ureca.uble.entity;
 
-import com.ureca.uble.entity.enums.Category;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -22,31 +21,26 @@ public class Store extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column
     private String address;
 
-    @Column(name = "phone_number", nullable = false)
+    @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(nullable = false)
+    @Column
     private Double latitude;
 
-    @Column(nullable = false)
+    @Column
     private Double longitude;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Category category;
 
     @Builder(access = PRIVATE)
     private Store(Brand brand, String name, String address, String phoneNumber,
-                  Double latitude, Double longitude, Category category) {
+                  Double latitude, Double longitude) {
         this.brand = brand;
         this.name = name;
         this.address = address;
         this.phoneNumber = phoneNumber;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.category = category;
     }
 }
