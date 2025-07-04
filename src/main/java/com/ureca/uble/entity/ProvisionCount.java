@@ -29,7 +29,7 @@ public class ProvisionCount extends BaseEntity {
     private Integer count;
 
     @Builder(access = PRIVATE)
-    private ProvisionCount(Benefit benefit, User user, boolean isAvailable, int count) {
+    private ProvisionCount(Benefit benefit, User user, Boolean isAvailable, Integer count) {
         this.benefit = benefit;
         this.user = user;
         this.isAvailable = isAvailable;
