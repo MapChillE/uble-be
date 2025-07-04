@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 import static lombok.AccessLevel.PRIVATE;
 
 @Entity
-@Table(name="brand")
+@Table(name="benefit")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Benefit extends BaseEntity {
