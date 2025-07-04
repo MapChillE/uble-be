@@ -13,8 +13,7 @@ public enum Category {
     FOOD("푸드"),
     CULTURE_LEISURE("문화/여가"),
     EDUCATION("교육"),
-    TRAVEL_TRANSPORTATION("여행/교통"),
-    LOCAL_MEMBERSHIP("우리동네멤버십")
+    TRAVEL_TRANSPORTATION("여행/교통")
     ;
 
     private final String name;
