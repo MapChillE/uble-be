@@ -39,7 +39,7 @@ public class SecurityConfig {
 		CorsConfigurationSource corsConfigurationSource, JwtValidator jwtValidator) throws Exception{
 		return http
 			.csrf(csrf -> csrf.disable())
-			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+			.cors(cors -> cors.configurationSource(corsConfigurationSource))
 			.formLogin(form -> form.disable())
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers("/api/auth/login", "/api/auth/reissue", "/api/auth/logout").permitAll()

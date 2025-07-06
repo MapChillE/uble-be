@@ -32,7 +32,7 @@ public class KakaoOauthClient {
 				.path("/oauth/token")
 				.queryParam("grant_type", "authorization_code")
 				.queryParam("client_id", clientId)
-				.queryParam("redirect_uri, redirectUri")
+				.queryParam("redirect_uri", redirectUri)
 				.queryParam("code", code)
 				.build())
 			.retrieve()
