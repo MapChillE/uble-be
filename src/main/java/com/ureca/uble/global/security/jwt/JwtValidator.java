@@ -20,10 +20,6 @@ public class JwtValidator {
 				.parseClaimsJws(token);
 			return true;
 		} catch (Exception e){
-			System.out.println(token);
-			System.out.println(secret);
-			System.out.println("🔴 JWT 검증 실패:");
-			e.printStackTrace(); // 반드시 추가
 			return false;
 		}
 	}
