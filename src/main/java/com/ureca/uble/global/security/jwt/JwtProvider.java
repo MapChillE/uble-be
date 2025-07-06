@@ -26,10 +26,10 @@ public class JwtProvider {
 	private String secret;
 
 	@Value("${jwt.access-token-validity}")
-	private long ACCESS_TOKEN_VALIDITY_SECONDS;
+	private long ACCESS_TOKEN_VALIDITY_MILLIS;
 
 	@Value("${jwt.refresh-token-validity}")
-	private long REFRESH_TOKEN_VALIDITY_SECONDS;
+	private long REFRESH_TOKEN_VALIDITY_MILLIS;
 
 	@Value("${jwt.cookie.domain}")
 	private String cookieDomain;
@@ -44,7 +44,7 @@ public class JwtProvider {
 		return Jwts.builder()
 			.subject(String.valueOf(user.getId()))
 			.issuedAt(new Date())
-			.expiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY_SECONDS))
+			.expiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY_MILLIS))
 			.signWith(Keys.hmacShaKeyFor(secret.getBytes()))
 			.compact();
 	}
@@ -53,7 +53,7 @@ public class JwtProvider {
 		return Jwts.builder()
 			.subject(String.valueOf(user.getId()))
 			.issuedAt(new Date())
-			.expiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY_SECONDS))
+			.expiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY_MILLIS))
 			.signWith(Keys.hmacShaKeyFor(secret.getBytes()))
 			.compact();
 	}
@@ -67,7 +67,7 @@ public class JwtProvider {
 			.path("/")
 			.httpOnly(true)
 			.secure(isSecure)
-			.maxAge(REFRESH_TOKEN_VALIDITY_SECONDS / 1000)
+			.maxAge(REFRESH_TOKEN_VALIDITY_MILLIS / 1000)
 			.sameSite(sameSite)
 			.domain(cookieDomain.isBlank() ? null : cookieDomain)
 			.build();
