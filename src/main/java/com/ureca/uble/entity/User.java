@@ -1,6 +1,5 @@
 package com.ureca.uble.entity;
 
-import com.ureca.uble.entity.enums.Provider;
 import com.ureca.uble.entity.enums.Rank;
 import com.ureca.uble.entity.enums.Role;
 import jakarta.persistence.*;
@@ -17,12 +16,6 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String nickname;
 
-    @Column(nullable = false)
-    private String email;
-
-    @Column(nullable = false)
-    private String password;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Rank rank;
@@ -31,21 +24,23 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private Role role;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Provider provider;
-
     @Column(name = "provider_id", nullable = false)
     private String providerId;
 
     @Builder(access = PRIVATE)
-    private User(String nickname, String email, String password, Rank rank, Role role, Provider provider, String providerId) {
+    private User(String nickname, Rank rank, Role role, String providerId) {
         this.nickname = nickname;
-        this.email = email;
-        this.password = password;
         this.rank = rank;
         this.role = role;
-        this.provider = provider;
         this.providerId = providerId;
+    }
+
+    public static User createTmpUser(String kakaoId, String nickname){
+        return User.builder()
+            .providerId(kakaoId)
+            .nickname(nickname)
+            .rank(Rank.NORMAL)
+            .role(Role.TMP_USER)
+            .build();
     }
 }
