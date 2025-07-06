@@ -32,4 +32,17 @@ public class Token extends BaseEntity {
         this.refreshToken = refreshToken;
         this.expiryDate = expiryDate;
     }
+
+    public static Token of (User user, String refreshToken, LocalDateTime expiryDate) {
+        return Token.builder()
+            .user(user)
+            .refreshToken(refreshToken)
+            .expiryDate(expiryDate)
+            .build();
+    }
+
+    public void updateRefreshToken(String refreshToken, LocalDateTime expiryDate) {
+        this.refreshToken = refreshToken;
+        this.expiryDate = expiryDate;
+    }
 }
