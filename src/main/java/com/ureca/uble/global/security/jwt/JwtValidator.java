@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Component
@@ -16,19 +18,21 @@ public class JwtValidator {
 	public boolean validateToken(String token) {
 		try{
 			Jwts.parser()
-				.setSigningKey(secret.getBytes())
-				.parseClaimsJws(token);
+				.verifyWith(Keys.hmacShaKeyFor(secret.getBytes()))
+				.build()
+				.parseSignedClaims(token);
 			return true;
-		} catch (Exception e){
+		} catch (JwtException | IllegalArgumentException e){
 			return false;
 		}
 	}
 
 	public Long getUserIdFromToken(String token) {
 		Claims claims = Jwts.parser()
-			.setSigningKey(secret.getBytes())
-			.parseClaimsJws(token)
-			.getBody();
+			.verifyWith(Keys.hmacShaKeyFor(secret.getBytes()))
+			.build()
+			.parseSignedClaims(token)
+			.getPayload();
 		return Long.valueOf(claims.getSubject());
 	}
 

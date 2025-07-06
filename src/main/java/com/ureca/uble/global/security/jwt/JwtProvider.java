@@ -5,6 +5,7 @@ import java.time.ZoneId;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
 import com.ureca.uble.entity.User;
@@ -12,6 +13,7 @@ import com.ureca.uble.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -40,19 +42,19 @@ public class JwtProvider {
 
 	public String createAccessToken(User user) {
 		return Jwts.builder()
-			.setSubject(String.valueOf(user.getId()))
-			.setIssuedAt(new Date())
-			.setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY_SECONDS))
-			.signWith(SignatureAlgorithm.HS512, secret.getBytes())
+			.subject(String.valueOf(user.getId()))
+			.issuedAt(new Date())
+			.expiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY_SECONDS))
+			.signWith(Keys.hmacShaKeyFor(secret.getBytes()))
 			.compact();
 	}
 
 	public String createRefreshToken(User user) {
 		return Jwts.builder()
-			.setSubject(String.valueOf(user.getId()))
-			.setIssuedAt(new Date())
-			.setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY_SECONDS))
-			.signWith(SignatureAlgorithm.HS512, secret.getBytes())
+			.subject(String.valueOf(user.getId()))
+			.issuedAt(new Date())
+			.expiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY_SECONDS))
+			.signWith(Keys.hmacShaKeyFor(secret.getBytes()))
 			.compact();
 	}
 
@@ -61,27 +63,37 @@ public class JwtProvider {
 	}
 
 	public void addRefreshTokenCookie(HttpServletResponse response, String token){
-		Cookie cookie = new Cookie("refreshToken", token);
-		cookie.setHttpOnly(true);
-		cookie.setSecure(true);
-		cookie.setPath("/");
-		cookie.setMaxAge((int) (REFRESH_TOKEN_VALIDITY_SECONDS / 1000));
-		response.addCookie(cookie);
+		ResponseCookie cookie = ResponseCookie.from("refreshToken", token)
+			.path("/")
+			.httpOnly(true)
+			.secure(isSecure)
+			.maxAge(REFRESH_TOKEN_VALIDITY_SECONDS / 1000)
+			.sameSite(sameSite)
+			.domain(cookieDomain.isBlank() ? null : cookieDomain)
+			.build();
+
+		response.addHeader("Set-Cookie", cookie.toString());
 	}
 
 	public void deleteRefreshTokenCookie(HttpServletResponse response){
-		Cookie cookie = new Cookie("refreshToken", null);
-		cookie.setMaxAge(0);
-		cookie.setPath("/");
-		cookie.setHttpOnly(true);
-		response.addCookie(cookie);
+		ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
+			.path("/")
+			.httpOnly(true)
+			.secure(isSecure)
+			.maxAge(0)
+			.sameSite(sameSite)
+			.domain(cookieDomain.isBlank() ? null : cookieDomain)
+			.build();
+
+		response.addHeader("Set-Cookie", cookie.toString());
 	}
 
 	public LocalDateTime getRefreshTokenExpiry(String token){
 		Claims claims = Jwts.parser()
-			.setSigningKey(secret.getBytes())
-			.parseClaimsJws(token)
-			.getBody();
+			.verifyWith(Keys.hmacShaKeyFor(secret.getBytes()))
+			.build()
+			.parseSignedClaims(token)
+			.getPayload();
 
 		return LocalDateTime.ofInstant(claims.getExpiration().toInstant(), ZoneId.systemDefault());
 	}
