@@ -1,6 +1,5 @@
 package com.ureca.uble.entity;
 
-import com.ureca.uble.entity.enums.Category;
 import com.ureca.uble.entity.enums.RankType;
 import com.ureca.uble.entity.enums.Season;
 import jakarta.persistence.*;
@@ -33,10 +32,6 @@ public class Brand extends BaseEntity {
     @Column(nullable = false)
     private Season season;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Category category;
-
     @Column(name = "is_online", nullable = false)
     private Boolean isOnline;
 
@@ -51,15 +46,13 @@ public class Brand extends BaseEntity {
     private RankType rankType;
 
     @Builder(access = PRIVATE)
-    private Brand(String name, String csrNumber, String description, String imageUrl,
-                  Season season, Category category, Boolean isOnline, Boolean isLocal,
-                  String reservationUrl, RankType rankType) {
+    private Brand(String name, String csrNumber, String description, String imageUrl, Season season,
+                  Boolean isOnline, Boolean isLocal, String reservationUrl, RankType rankType) {
         this.name = name;
         this.csrNumber = csrNumber;
         this.description = description;
         this.imageUrl = imageUrl;
         this.season = season;
-        this.category = category;
         this.isOnline = isOnline;
         this.isLocal = isLocal;
         this.reservationUrl = reservationUrl;
