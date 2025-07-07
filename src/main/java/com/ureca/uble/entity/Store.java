@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.locationtech.jts.geom.Point;
 
 import static lombok.AccessLevel.PRIVATE;
 
@@ -27,20 +28,20 @@ public class Store extends BaseEntity {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column
-    private Double latitude;
+    @Column(name = "operation_time")
+    private String operationTime;
 
-    @Column
-    private Double longitude;
+    @Column(columnDefinition = "geography(Point,4326)")
+    private Point location;
 
     @Builder(access = PRIVATE)
     private Store(Brand brand, String name, String address, String phoneNumber,
-                  Double latitude, Double longitude) {
+                  String operationTime, Point location) {
         this.brand = brand;
         this.name = name;
         this.address = address;
         this.phoneNumber = phoneNumber;
-        this.latitude = latitude;
-        this.longitude = longitude;
+        this.operationTime = operationTime;
+        this.location = location;
     }
 }

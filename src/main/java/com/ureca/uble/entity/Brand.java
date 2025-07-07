@@ -1,6 +1,7 @@
 package com.ureca.uble.entity;
 
 import com.ureca.uble.entity.enums.Category;
+import com.ureca.uble.entity.enums.RankType;
 import com.ureca.uble.entity.enums.Season;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -22,14 +23,8 @@ public class Brand extends BaseEntity {
     @Column(name = "csr_number", nullable = false)
     private String csrNumber;
 
-    @Column(columnDefinition="TEXT", nullable = false)
-    private String benefit;
-
     @Column(nullable = false)
     private String description;
-
-    @Column(columnDefinition="TEXT", nullable = false)
-    private String manual;
 
     @Column(name = "image_url", nullable = false)
     private String imageUrl;
@@ -51,20 +46,23 @@ public class Brand extends BaseEntity {
     @Column(name = "reservation_url")
     private String reservationUrl;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "rank_type", nullable = false)
+    private RankType rankType;
+
     @Builder(access = PRIVATE)
-    private Brand(String name, String csrNumber, String benefit, String description,
-                  String manual, String imageUrl, Season season, Category category, Boolean isOnline,
-                  Boolean isLocal, String reservationUrl) {
+    private Brand(String name, String csrNumber, String description, String imageUrl,
+                  Season season, Category category, Boolean isOnline, Boolean isLocal,
+                  String reservationUrl, RankType rankType) {
         this.name = name;
         this.csrNumber = csrNumber;
-        this.benefit = benefit;
         this.description = description;
-        this.manual = manual;
         this.imageUrl = imageUrl;
         this.season = season;
         this.category = category;
         this.isOnline = isOnline;
         this.isLocal = isLocal;
         this.reservationUrl = reservationUrl;
+        this.rankType = rankType;
     }
 }
