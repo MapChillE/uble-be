@@ -1,24 +1,18 @@
 package com.ureca.uble.domain.usageHistory.controller;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ureca.uble.domain.auth.dto.response.ReissueRes;
-import com.ureca.uble.domain.auth.exception.AuthErrorCode;
 import com.ureca.uble.domain.usageHistory.dto.response.UsageHistoryRes;
 import com.ureca.uble.domain.usageHistory.service.UsageHistoryService;
 import com.ureca.uble.global.dto.response.CursorPageRes;
-import com.ureca.uble.global.exception.GlobalException;
 import com.ureca.uble.global.response.CommonResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
