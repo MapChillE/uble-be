@@ -28,7 +28,7 @@ public class UsageHistoryServiceTest {
 
 	@Test
 	@DisplayName("사용자 ID로 이용내역을 조회한다.")
-	void getUseageHistorySuccess(){
+	void getUsageHistorySuccess(){
 		//given
 		Long userId = 1L;
 		Long lastHistoryId = null;
