@@ -5,30 +5,26 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.locationtech.jts.geom.Point;
 
 import static lombok.AccessLevel.PRIVATE;
 
 @Entity
-@Table(name="pin")
+@Table(name="user_category")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Pin extends BaseEntity {
+public class UserCategory extends BaseEntity{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(nullable = false)
-    private String name;
-
-    @Column(columnDefinition = "geography(Point,4326)")
-    private Point location;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 
     @Builder(access = PRIVATE)
-    private Pin(User user, String name, Point location) {
+    private UserCategory(User user, Category category) {
         this.user = user;
-        this.name = name;
-        this.location = location;
+        this.category = category;
     }
 }

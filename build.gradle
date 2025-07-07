@@ -73,6 +73,10 @@ dependencies {
 
     // Mockito
     testImplementation 'org.mockito:mockito-junit-jupiter:5.2.0'
+
+    // postGIS
+    implementation 'org.hibernate.orm:hibernate-spatial:6.4.0.Final'
+    implementation 'org.locationtech.jts:jts-core:1.19.0'
 }
 
 tasks.named('test') {

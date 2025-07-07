@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 import static lombok.AccessLevel.PRIVATE;
 
 @Entity
-@Table(name="provision_count")
+@Table(name="usage_count")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ProvisionCount extends BaseEntity {
+public class UsageCount extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "benefit_id", nullable = false)
@@ -29,7 +29,7 @@ public class ProvisionCount extends BaseEntity {
     private Integer count;
 
     @Builder(access = PRIVATE)
-    private ProvisionCount(Benefit benefit, User user, Boolean isAvailable, Integer count) {
+    private UsageCount(Benefit benefit, User user, Boolean isAvailable, Integer count) {
         this.benefit = benefit;
         this.user = user;
         this.isAvailable = isAvailable;
