@@ -38,7 +38,7 @@ public class BookmarkController {
      * 즐겨찾기 삭제
      *
      * @param userId 사용자 정보
-     * @param bookmarkId 제휴처 id
+     * @param bookmarkId 즐겨찾기 id
      */
     @Operation(summary = "즐겨찾기 삭제", description = "즐겨찾기 삭제")
     @DeleteMapping("/{bookmarkId}")

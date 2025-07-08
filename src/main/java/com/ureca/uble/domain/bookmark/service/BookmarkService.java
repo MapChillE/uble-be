@@ -63,7 +63,7 @@ public class BookmarkService {
     /**
      * 즐겨찾기 조회
      */
-    @Transactional
+    @Transactional(readOnly = true)
     public CursorPageRes<GetBookmarkRes> getBookmarks(Long userId, Long lastBookmarkId, int size) {
         List<GetBookmarkRes> bookmarkList = new ArrayList<>(bookmarkRepository.getBookmarksByPage(userId, size + 1, lastBookmarkId)
             .stream().map(GetBookmarkRes::from).toList());
