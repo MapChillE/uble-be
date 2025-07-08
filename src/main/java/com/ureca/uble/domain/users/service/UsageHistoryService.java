@@ -1,6 +1,7 @@
 package com.ureca.uble.domain.users.service;
 
 import com.ureca.uble.domain.brand.repository.BenefitRepository;
+import com.ureca.uble.domain.store.repository.StoreRepository;
 import com.ureca.uble.domain.users.dto.request.CreateUsageHistoryReq;
 import com.ureca.uble.domain.users.dto.response.CreateUsageHistoryRes;
 import com.ureca.uble.domain.users.dto.response.UsageHistoryRes;
@@ -12,13 +13,14 @@ import com.ureca.uble.entity.enums.Period;
 import com.ureca.uble.entity.enums.Rank;
 import com.ureca.uble.global.exception.GlobalException;
 import com.ureca.uble.global.response.CursorPageRes;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+import static com.ureca.uble.domain.brand.exception.BrandErrorCode.BENEFIT_NOT_FOUND;
+import static com.ureca.uble.domain.store.exception.StoreErrorCode.STORE_NOT_FOUND;
 import static com.ureca.uble.domain.users.exception.UserErrorCode.BENEFIT_NOT_AVAILABLE;
 import static com.ureca.uble.domain.users.exception.UserErrorCode.USER_NOT_FOUND;
 
@@ -30,7 +32,7 @@ public class UsageHistoryService {
 	private final UsageCountRepository usageCountRepository;
 	private final UserRepository userRepository;
 	private final BenefitRepository benefitRepository;
-	private final EntityManager em;
+	private final StoreRepository storeRepository;
 
 	/**
 	 * 매장 이용 내역 전체 조회
@@ -45,8 +47,9 @@ public class UsageHistoryService {
 	 */
 	@Transactional
 	public CreateUsageHistoryRes createUsageHistory(Long userId, Long storeId, CreateUsageHistoryReq req) {
+		// 정보 검증
 		User user = findUser(userId);
-		Store storeRef = em.getReference(Store.class, storeId);
+		Store store = findStore(storeId);
 
 		// 등급에 따른 추가 작업 처리
 		switch (req.getBenefitType()) {
@@ -57,7 +60,7 @@ public class UsageHistoryService {
 		}
 
 		// 로그 저장
-		UsageHistory savedHistory = usageRepository.save(UsageHistory.of(user, storeRef));
+		UsageHistory savedHistory = usageRepository.save(UsageHistory.of(user, store));
 
 		return new CreateUsageHistoryRes(savedHistory.getId());
 	}
@@ -77,12 +80,11 @@ public class UsageHistoryService {
 	}
 
 	private void handleNormalBenefit(User user, Long storeId) {
-		Benefit benefit = benefitRepository.findNormalBenefitByStoreId(storeId);
+		Benefit benefit = findBenefitByStoreId(storeId);
 		Optional<UsageCount> optionalCount = usageCountRepository.findByUserAndBenefit(user, benefit);
 
-		if (optionalCount.isEmpty()) {
-			// 새로운 count 생성
-			UsageCount usageCount = UsageCount.of(user, benefit, benefit.getNumber() != 1, 1);
+		if (optionalCount.isEmpty()) { // 새로운 count 생성
+			UsageCount usageCount = UsageCount.of(user, benefit, benefit.getNumber() > 1, 1);
 			usageCountRepository.save(usageCount);
 		} else {
 			UsageCount usageCount = optionalCount.get();
@@ -95,7 +97,15 @@ public class UsageHistoryService {
 		}
 	}
 
+	private Benefit findBenefitByStoreId(Long storeId) {
+		return benefitRepository.findNormalBenefitByStoreId(storeId).orElseThrow(() -> new GlobalException(BENEFIT_NOT_FOUND));
+	}
+
 	private User findUser(Long userId) {
 		return userRepository.findById(userId).orElseThrow(() -> new GlobalException(USER_NOT_FOUND));
+	}
+
+	private Store findStore(Long storeId) {
+		return storeRepository.findById(storeId).orElseThrow(() -> new GlobalException(STORE_NOT_FOUND));
 	}
 }

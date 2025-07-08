@@ -186,7 +186,7 @@ public class UsageHistoryServiceTest {
 
 		Benefit benefit = mock(Benefit.class);
 		when(benefit.getNumber()).thenReturn(3);
-		when(benefitRepository.findNormalBenefitByStoreId(storeId)).thenReturn(benefit);
+		when(benefitRepository.findNormalBenefitByStoreId(storeId)).thenReturn(Optional.of(benefit));
 		when(usageCountRepository.findByUserAndBenefit(normalUser, benefit)).thenReturn(Optional.empty());
 
 		UsageHistory savedHistory = mock(UsageHistory.class);
@@ -216,7 +216,7 @@ public class UsageHistoryServiceTest {
 		Benefit benefit = mock(Benefit.class);
 		when(benefit.getNumber()).thenReturn(2);
 		when(benefit.getPeriod()).thenReturn(Period.MONTHLY);
-		when(benefitRepository.findNormalBenefitByStoreId(storeId)).thenReturn(benefit);
+		when(benefitRepository.findNormalBenefitByStoreId(storeId)).thenReturn(Optional.of(benefit));
 
 		UsageCount usageCount = mock(UsageCount.class);
 		when(usageCount.getCount()).thenReturn(2);

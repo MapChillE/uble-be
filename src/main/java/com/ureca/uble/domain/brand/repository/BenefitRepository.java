@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 public interface BenefitRepository extends JpaRepository<Benefit, Long> {
     @Query(value = """
         SELECT *
@@ -17,5 +19,5 @@ public interface BenefitRepository extends JpaRepository<Benefit, Long> {
         )
         LIMIT 1
     """, nativeQuery = true)
-    Benefit findNormalBenefitByStoreId(@Param("storeId") Long storeId);
+    Optional<Benefit> findNormalBenefitByStoreId(@Param("storeId") Long storeId);
 }
