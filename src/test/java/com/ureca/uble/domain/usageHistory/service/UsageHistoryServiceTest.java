@@ -37,11 +37,7 @@ public class UsageHistoryServiceTest {
 		List<UsageHistoryRes> content = List.of(
 			UsageHistoryRes.of(1L, "스타벅스 선릉점", LocalDateTime.now())
 		);
-		CursorPageRes<UsageHistoryRes> expectedResult = CursorPageRes.<UsageHistoryRes>builder()
-			.content(content)
-			.hasNext(false)
-			.lastCursorId(null)
-			.build();
+		CursorPageRes<UsageHistoryRes> expectedResult = CursorPageRes.of(content, false, null);
 		when(usageHistoryRepository.findUsagesByUserId(userId, lastHistoryId, size)).thenReturn(expectedResult);
 
 		//when
