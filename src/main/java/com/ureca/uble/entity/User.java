@@ -36,6 +36,9 @@ public class User extends BaseEntity {
     @Column(name = "is_vip_available")
     private Boolean isVipAvailable;
 
+    @Column(name = "is_local_available")
+    private Boolean isLocalAvailable;
+
     @Column(name = "is_deleted")
     private Boolean isDeleted;
 
@@ -47,12 +50,13 @@ public class User extends BaseEntity {
 
     @Builder(access = PRIVATE)
     private User(String nickname, Rank rank, Role role, String providerId, Boolean isVipAvailable,
-                 Boolean isDeleted, LocalDate birthDate, Gender gender) {
+                 Boolean isLocalAvailable, Boolean isDeleted, LocalDate birthDate, Gender gender) {
         this.nickname = nickname;
         this.rank = rank;
         this.role = role;
         this.providerId = providerId;
         this.isVipAvailable = isVipAvailable;
+        this.isLocalAvailable = isLocalAvailable;
         this.isDeleted = isDeleted;
         this.birthDate = birthDate;
         this.gender = gender;
@@ -66,8 +70,17 @@ public class User extends BaseEntity {
             .role(Role.TMP_USER)
             .isDeleted(false)
             .isVipAvailable(false)
+            .isLocalAvailable(false)
             .birthDate(null)
             .gender(null)
             .build();
+    }
+
+    public void updateVipAvailability(boolean isVipAvailable) {
+        this.isVipAvailable = isVipAvailable;
+    }
+
+    public void updateLocalAvailability(boolean isLocalAvailable) {
+        this.isLocalAvailable = isLocalAvailable;
     }
 }
