@@ -16,16 +16,20 @@ import static lombok.AccessLevel.PRIVATE;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Brand extends BaseEntity {
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
+
     @Column(nullable = false)
     private String name;
 
-    @Column(name = "csr_number", nullable = false)
+    @Column(name = "csr_number")
     private String csrNumber;
 
-    @Column(nullable = false)
+    @Column
     private String description;
 
-    @Column(name = "image_url", nullable = false)
+    @Column(name = "image_url")
     private String imageUrl;
 
     @Enumerated(EnumType.STRING)
@@ -46,8 +50,9 @@ public class Brand extends BaseEntity {
     private RankType rankType;
 
     @Builder(access = PRIVATE)
-    private Brand(String name, String csrNumber, String description, String imageUrl, Season season,
+    private Brand(Category category, String name, String csrNumber, String description, String imageUrl, Season season,
                   Boolean isOnline, Boolean isLocal, String reservationUrl, RankType rankType) {
+        this.category = category;
         this.name = name;
         this.csrNumber = csrNumber;
         this.description = description;
