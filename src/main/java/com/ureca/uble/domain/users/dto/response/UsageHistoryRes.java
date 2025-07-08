@@ -1,4 +1,4 @@
-package com.ureca.uble.domain.usageHistory.dto.response;
+package com.ureca.uble.domain.users.dto.response;
 
 import java.time.LocalDateTime;
 

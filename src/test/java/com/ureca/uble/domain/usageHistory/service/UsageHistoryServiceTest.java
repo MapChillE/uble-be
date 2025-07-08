@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.ureca.uble.domain.users.service.UsageHistoryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,8 +14,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.ureca.uble.domain.usageHistory.dto.response.UsageHistoryRes;
-import com.ureca.uble.domain.usageHistory.repository.UsageHistoryRepository;
+import com.ureca.uble.domain.users.dto.response.UsageHistoryRes;
+import com.ureca.uble.domain.users.repository.UsageHistoryRepository;
 import com.ureca.uble.global.response.CursorPageRes;
 
 @ExtendWith(MockitoExtension.class)
