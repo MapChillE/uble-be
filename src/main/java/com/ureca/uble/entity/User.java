@@ -43,7 +43,6 @@ public class User extends BaseEntity {
     private LocalDate birthDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private Gender gender;
 
     @Builder(access = PRIVATE)
@@ -65,6 +64,10 @@ public class User extends BaseEntity {
             .nickname(nickname)
             .rank(Rank.NORMAL)
             .role(Role.TMP_USER)
+            .isDeleted(false)
+            .isVipAvailable(false)
+            .birthDate(null)
+            .gender(null)
             .build();
     }
 }
