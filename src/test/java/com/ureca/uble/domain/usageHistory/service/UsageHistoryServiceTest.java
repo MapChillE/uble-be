@@ -1,6 +1,7 @@
 package com.ureca.uble.domain.usageHistory.service;
 
 import com.ureca.uble.domain.brand.repository.BenefitRepository;
+import com.ureca.uble.domain.store.repository.StoreRepository;
 import com.ureca.uble.domain.users.dto.request.CreateUsageHistoryReq;
 import com.ureca.uble.domain.users.dto.response.CreateUsageHistoryRes;
 import com.ureca.uble.domain.users.dto.response.UsageHistoryRes;
@@ -39,6 +40,8 @@ public class UsageHistoryServiceTest {
 
 	@Mock
 	private UserRepository userRepository;
+	@Mock
+	private StoreRepository storeRepository;
 	@Mock
 	private UsageHistoryRepository usageHistoryRepository;
 	@Mock
@@ -80,11 +83,11 @@ public class UsageHistoryServiceTest {
 		Long storeId = 100L;
 
 		User vipUser = mock(User.class);
+		Store store = mock(Store.class);
 		when(vipUser.getRank()).thenReturn(Rank.VIP);
 		when(vipUser.getIsVipAvailable()).thenReturn(true);
 		when(userRepository.findById(userId)).thenReturn(Optional.of(vipUser));
-
-		when(em.getReference(Store.class, storeId)).thenReturn(mock(Store.class));
+		when(storeRepository.findById(storeId)).thenReturn(Optional.of(store));
 
 		UsageHistory savedHistory = mock(UsageHistory.class);
 		when(savedHistory.getId()).thenReturn(10L);
@@ -98,6 +101,7 @@ public class UsageHistoryServiceTest {
 		verify(vipUser).updateVipAvailability(false);
 	}
 
+
 	@Test
 	@DisplayName("VIP 혜택을 사용할 수 없는 경우 에러가 발생한다.")
 	void createUsageHistory_vip_fail() {
@@ -106,11 +110,11 @@ public class UsageHistoryServiceTest {
 		Long storeId = 100L;
 
 		User vipUser = mock(User.class);
+		Store store = mock(Store.class);
 		when(vipUser.getRank()).thenReturn(Rank.VIP);
 		when(vipUser.getIsVipAvailable()).thenReturn(false);
 		when(userRepository.findById(userId)).thenReturn(Optional.of(vipUser));
-
-		when(em.getReference(Store.class, storeId)).thenReturn(mock(Store.class));
+		when(storeRepository.findById(storeId)).thenReturn(Optional.of(store));
 
 		// when
 		GlobalException exception = assertThrows(GlobalException.class, () -> {
@@ -131,11 +135,11 @@ public class UsageHistoryServiceTest {
 		Long storeId = 100L;
 
 		User localUser = mock(User.class);
+		Store store = mock(Store.class);
 		when(localUser.getRank()).thenReturn(Rank.PREMIUM);
 		when(localUser.getIsLocalAvailable()).thenReturn(true);
 		when(userRepository.findById(userId)).thenReturn(Optional.of(localUser));
-
-		when(em.getReference(Store.class, storeId)).thenReturn(mock(Store.class));
+		when(storeRepository.findById(storeId)).thenReturn(Optional.of(store));
 
 		UsageHistory savedHistory = mock(UsageHistory.class);
 		when(savedHistory.getId()).thenReturn(10L);
@@ -157,9 +161,11 @@ public class UsageHistoryServiceTest {
 		Long storeId = 100L;
 
 		User localUser = mock(User.class);
+		Store store = mock(Store.class);
 		when(localUser.getRank()).thenReturn(Rank.PREMIUM);
 		when(localUser.getIsLocalAvailable()).thenReturn(false);
 		when(userRepository.findById(userId)).thenReturn(Optional.of(localUser));
+		when(storeRepository.findById(storeId)).thenReturn(Optional.of(store));
 
 		// when
 		GlobalException exception = assertThrows(GlobalException.class, () ->
@@ -180,9 +186,9 @@ public class UsageHistoryServiceTest {
 		Long storeId = 100L;
 
 		User normalUser = mock(User.class);
+		Store store = mock(Store.class);
 		when(userRepository.findById(userId)).thenReturn(Optional.of(normalUser));
-
-		when(em.getReference(Store.class, storeId)).thenReturn(mock(Store.class));
+		when(storeRepository.findById(storeId)).thenReturn(Optional.of(store));
 
 		Benefit benefit = mock(Benefit.class);
 		when(benefit.getNumber()).thenReturn(3);
@@ -210,8 +216,9 @@ public class UsageHistoryServiceTest {
 		Long storeId = 100L;
 
 		User normalUser = mock(User.class);
+		Store store = mock(Store.class);
 		when(userRepository.findById(userId)).thenReturn(Optional.of(normalUser));
-		when(em.getReference(Store.class, storeId)).thenReturn(mock(Store.class));
+		when(storeRepository.findById(storeId)).thenReturn(Optional.of(store));
 
 		Benefit benefit = mock(Benefit.class);
 		when(benefit.getNumber()).thenReturn(2);
