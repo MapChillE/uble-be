@@ -1,6 +1,6 @@
-package com.ureca.uble.domain.usageHistory.repository;
+package com.ureca.uble.domain.users.repository;
 
-import com.ureca.uble.domain.usageHistory.dto.response.UsageHistoryRes;
+import com.ureca.uble.domain.users.dto.response.UsageHistoryRes;
 import com.ureca.uble.global.response.CursorPageRes;
 
 public interface CustomUsageHistoryRepository {

@@ -35,4 +35,18 @@ public class UsageCount extends BaseEntity {
         this.isAvailable = isAvailable;
         this.count = count;
     }
+
+    public static UsageCount of(User user, Benefit benefit, boolean isAvailable, int count) {
+        return UsageCount.builder()
+            .user(user)
+            .benefit(benefit)
+            .isAvailable(isAvailable)
+            .count(count)
+            .build();
+    }
+
+    public void update(int count, boolean isAvailable) {
+        this.count = count;
+        this.isAvailable = isAvailable;
+    }
 }

@@ -1,4 +1,4 @@
-package com.ureca.uble.domain.usageHistory.repository;
+package com.ureca.uble.domain.users.repository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.ureca.uble.domain.usageHistory.dto.response.UsageHistoryRes;
+import com.ureca.uble.domain.users.dto.response.UsageHistoryRes;
 import com.ureca.uble.entity.QStore;
 import com.ureca.uble.entity.QUsageHistory;
 import com.ureca.uble.global.response.CursorPageRes;
