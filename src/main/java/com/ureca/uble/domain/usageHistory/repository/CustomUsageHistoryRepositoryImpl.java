@@ -50,7 +50,7 @@ public class CustomUsageHistoryRepositoryImpl implements CustomUsageHistoryRepos
 			results = results.subList(0, size);
 		}
 
-		return CursorPageRes.of(results, hasNext, lastHistoryId);
+		return CursorPageRes.of(results, hasNext, nextCursor);
 	}
 
 	private BooleanExpression ltHistoryId(Long lastHistoryId, QUsageHistory usage) {
