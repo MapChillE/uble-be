@@ -10,7 +10,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ureca.uble.domain.usageHistory.dto.response.UsageHistoryRes;
 import com.ureca.uble.entity.QStore;
 import com.ureca.uble.entity.QUsageHistory;
-import com.ureca.uble.global.dto.response.CursorPageRes;
+import com.ureca.uble.global.response.CursorPageRes;
 
 import lombok.RequiredArgsConstructor;
 
@@ -50,11 +50,7 @@ public class CustomUsageHistoryRepositoryImpl implements CustomUsageHistoryRepos
 			results = results.subList(0, size);
 		}
 
-		return CursorPageRes.<UsageHistoryRes>builder()
-			.content(results)
-			.hasNext(hasNext)
-			.lastCursorId(nextCursor)
-			.build();
+		return CursorPageRes.of(results, hasNext, nextCursor);
 	}
 
 	private BooleanExpression ltHistoryId(Long lastHistoryId, QUsageHistory usage) {
