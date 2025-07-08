@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ureca.uble.domain.usageHistory.dto.response.UsageHistoryRes;
 import com.ureca.uble.entity.QStore;
@@ -29,7 +30,8 @@ public class CustomUsageHistoryRepositoryImpl implements CustomUsageHistoryRepos
 			.join(usage.store, store).fetchJoin()
 			.where(
 				usage.user.id.eq(userId),
-				lastHistoryId != null ? usage.id.lt(lastHistoryId) : null)
+				ltHistoryId(lastHistoryId, usage)
+			)
 			.orderBy(usage.id.desc())
 			.limit(size + 1)
 			.fetch()
@@ -53,5 +55,9 @@ public class CustomUsageHistoryRepositoryImpl implements CustomUsageHistoryRepos
 			.hasNext(hasNext)
 			.lastCursorId(nextCursor)
 			.build();
+	}
+
+	private BooleanExpression ltHistoryId(Long lastHistoryId, QUsageHistory usage) {
+		return lastHistoryId != null ? usage.id.lt(lastHistoryId) : null;
 	}
 }
