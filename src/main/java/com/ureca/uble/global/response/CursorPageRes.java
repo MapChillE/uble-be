@@ -1,4 +1,4 @@
-package com.ureca.uble.global.dto.response;
+package com.ureca.uble.global.response;
 
 import java.util.List;
 
@@ -18,4 +18,12 @@ public class CursorPageRes<T> {
 
 	@Schema(description = "마지막 커서 ID", example = "99")
 	private Long lastCursorId;
+
+	public static <T> CursorPageRes<T> of(List<T> content, boolean hasNext, Long lastCursorId) {
+		return CursorPageRes.<T>builder()
+			.content(content)
+			.hasNext(hasNext)
+			.lastCursorId(lastCursorId)
+			.build();
+	}
 }

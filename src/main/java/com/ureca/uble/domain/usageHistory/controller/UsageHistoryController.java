@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ureca.uble.domain.usageHistory.dto.response.UsageHistoryRes;
 import com.ureca.uble.domain.usageHistory.service.UsageHistoryService;
-import com.ureca.uble.global.dto.response.CursorPageRes;
+import com.ureca.uble.global.response.CursorPageRes;
 import com.ureca.uble.global.response.CommonResponse;
 
 import io.swagger.v3.oas.annotations.Operation;

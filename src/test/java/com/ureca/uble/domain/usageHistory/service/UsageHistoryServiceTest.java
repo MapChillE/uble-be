@@ -15,7 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.ureca.uble.domain.usageHistory.dto.response.UsageHistoryRes;
 import com.ureca.uble.domain.usageHistory.repository.UsageHistoryRepository;
-import com.ureca.uble.global.dto.response.CursorPageRes;
+import com.ureca.uble.global.response.CursorPageRes;
 
 @ExtendWith(MockitoExtension.class)
 public class UsageHistoryServiceTest {
