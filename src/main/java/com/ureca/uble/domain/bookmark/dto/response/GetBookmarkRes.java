@@ -7,6 +7,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
+@Schema(description = "즐겨찾기 정보 반환 DTO")
 public class GetBookmarkRes {
     @Schema(description = "즐겨찾기 id", example = "true")
     private Long bookmarkId;
