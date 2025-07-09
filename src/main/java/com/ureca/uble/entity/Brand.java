@@ -10,6 +10,9 @@ import lombok.NoArgsConstructor;
 
 import static lombok.AccessLevel.PRIVATE;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name="brand")
 @Getter
@@ -48,6 +51,9 @@ public class Brand extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "rank_type", nullable = false)
     private RankType rankType;
+
+    @OneToMany(mappedBy = "brand", fetch = FetchType.LAZY)
+    private List<Benefit> benefits = new ArrayList<>();
 
     @Builder(access = PRIVATE)
     private Brand(Category category, String name, String csrNumber, String description, String imageUrl, Season season,

@@ -3,6 +3,7 @@ package com.ureca.uble.domain.brand.dto.response;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.ureca.uble.entity.Brand;
 import com.ureca.uble.entity.enums.Season;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -46,32 +47,19 @@ public class BrandDetailRes {
 	@Schema(description = "혜택 리스트")
 	private List<BenefitRes> benefits;
 
-	public static BrandDetailRes of(BrandDetailRes detail, List<BenefitRes> benefits) {
+	public static BrandDetailRes of(Brand brand, boolean isBookmarked, Long bookmarkId, List<BenefitRes> benefits) {
 		return BrandDetailRes.builder()
-			.brandId(detail.getBrandId())
-			.name(detail.getName())
-			.csrNumber(detail.getCsrNumber())
-			.description(detail.getDescription())
-			.imgUrl(detail.getImgUrl())
-			.season(detail.getSeason())
-			.categoryName(detail.getCategoryName())
-			.isBookmarked(detail.isBookmarked())
-			.bookmarkId(detail.getBookmarkId())
+			.brandId(brand.getId())
+			.name(brand.getName())
+			.csrNumber(brand.getCsrNumber())
+			.description(brand.getDescription())
+			.imgUrl(brand.getImageUrl())
+			.season(brand.getSeason())
+			.categoryName(brand.getCategory().getName())
+			.isBookmarked(isBookmarked)
+			.bookmarkId(bookmarkId)
 			.benefits(benefits)
 			.build();
 	}
 
-	public BrandDetailRes(Long brandId, String name, String csrNumber, String description,
-		String imgUrl, Season season, String categoryName,
-		boolean isBookmarked, Long bookmarkId) {
-		this.brandId = brandId;
-		this.name = name;
-		this.csrNumber = csrNumber;
-		this.description = description;
-		this.imgUrl = imgUrl;
-		this.season = season;
-		this.categoryName = categoryName;
-		this.isBookmarked = isBookmarked;
-		this.bookmarkId = bookmarkId;
-	}
 }
