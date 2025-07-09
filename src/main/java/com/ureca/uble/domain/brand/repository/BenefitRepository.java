@@ -1,10 +1,12 @@
 package com.ureca.uble.domain.brand.repository;
 
+import com.ureca.uble.domain.brand.dto.response.BenefitRes;
 import com.ureca.uble.entity.Benefit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface BenefitRepository extends JpaRepository<Benefit, Long> {
@@ -20,4 +22,14 @@ public interface BenefitRepository extends JpaRepository<Benefit, Long> {
         LIMIT 1
     """, nativeQuery = true)
     Optional<Benefit> findNormalBenefitByStoreId(@Param("storeId") Long storeId);
+
+    @Query("""
+		SELECT new com.ureca.uble.domain.brand.dto.response.BenefitRes(
+			b.rank, b.content, b.manual, b.period, b.number
+		)
+		FROM Benefit b
+		WHERE b.brand.id = :brandId
+		ORDER BY b.rank
+	""")
+    List<BenefitRes> findAllByBrandId(@Param("brandId") Long brandId);
 }
