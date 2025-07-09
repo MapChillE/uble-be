@@ -15,6 +15,9 @@ public enum Period {
     private final String name;
 
     public String formatProvisionCount(Integer count){
-        return String.format("%s %d회", name, count);
+        if (count == null) {
+           return this == NONE ? "제한없음" : name;
+        }
+        return this == NONE ? "제한없음" : String.format("%s %d회", name, count);
     }
 }
