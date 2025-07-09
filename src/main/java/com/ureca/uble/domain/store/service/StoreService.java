@@ -23,10 +23,10 @@ public class StoreService {
     /**
      * 근처 매장 정보 조회
      */
-    public GetStoreListRes getStores(double latitude, double longitude, int distance, Long categoryId, Season season, Boolean isLocal) {
+    public GetStoreListRes getStores(double latitude, double longitude, int distance, Long categoryId, Long brandId, Season season, Boolean isLocal) {
         Point curPoint = getPoint(latitude, longitude);
 
-        List<GetStoreRes> storeList = storeRepository.findStoresByFiltering(curPoint, distance, categoryId, season, isLocal)
+        List<GetStoreRes> storeList = storeRepository.findStoresByFiltering(curPoint, distance, categoryId, brandId, season, isLocal)
             .stream().map(GetStoreRes::from).toList();
 
         return new GetStoreListRes(storeList);

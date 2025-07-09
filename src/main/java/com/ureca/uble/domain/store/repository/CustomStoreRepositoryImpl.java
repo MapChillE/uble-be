@@ -21,7 +21,7 @@ public class CustomStoreRepositoryImpl implements CustomStoreRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<Store> findStoresByFiltering(Point curPoint, int distance, Long categoryId, Season season, Boolean isLocal) {
+    public List<Store> findStoresByFiltering(Point curPoint, int distance, Long categoryId, Long brandId, Season season, Boolean isLocal) {
         return jpaQueryFactory
             .select(store)
             .from(store)
@@ -29,6 +29,7 @@ public class CustomStoreRepositoryImpl implements CustomStoreRepository {
             .where(
                 withinRadius(curPoint, distance),
                 categoryIdEq(categoryId),
+                brandIdEq(brandId),
                 seasonEq(season),
                 isLocalEq(isLocal)
             )
@@ -43,6 +44,10 @@ public class CustomStoreRepositoryImpl implements CustomStoreRepository {
 
     private BooleanExpression categoryIdEq(Long categoryId) {
         return categoryId == null ? null : brand.category.id.eq(categoryId);
+    }
+
+    private BooleanExpression brandIdEq(Long brandId) {
+        return brandId == null ? null : brand.id.eq(brandId);
     }
 
     private BooleanExpression seasonEq(Season season) {

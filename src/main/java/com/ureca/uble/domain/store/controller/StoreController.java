@@ -40,11 +40,13 @@ public class StoreController {
         @RequestParam(defaultValue = "500") int distance,
         @Parameter(description = "카테고리 id 필터링")
         @RequestParam(required = false) Long categoryId,
+        @Parameter(description = "제휴처 id 필터링")
+        @RequestParam(required = false) Long brandId,
         @Parameter(description = "계절 필터링")
         @RequestParam(required = false) Season season,
         @Parameter(description = "우리 동네 필터링")
         @RequestParam(required = false) Boolean isLocal) {
-        return CommonResponse.success(storeService.getStores(latitude, longitude, distance, categoryId, season, isLocal));
+        return CommonResponse.success(storeService.getStores(latitude, longitude, distance, categoryId, brandId, season, isLocal));
     }
 
 }

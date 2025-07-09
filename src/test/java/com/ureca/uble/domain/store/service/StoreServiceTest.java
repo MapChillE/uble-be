@@ -43,6 +43,7 @@ class StoreServiceTest {
 
         int distance = 500;
         Long categoryId = null;
+        Long brandId = null;
         Season season = null;
         Boolean isLocal = null;
 
@@ -52,11 +53,11 @@ class StoreServiceTest {
         when(mockStore.getLocation()).thenReturn(storeLocation);
 
         when(storeRepository.findStoresByFiltering(
-            any(Point.class), anyInt(), any(), any(), any()))
+            any(Point.class), anyInt(), any(), any(), any(), any()))
             .thenReturn(List.of(mockStore));
 
         // when
-        GetStoreListRes result = storeService.getStores(testPoint.getY(), testPoint.getX(), distance, categoryId, season, isLocal);
+        GetStoreListRes result = storeService.getStores(testPoint.getY(), testPoint.getX(), distance, categoryId, brandId, season, isLocal);
 
         // then
         assertNotNull(result);
