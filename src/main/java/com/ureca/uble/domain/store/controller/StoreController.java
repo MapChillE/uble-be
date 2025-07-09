@@ -26,6 +26,7 @@ public class StoreController {
      * @param longitude 경도
      * @param distance 거리
      * @param categoryId 카테고리 id
+     * @param brandId 제휴처 id
      * @param season 계절 정보
      * @param isLocal 우리 동네 여부
      */
