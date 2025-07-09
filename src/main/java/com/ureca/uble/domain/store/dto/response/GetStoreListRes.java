@@ -10,6 +10,6 @@ import java.util.List;
 @AllArgsConstructor
 @Schema(description = "매장 리스트 반환 DTO")
 public class GetStoreListRes {
-    @Schema(description = "매장 id", example = "1")
+    @Schema(description = "매장 리스트", example = "매장 정보 리스트")
     private List<GetStoreRes> storeList;
 }

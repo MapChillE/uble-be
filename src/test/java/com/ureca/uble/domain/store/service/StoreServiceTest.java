@@ -6,13 +6,14 @@ import com.ureca.uble.entity.Store;
 import com.ureca.uble.entity.enums.Season;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
@@ -23,6 +24,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class StoreServiceTest {
 
     @Mock
@@ -34,7 +36,6 @@ class StoreServiceTest {
     @Test
     @DisplayName("반경 500m 내의 매장 중 필터링 조건에 맞는 매장 리스트를 조회합니다.")
     void getStores_get_check() {
-        MockitoAnnotations.openMocks(this);
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 
         // given

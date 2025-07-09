@@ -25,8 +25,8 @@ public class GetStoreRes {
         return GetStoreRes.builder()
             .storeId(store.getId())
             .storeName(store.getName())
-            .latitude(store.getLocation().getX())
-            .longitude(store.getLocation().getY())
+            .latitude(store.getLocation().getY())
+            .longitude(store.getLocation().getX())
             .build();
     }
 }
