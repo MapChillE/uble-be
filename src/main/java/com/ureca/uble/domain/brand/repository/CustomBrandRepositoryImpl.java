@@ -28,7 +28,7 @@ public class CustomBrandRepositoryImpl implements CustomBrandRepository {
 				categoryIdEq(categoryId),
 				seasonEq(season),
 				isLocalEq(isLocal),
-				ltBrandId(lastBrandId)
+				gtBrandId(lastBrandId)
 			)
 			.orderBy(brand.id.asc())
 			.limit(size)
@@ -47,5 +47,5 @@ public class CustomBrandRepositoryImpl implements CustomBrandRepository {
 		return isLocal == null ? null : brand.isLocal.eq(isLocal);
 	}
 
-	private BooleanExpression ltBrandId(Long lastBrandId) { return lastBrandId == null ? null : brand.id.lt(lastBrandId); }
+	private BooleanExpression gtBrandId(Long lastBrandId) { return lastBrandId == null ? null : brand.id.gt(lastBrandId); }
 }
