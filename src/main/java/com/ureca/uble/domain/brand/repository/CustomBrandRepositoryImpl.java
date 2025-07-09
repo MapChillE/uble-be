@@ -47,5 +47,7 @@ public class CustomBrandRepositoryImpl implements CustomBrandRepository {
 		return isLocal == null ? null : brand.isLocal.eq(isLocal);
 	}
 
-	private BooleanExpression gtBrandId(Long lastBrandId) { return lastBrandId == null ? null : brand.id.gt(lastBrandId); }
+	private BooleanExpression gtBrandId(Long lastBrandId) {
+		return lastBrandId == null ? null : brand.id.gt(lastBrandId);
+	}
 }
