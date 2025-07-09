@@ -1,11 +1,9 @@
 package com.ureca.uble.domain.store.service;
 
 import com.ureca.uble.domain.store.dto.response.GetStoreListRes;
-import com.ureca.uble.domain.store.dto.response.GetStoreRes;
 import com.ureca.uble.domain.store.repository.StoreRepository;
 import com.ureca.uble.entity.Store;
 import com.ureca.uble.entity.enums.Season;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
@@ -18,8 +16,10 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
