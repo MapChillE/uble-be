@@ -22,11 +22,10 @@ public class BenefitListRes {
 	private String provisionCount;
 
 	public static BenefitListRes from(Benefit benefit) {
-		String provisionCount = benefit.getPeriod().formatProvisionCount(benefit.getNumber());
 		return BenefitListRes.builder()
 			.rank(benefit.getRank())
 			.content(benefit.getContent())
-			.provisionCount(provisionCount)
+			.provisionCount(benefit.getPeriod().formatProvisionCount(benefit.getNumber()))
 			.build();
 	}
 
