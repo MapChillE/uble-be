@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.ureca.uble.entity.Brand;
 
-public interface BrandRepository extends JpaRepository<Brand, Long> {
+public interface BrandRepository extends JpaRepository<Brand, Long>, CustomBrandRepository {
 
 	@Query("""
 		SELECT b from Brand b
