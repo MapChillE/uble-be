@@ -28,20 +28,15 @@ public class Store extends BaseEntity {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(name = "operation_time")
-    private String operationTime;
-
     @Column(columnDefinition = "geography(Point,4326)")
     private Point location;
 
     @Builder(access = PRIVATE)
-    private Store(Brand brand, String name, String address, String phoneNumber,
-                  String operationTime, Point location) {
+    private Store(Brand brand, String name, String address, String phoneNumber, Point location) {
         this.brand = brand;
         this.name = name;
         this.address = address;
         this.phoneNumber = phoneNumber;
-        this.operationTime = operationTime;
         this.location = location;
     }
 }
