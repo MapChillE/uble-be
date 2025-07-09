@@ -26,7 +26,7 @@ public class BrandController {
 	public CommonResponse<BrandDetailRes> getBrandDetail(
 		@Parameter(description = "사용자정보", required = true)
 		@AuthenticationPrincipal Long userId,
-		@Parameter(description = "즐겨찾기 id", required = true)
+		@Parameter(description = "제휴처 id", required = true)
 		@PathVariable Long brandId
 	) {
 		return CommonResponse.success(brandService.getBrandDetail(userId, brandId));
