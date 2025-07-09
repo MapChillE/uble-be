@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ureca.uble.domain.bookmark.repository.BookmarkRepository;
 import com.ureca.uble.domain.brand.dto.response.BenefitDetailRes;
@@ -27,6 +28,7 @@ public class BrandService {
 	private final BrandRepository brandRepository;
 	private final BookmarkRepository bookmarkRepository;
 
+	@Transactional(readOnly = true)
 	public BrandDetailRes getBrandDetail(Long userId, Long brandId) {
 		Brand brand = brandRepository.findWithBenefitsById(brandId)
 			.orElseThrow(() -> new GlobalException(BrandErrorCode.BRAND_NOT_FOUND));
@@ -42,6 +44,7 @@ public class BrandService {
 		return BrandDetailRes.of(brand, isBookmarked, bookmarkId, benefits);
 	}
 
+	@Transactional(readOnly = true)
 	public CursorPageRes<BrandListRes> getBrandList(Long userId, Long categoryId, Season season, Boolean isLocal, Long lastBrandId, int size) {
 
 		List<Brand> brands = brandRepository.findWithFilterAndCursor(categoryId, season, isLocal, lastBrandId, size+1);
