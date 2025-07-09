@@ -28,9 +28,7 @@ public class StoreService {
 
         List<GetStoreRes> storeList = storeRepository.findStoresByFiltering(curPoint, distance, categoryId, season, isLocal)
             .stream().map(GetStoreRes::from).toList();
-        for (int i = 0; i < storeList.size(); i++) {
-            System.out.println(storeList.get(i).getStoreName());
-        }
+
         return new GetStoreListRes(storeList);
     }
 
