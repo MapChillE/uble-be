@@ -46,7 +46,8 @@ public class BrandServiceTest {
 
 		Brand mockBrand = mock(Brand.class);
 		when(mockBrand.getId()).thenReturn(brandId);
-		when(mockBrand.getName()).thenReturn("투썸 플레이스");when(mockBrand.getCsrNumber()).thenReturn("1234-5678");
+		when(mockBrand.getName()).thenReturn("투썸 플레이스");
+		when(mockBrand.getCsrNumber()).thenReturn("1234-5678");
 		when(mockBrand.getDescription()).thenReturn("설명");
 		when(mockBrand.getImageUrl()).thenReturn("https://image.com");
 		when(mockBrand.getSeason()).thenReturn(Season.SPRING);

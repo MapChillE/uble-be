@@ -9,7 +9,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-@Schema(description="등급별 헤택 간략 정보 DTO")
+@Schema(description="등급별 혜택 간략 정보 DTO")
 public class BenefitListRes {
 
 	@Schema(description = "등급", example="우수/VIP/VVIP")

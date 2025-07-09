@@ -11,7 +11,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-@Schema(description="제휴처 상세 정보 조회 응답 DTO")
+@Schema(description="제휴처 목록 정보 조회 응답 DTO")
 public class BrandListRes {
 	@Schema(description = "제휴처 ID", example = "12")
 	private Long brandId;
