@@ -17,10 +17,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class KakaoOauthClient {
 
-	@Value("${KAKAO_CLIENT_ID}")
+	@Value("${kakao.client-id}")
 	private String clientId;
 
-	@Value("${KAKAO_REDIRECT_URI}")
+	@Value("${kakao.redirect-uri}")
 	private String redirectUri;
 
 	private final WebClient kakaoAuthWebClient;
