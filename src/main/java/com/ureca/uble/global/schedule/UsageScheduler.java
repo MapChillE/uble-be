@@ -20,7 +20,7 @@ public class UsageScheduler {
 
     // 하루에 한 번 (매일 자정)
 //    @Scheduled(cron = "0 0 0 * * *")
-    @Scheduled(cron = "0 0/5 * * * *") // 매 5분마다 실행
+    @Scheduled(cron = "0 0,6,12,18,24,30,36,42,48,54 * * * *")
     public void updateDaily() {
         redisLockUtil.executeWithLockWithRetry("normal-daily-lock", 1, 300, () -> {
             log.info("[NORMAL] DAILY 초기화 작업 시작: {}", LocalDateTime.now());
@@ -31,7 +31,7 @@ public class UsageScheduler {
 
     // 일주에 한 번 (매주 월요일 자정)
 //    @Scheduled(cron = "0 0 0 * * 1")
-    @Scheduled(cron = "0 1/5 * * * *") // 매 5분마다 1분부터 실행 (1,6,11,...)
+    @Scheduled(cron = "0 1,7,13,19,25,31,37,43,49,55 * * * *")
     public void updateWeekly() {
         redisLockUtil.executeWithLockWithRetry("normal-weekly-lock", 1, 300, () -> {
             log.info("[NORMAL] WEEKLY 초기화 작업 시작: {}", LocalDateTime.now());
@@ -42,7 +42,7 @@ public class UsageScheduler {
 
     // 한달에 한 번 (매월 1일 자정)
 //    @Scheduled(cron = "0 0 0 1 * *")
-    @Scheduled(cron = "0 2/5 * * * *") // 매 5분마다 2분부터 실행 (2,7,12,...)
+    @Scheduled(cron = "0 2,8,14,20,26,32,38,44,50,56 * * * *")
     public void updateMonthly() {
         redisLockUtil.executeWithLockWithRetry("normal-monthly-lock", 1, 300, () -> {
             log.info("[NORMAL] MONTHLY 초기화 작업 시작: {}", LocalDateTime.now());
@@ -53,7 +53,7 @@ public class UsageScheduler {
 
     // 일년에 한 번 (매년 1월 1일 자정)
 //    @Scheduled(cron = "0 0 0 1 1 *")
-    @Scheduled(cron = "0 3/5 * * * *") // 매 5분마다 3분부터 실행 (3,8,13,...)
+    @Scheduled(cron = "0 3,9,15,21,27,33,39,45,51,57 * * * *")
     public void updateYearly() {
         redisLockUtil.executeWithLockWithRetry("normal-yearly-lock", 1, 300, () -> {
             log.info("[NORMAL] YEARLY 초기화 작업 시작: {}", LocalDateTime.now());
@@ -64,7 +64,7 @@ public class UsageScheduler {
 
     // 한달에 한 번 (매월 1일 자정)
 //    @Scheduled(cron = "0 0 0 1 * *")
-    @Scheduled(cron = "0 4/5 * * * *") // 매 5분마다 4분부터 실행 (4,9,14,...)
+    @Scheduled(cron = "0 4,10,16,22,28,34,40,46,52,58 * * * *")
     public void updateVip() {
         redisLockUtil.executeWithLockWithRetry("vip-monthly-lock", 1, 300, () -> {
             log.info("[VIP] MONTHLY 초기화 작업 시작: {}", LocalDateTime.now());
@@ -75,7 +75,7 @@ public class UsageScheduler {
 
     // 하루에 한 번 (매일 자정)
 //    @Scheduled(cron = "0 0 0 * * *")
-    @Scheduled(cron = "0 5/5 * * * *") // 매 5분마다 5분부터 실행 (5,10,15,...)
+    @Scheduled(cron = "0 5,11,17,23,29,35,41,47,53,59 * * * *")
     public void updateLocal() {
         redisLockUtil.executeWithLockWithRetry("local-daily-lock", 1, 300, () -> {
             log.info("[LOCAL] DAILY 초기화 작업 시작: {}", LocalDateTime.now());
