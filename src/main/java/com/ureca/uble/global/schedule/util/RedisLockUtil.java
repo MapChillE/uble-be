@@ -48,6 +48,11 @@ public class RedisLockUtil {
         } finally {
             // 항상 락 해제
             if (isLocked && lock.isHeldByCurrentThread()) {
+                try {
+                    Thread.sleep(60000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 lock.unlock();
             }
         }
