@@ -57,7 +57,12 @@ public class NormalBatchConfig {
         @Value("#{jobParameters['period']}") String periodStr) {
         JpaPagingItemReader<Benefit> reader = new JpaPagingItemReader<>();
         reader.setEntityManagerFactory(entityManagerFactory);
-        reader.setQueryString("SELECT b FROM Benefit b WHERE b.period = :period AND b.rank = :rank");
+        reader.setQueryString(
+            "SELECT b FROM Benefit b " +
+                "JOIN b.brand br " +
+                "WHERE b.period = :period " +
+                "AND (br.rankType = 'NORMAL' OR (br.rankType = 'VIP_NORMAL' AND b.rank != 'VIP')) "
+        );
         reader.setParameterValues(Map.of(
             "period", Period.valueOf(periodStr),
             "rank", Rank.NORMAL
