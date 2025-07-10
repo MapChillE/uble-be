@@ -117,6 +117,10 @@ public class AuthService {
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> new GlobalException(UserErrorCode.USER_NOT_FOUND));
 
+		if(user.getIsDeleted()){
+			throw new GlobalException(UserErrorCode.USER_ALREADY_DELETED);
+		}
+
 		user.updateIsDeleted();
 
 		tokenRepository.deleteByUser(user);
