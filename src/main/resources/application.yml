@@ -23,6 +23,13 @@ spring:
         mode: always
         encoding: UTF-8
 
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      ssl:
+        enabled: true
+
 kakao:
   client-id: ${KAKAO_CLIENT_ID}
   redirect-uri: ${KAKAO_REDIRECT_URI}
@@ -31,5 +38,6 @@ jwt:
   secret: ${JWT_SECRET}
   access-token-validity: 1800000
   refresh-token-validity: 604800000
+
 domain:
   base-url: ${DOMAIN_BASE_URL}
