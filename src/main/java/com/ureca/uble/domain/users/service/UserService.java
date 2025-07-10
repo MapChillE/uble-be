@@ -49,7 +49,7 @@ public class UserService {
 			request.getBirthDate()
 		);
 
-		userCategoryRepository.deleteByUserId(userId);
+		userCategoryRepository.deleteByUser(user);
 
 		List<Category> categories = categoryRepository.findAllById(request.getCategoryIds());
 		categories.forEach(category -> {

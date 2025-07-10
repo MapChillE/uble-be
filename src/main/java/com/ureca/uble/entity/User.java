@@ -98,4 +98,6 @@ public class User extends BaseEntity {
             this.role = Role.USER;
         }
     }
+
+    public void updateIsDeleted() { this.isDeleted = true; }
 }

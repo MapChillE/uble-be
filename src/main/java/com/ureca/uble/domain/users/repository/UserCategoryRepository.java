@@ -9,5 +9,5 @@ import com.ureca.uble.entity.UserCategory;
 
 public interface UserCategoryRepository extends JpaRepository<UserCategory, Long> {
 	List<UserCategory> findByUser(User user);
-	void deleteByUserId(Long userId);
+	void deleteByUser(User user);
 }

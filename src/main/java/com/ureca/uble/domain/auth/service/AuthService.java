@@ -6,9 +6,17 @@ import org.springframework.stereotype.Service;
 
 import com.ureca.uble.domain.auth.api.KakaoOauthClient;
 import com.ureca.uble.domain.auth.dto.response.KakaoUserRes;
+import com.ureca.uble.domain.auth.dto.response.WithdrawRes;
 import com.ureca.uble.domain.auth.exception.AuthErrorCode;
+import com.ureca.uble.domain.bookmark.repository.BookmarkRepository;
+import com.ureca.uble.domain.brand.repository.BenefitRepository;
+import com.ureca.uble.domain.feedback.repository.FeedbackRepository;
 import com.ureca.uble.domain.token.repository.TokenRepository;
 import com.ureca.uble.domain.users.exception.UserErrorCode;
+import com.ureca.uble.domain.users.repository.PinRepository;
+import com.ureca.uble.domain.users.repository.UsageCountRepository;
+import com.ureca.uble.domain.users.repository.UsageHistoryRepository;
+import com.ureca.uble.domain.users.repository.UserCategoryRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.Token;
 import com.ureca.uble.entity.User;
@@ -30,6 +38,12 @@ public class AuthService {
 	private final JwtProvider jwtProvider;
 	private final JwtValidator jwtValidator;
 	private final KakaoOauthClient kakaoOauthClient;
+	private final UserCategoryRepository userCategoryRepository;
+	private final UsageHistoryRepository usageHistoryRepository;
+	private final BookmarkRepository bookmarkRepository;
+	private final PinRepository pinRepository;
+	private final UsageCountRepository usageCountRepository;
+	private final FeedbackRepository feedbackRepository;
 
 	@Transactional
 	public User login(String code, HttpServletResponse response) {
@@ -96,5 +110,23 @@ public class AuthService {
 		tokenRepository.deleteByUser(user);
 
 		jwtProvider.deleteRefreshTokenCookie(response);
+	}
+
+	@Transactional
+	public WithdrawRes withdraw(Long userId) {
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new GlobalException(UserErrorCode.USER_NOT_FOUND));
+
+		user.updateIsDeleted();
+
+		tokenRepository.deleteByUser(user);
+		pinRepository.deleteByUser(user);
+		userCategoryRepository.deleteByUser(user);
+		usageHistoryRepository.deleteByUser(user);
+		usageCountRepository.deleteByUser(user);
+		feedbackRepository.deleteByUser(user);
+		bookmarkRepository.deleteByUser(user);
+
+		return new WithdrawRes();
 	}
 }

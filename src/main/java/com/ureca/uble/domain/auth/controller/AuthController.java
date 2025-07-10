@@ -1,6 +1,8 @@
 package com.ureca.uble.domain.auth.controller;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +12,7 @@ import com.ureca.uble.domain.auth.dto.request.KakaoLoginReq;
 import com.ureca.uble.domain.auth.dto.response.KakaoLoginRes;
 import com.ureca.uble.domain.auth.dto.response.LogoutRes;
 import com.ureca.uble.domain.auth.dto.response.ReissueRes;
+import com.ureca.uble.domain.auth.dto.response.WithdrawRes;
 import com.ureca.uble.domain.auth.exception.AuthErrorCode;
 import com.ureca.uble.domain.auth.service.AuthService;
 import com.ureca.uble.entity.User;
@@ -17,6 +20,7 @@ import com.ureca.uble.global.exception.GlobalException;
 import com.ureca.uble.global.response.CommonResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -53,6 +57,15 @@ public class AuthController {
 		}
 		authService.logout(refreshToken, response);
 		return CommonResponse.success(new LogoutRes());
+	}
+
+	@DeleteMapping("/withdraw")
+	@Operation(summary = "회원탈퇴", description = "isDeleted값을 true로 바꾸고 관련 정보를 삭제합니다.")
+	public CommonResponse<WithdrawRes> withdraw(
+		@Parameter(description = "사용자정보", required = true)
+		@AuthenticationPrincipal Long userId
+	){
+		return CommonResponse.success(authService.withdraw(userId));
 	}
 
 }
