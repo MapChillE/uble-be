@@ -73,7 +73,7 @@ public class UserServiceTest {
 
 	@Test
 	@DisplayName("사용자가 존재하지 않을 시 사용자 정보 조회에 실패한다.")
-	void getUserInfo_userNotFount(){
+	void getUserInfo_userNotFound(){
 		//given
 		when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
@@ -117,7 +117,7 @@ public class UserServiceTest {
 
 	@Test
 	@DisplayName("사용자가 존재하지 않을 시 사용자 정보 갱신에 실패한다.")
-	void updateUserInfo_userNotFount(){
+	void updateUserInfo_userNotFound(){
 		//given
 		when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
