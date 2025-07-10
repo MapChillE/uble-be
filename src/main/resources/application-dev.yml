@@ -1,0 +1,8 @@
+jwt:
+  cookie:
+    domain: localhost
+    secure: false
+    same-site: Lax
+
+redis:
+  ssl-enable: false

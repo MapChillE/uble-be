@@ -27,4 +27,11 @@ public class UsageHistory extends BaseEntity {
         this.user = user;
         this.store = store;
     }
+
+    public static UsageHistory of(User user, Store store) {
+        return UsageHistory.builder()
+            .user(user)
+            .store(store)
+            .build();
+    }
 }
