@@ -1,6 +1,7 @@
 package com.ureca.uble.domain.auth.service;
 
 import static org.assertj.core.api.AssertionsForClassTypes.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDateTime;
@@ -15,10 +16,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.ureca.uble.domain.auth.api.KakaoOauthClient;
 import com.ureca.uble.domain.auth.dto.response.KakaoUserRes;
+import com.ureca.uble.domain.auth.dto.response.WithdrawRes;
+import com.ureca.uble.domain.bookmark.repository.BookmarkRepository;
+import com.ureca.uble.domain.feedback.repository.FeedbackRepository;
 import com.ureca.uble.domain.token.repository.TokenRepository;
+import com.ureca.uble.domain.users.repository.PinRepository;
+import com.ureca.uble.domain.users.repository.UsageCountRepository;
+import com.ureca.uble.domain.users.repository.UsageHistoryRepository;
+import com.ureca.uble.domain.users.repository.UserCategoryRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.Token;
 import com.ureca.uble.entity.User;
+import com.ureca.uble.global.exception.GlobalException;
 import com.ureca.uble.global.security.jwt.JwtProvider;
 import com.ureca.uble.global.security.jwt.JwtValidator;
 
@@ -35,6 +44,24 @@ public class AuthServiceTest {
 
 	@Mock
 	private TokenRepository tokenRepository;
+
+	@Mock
+	private PinRepository pinRepository;
+
+	@Mock
+	private UserCategoryRepository userCategoryRepository;
+
+	@Mock
+	private UsageCountRepository usageCountRepository;
+
+	@Mock
+	private UsageHistoryRepository usageHistoryRepository;
+
+	@Mock
+	private FeedbackRepository feedbackRepository;
+
+	@Mock
+	private BookmarkRepository bookmarkRepository;
 
 	@Mock
 	private JwtProvider jwtProvider;
@@ -127,5 +154,41 @@ public class AuthServiceTest {
 		// then
 		verify(tokenRepository).deleteByUser(user);
 		verify(jwtProvider).deleteRefreshTokenCookie(response);
+	}
+
+	@Test
+	@DisplayName("회원 탈퇴 성공 시 관련 데이터를 삭제하고 isDeleted를 true로 설정한다.")
+	void withdrawSuccess(){
+		//given
+		Long userId = 1L;
+		User user = mock(User.class);
+		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+		//when
+		WithdrawRes res = authService.withdraw(userId);
+
+		//then
+		verify(user).updateIsDeleted();
+		verify(tokenRepository).deleteByUser(user);
+		verify(pinRepository).deleteByUser(user);
+		verify(userCategoryRepository).deleteByUser(user);
+		verify(usageCountRepository).deleteByUser(user);
+		verify(usageHistoryRepository).deleteByUser(user);
+		verify(feedbackRepository).deleteByUser(user);
+		verify(bookmarkRepository).deleteByUser(user);
+
+		assertThat(res).isNotNull();
+	}
+
+	@Test
+	@DisplayName("존재하지 않는 사용자인 경우 회원탈퇴에 실패합니다.")
+	void withdrawFail(){
+		//given
+		Long userId = 1L;
+		when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+		//when, then
+		assertThrows(GlobalException.class, () -> authService.withdraw(userId));
+		verify(tokenRepository, never()).deleteByUser(any());
 	}
 }

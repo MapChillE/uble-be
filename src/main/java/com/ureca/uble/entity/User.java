@@ -1,17 +1,22 @@
 package com.ureca.uble.entity;
 
+import static lombok.AccessLevel.*;
+
+import java.time.LocalDate;
+
 import com.ureca.uble.entity.enums.Gender;
 import com.ureca.uble.entity.enums.Rank;
 import com.ureca.uble.entity.enums.Role;
-import jakarta.persistence.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
-
-import static lombok.AccessLevel.PRIVATE;
 
 @Entity
 @Table(name="users")
@@ -83,4 +88,16 @@ public class User extends BaseEntity {
     public void updateLocalAvailability(boolean isLocalAvailable) {
         this.isLocalAvailable = isLocalAvailable;
     }
+
+    public void updateUserInfo(Rank rank, Gender gender, LocalDate birthDate) {
+        this.rank = rank;
+        this.gender = gender;
+        this.birthDate = birthDate;
+
+        if(this.role == Role.TMP_USER){
+            this.role = Role.USER;
+        }
+    }
+
+    public void updateIsDeleted() { this.isDeleted = true; }
 }
