@@ -16,10 +16,11 @@ public class RedisLockUtil {
 
     private final RedissonClient redissonClient;
 
+    private static final int MAX_RETRY_COUNT = 3;
+    private static final int RETRY_DELAY_MS = 1000;
+
     public <T> void executeWithLockWithRetry(String lockKey, long waitTime, long leaseTime, Supplier<T> task) {
         RLock lock = redissonClient.getLock(lockKey);
-        int maxRetry = 3;
-        long retryDelay = 1000;
         boolean isLocked = false;
 
         try {
@@ -29,17 +30,17 @@ public class RedisLockUtil {
                 return;
             }
 
-            for (int atmp = 1; atmp <= maxRetry; atmp++) {
+            for (int atmp = 1; atmp <= MAX_RETRY_COUNT; atmp++) {
                 try {
                     task.get();
                     return;
                 } catch (Exception e) {
-                    log.warn("재시도 : ({}/{})", atmp + 1, maxRetry, e);
-                    if (atmp == maxRetry) {
+                    log.warn("재시도 : ({}/{})", atmp, MAX_RETRY_COUNT, e);
+                    if (atmp == MAX_RETRY_COUNT) {
                         log.error("최대 재시도 횟수 초과, 종료합니다.");
                         throw e;
                     }
-                    Thread.sleep(retryDelay);
+                    Thread.sleep(RETRY_DELAY_MS);
                 }
             }
         } catch (InterruptedException e) {
