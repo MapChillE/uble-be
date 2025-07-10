@@ -1,4 +1,4 @@
-package com.ureca.uble.domain.usageHistory.service;
+package com.ureca.uble.domain.users.service;
 
 import com.ureca.uble.domain.brand.repository.BenefitRepository;
 import com.ureca.uble.domain.store.repository.StoreRepository;
@@ -8,7 +8,6 @@ import com.ureca.uble.domain.users.dto.response.UsageHistoryRes;
 import com.ureca.uble.domain.users.repository.UsageCountRepository;
 import com.ureca.uble.domain.users.repository.UsageHistoryRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
-import com.ureca.uble.domain.users.service.UsageHistoryService;
 import com.ureca.uble.entity.*;
 import com.ureca.uble.entity.enums.BenefitType;
 import com.ureca.uble.entity.enums.Period;
