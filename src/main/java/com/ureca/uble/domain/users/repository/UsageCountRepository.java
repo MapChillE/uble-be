@@ -9,4 +9,5 @@ import java.util.Optional;
 
 public interface UsageCountRepository extends JpaRepository<UsageCount, Long> {
     Optional<UsageCount> findByUserAndBenefit(User user, Benefit benefit);
+    void deleteByUser(User user);
 }
