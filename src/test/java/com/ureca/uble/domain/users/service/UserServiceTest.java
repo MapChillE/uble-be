@@ -16,8 +16,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.ureca.uble.domain.brand.repository.CategoryRepository;
-import com.ureca.uble.domain.users.dto.request.UserInfoReq;
-import com.ureca.uble.domain.users.dto.response.UserInfoRes;
+import com.ureca.uble.domain.users.dto.request.UpdateUserInfoReq;
+import com.ureca.uble.domain.users.dto.response.GetUserInfoRes;
+import com.ureca.uble.domain.users.dto.response.UpdateUserInfoRes;
 import com.ureca.uble.domain.users.exception.UserErrorCode;
 import com.ureca.uble.domain.users.repository.UserCategoryRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
@@ -61,7 +62,7 @@ public class UserServiceTest {
 		));
 
 		//when
-		UserInfoRes result = userService.getUserInfo(userId);
+		GetUserInfoRes result = userService.getUserInfo(userId);
 
 		//then
 		assertThat(result).isNotNull();
@@ -93,7 +94,7 @@ public class UserServiceTest {
 		Category cat1 = mock(Category.class);
 		Category cat2 = mock(Category.class);
 
-		UserInfoReq request = mock(UserInfoReq.class);
+		UpdateUserInfoReq request = mock(UpdateUserInfoReq.class);
 		when(request.getRank()).thenReturn(Rank.VIP);
 		when(request.getGender()).thenReturn(Gender.FEMALE);
 		when(request.getBirthDate()).thenReturn(LocalDate.of(1999, 1, 1));
@@ -103,7 +104,7 @@ public class UserServiceTest {
 		when(categoryRepository.findAllById(categoryIds)).thenReturn(List.of(cat1, cat2));
 
 		//when
-		UserInfoRes result = userService.updateUserInfo(userId, request);
+		UpdateUserInfoRes result = userService.updateUserInfo(userId, request);
 
 		//then
 		verify(user).updateUserInfo(Rank.VIP, Gender.FEMALE, LocalDate.of(1999, 1, 1));
@@ -120,7 +121,7 @@ public class UserServiceTest {
 		//given
 		when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-		UserInfoReq req = mock(UserInfoReq.class);
+		UpdateUserInfoReq req = mock(UpdateUserInfoReq.class);
 
 		//when, then
 		GlobalException ex = assertThrows(GlobalException.class, () ->

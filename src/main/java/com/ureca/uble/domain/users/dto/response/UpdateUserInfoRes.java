@@ -1,18 +1,20 @@
-package com.ureca.uble.domain.users.dto.request;
+package com.ureca.uble.domain.users.dto.response;
 
 import java.time.LocalDate;
 import java.util.List;
 
+import com.ureca.uble.entity.User;
 import com.ureca.uble.entity.enums.Gender;
 import com.ureca.uble.entity.enums.Rank;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Schema(description = "사용자 정보 관련 요청 DTO")
-public class UserInfoReq {
-
+@Builder
+@Schema(description="사용자 정보 관련 응답 DTO")
+public class UpdateUserInfoRes {
 	@Schema(description = "요금제 등급", example = "VIP")
 	private Rank rank;
 
@@ -24,4 +26,14 @@ public class UserInfoReq {
 
 	@Schema(description = "카테고리 ID 리스트", example = "[1, 3, 5]")
 	private List<Long> categoryIds;
+
+	public static UpdateUserInfoRes of(User user, List<Long> categoryIds){
+		return UpdateUserInfoRes.builder()
+			.rank(user.getRank())
+			.gender(user.getGender())
+			.birthDate(user.getBirthDate())
+			.categoryIds(categoryIds)
+			.build();
+	}
+
 }

@@ -6,8 +6,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ureca.uble.domain.brand.repository.CategoryRepository;
-import com.ureca.uble.domain.users.dto.request.UserInfoReq;
-import com.ureca.uble.domain.users.dto.response.UserInfoRes;
+import com.ureca.uble.domain.users.dto.request.UpdateUserInfoReq;
+import com.ureca.uble.domain.users.dto.response.GetUserInfoRes;
+import com.ureca.uble.domain.users.dto.response.UpdateUserInfoRes;
 import com.ureca.uble.domain.users.exception.UserErrorCode;
 import com.ureca.uble.domain.users.repository.UserCategoryRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
@@ -27,7 +28,7 @@ public class UserService {
 	private final CategoryRepository categoryRepository;
 
 	@Transactional
-	public UserInfoRes getUserInfo(Long userId) {
+	public GetUserInfoRes getUserInfo(Long userId) {
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> new GlobalException(UserErrorCode.USER_NOT_FOUND));
 
@@ -35,11 +36,11 @@ public class UserService {
 			.map(uc -> uc.getCategory().getId())
 			.toList();
 
-		return UserInfoRes.of(user, categoryIds);
+		return GetUserInfoRes.of(user, categoryIds);
 	}
 
 	@Transactional
-	public UserInfoRes updateUserInfo(Long userId, UserInfoReq request) {
+	public UpdateUserInfoRes updateUserInfo(Long userId, UpdateUserInfoReq request) {
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> new GlobalException(UserErrorCode.USER_NOT_FOUND));
 
@@ -57,6 +58,6 @@ public class UserService {
 			userCategoryRepository.save(userCategory);
 		});
 
-		return UserInfoRes.of(user, request.getCategoryIds());
+		return UpdateUserInfoRes.of(user, request.getCategoryIds());
 	}
 }
