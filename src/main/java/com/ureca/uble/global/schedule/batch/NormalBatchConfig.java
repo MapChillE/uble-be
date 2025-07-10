@@ -74,10 +74,11 @@ public class NormalBatchConfig {
     @StepScope
     public ItemWriter<Benefit> usageCountResetWriter() {
         return benefits -> {
+            long cnt = 0L;
             for (Benefit benefit : benefits) {
-                int updated = usageCountRepository.resetCountAndIsAvailableByBenefitId(benefit.getId());
-                log.info("benefitId={} usageCount cnt 0으로 초기화 ({}건)", benefit.getId(), updated);
+                cnt += usageCountRepository.resetCountAndIsAvailableByBenefitId(benefit.getId());
             }
+            log.info("usageCount cnt 0으로 초기화 ({}건)", cnt);
         };
     }
 }
