@@ -114,8 +114,7 @@ public class AuthService {
 
 	@Transactional
 	public WithdrawRes withdraw(Long userId) {
-		User user = userRepository.findById(userId)
-			.orElseThrow(() -> new GlobalException(UserErrorCode.USER_NOT_FOUND));
+		User user = findUser(userId);
 
 		if(user.getIsDeleted()){
 			throw new GlobalException(UserErrorCode.USER_ALREADY_DELETED);
@@ -132,5 +131,10 @@ public class AuthService {
 		bookmarkRepository.deleteByUser(user);
 
 		return new WithdrawRes();
+	}
+
+	private User findUser(Long userId){
+		return userRepository.findById(userId)
+			.orElseThrow(() -> new GlobalException(UserErrorCode.USER_NOT_FOUND));
 	}
 }

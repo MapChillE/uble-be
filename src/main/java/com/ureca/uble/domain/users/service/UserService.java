@@ -27,10 +27,9 @@ public class UserService {
 	private final UserCategoryRepository userCategoryRepository;
 	private final CategoryRepository categoryRepository;
 
-	@Transactional
+	@Transactional(readOnly = true)
 	public GetUserInfoRes getUserInfo(Long userId) {
-		User user = userRepository.findById(userId)
-			.orElseThrow(() -> new GlobalException(UserErrorCode.USER_NOT_FOUND));
+		User user = findUser(userId);
 
 		List<Long> categoryIds = userCategoryRepository.findByUser(user).stream()
 			.map(uc -> uc.getCategory().getId())
@@ -41,8 +40,7 @@ public class UserService {
 
 	@Transactional
 	public UpdateUserInfoRes updateUserInfo(Long userId, UpdateUserInfoReq request) {
-		User user = userRepository.findById(userId)
-			.orElseThrow(() -> new GlobalException(UserErrorCode.USER_NOT_FOUND));
+		User user = findUser(userId);
 
 		user.updateUserInfo(
 			request.getRank(),
@@ -59,5 +57,10 @@ public class UserService {
 		});
 
 		return UpdateUserInfoRes.of(user, request.getCategoryIds());
+	}
+
+	private User findUser(Long userId){
+		return userRepository.findById(userId)
+			.orElseThrow(() -> new GlobalException(UserErrorCode.USER_NOT_FOUND));
 	}
 }
