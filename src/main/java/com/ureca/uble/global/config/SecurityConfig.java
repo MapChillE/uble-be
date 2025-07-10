@@ -23,7 +23,7 @@ import com.ureca.uble.global.security.jwt.filter.JwtAuthenticationFilter;
 @EnableWebSecurity
 public class SecurityConfig {
 
-	@Value("${DOMAIN_BASE_URL}")
+	@Value("${domain.base-url}")
 	private String domainBaseUrl;
 
 	@Bean

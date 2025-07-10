@@ -1,11 +1,12 @@
 package com.ureca.uble.domain.brand.repository;
 
-import com.ureca.uble.entity.Benefit;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.Optional;
+import com.ureca.uble.entity.Benefit;
 
 public interface BenefitRepository extends JpaRepository<Benefit, Long> {
     @Query(value = """

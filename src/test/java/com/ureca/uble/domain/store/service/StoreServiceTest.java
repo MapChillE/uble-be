@@ -34,7 +34,7 @@ class StoreServiceTest {
     private StoreService storeService;
 
     @Test
-    @DisplayName("반경 500m 내의 매장 중 필터링 조건에 맞는 매장 리스트를 조회합니다.")
+    @DisplayName("반경 500m 내의 매장 중 필터링 조건에 맞는 매장 리스트를 조회한다.")
     void getStores_get_check() {
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 
