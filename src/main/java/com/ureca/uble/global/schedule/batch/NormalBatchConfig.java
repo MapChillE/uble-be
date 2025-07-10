@@ -64,8 +64,7 @@ public class NormalBatchConfig {
                 "AND (br.rankType = 'NORMAL' OR (br.rankType = 'VIP_NORMAL' AND b.rank != 'VIP')) "
         );
         reader.setParameterValues(Map.of(
-            "period", Period.valueOf(periodStr),
-            "rank", Rank.NORMAL
+            "period", Period.valueOf(periodStr)
         ));
         reader.setPageSize(100);
         return reader;
