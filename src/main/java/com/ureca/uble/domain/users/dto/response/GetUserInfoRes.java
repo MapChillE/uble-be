@@ -1,7 +1,9 @@
 package com.ureca.uble.domain.users.dto.response;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import com.ureca.uble.entity.User;
 import com.ureca.uble.entity.enums.Gender;
@@ -31,12 +33,13 @@ public class GetUserInfoRes {
 	private List<Long> categoryIds;
 
 	public static GetUserInfoRes of(User user, List<Long> categoryIds){
+		List<Long> safeCategories = Objects.requireNonNullElse(categoryIds, Collections.emptyList());
 		return GetUserInfoRes.builder()
 			.nickname(user.getNickname())
 			.rank(user.getRank())
 			.gender(user.getGender())
 			.birthDate(user.getBirthDate())
-			.categoryIds(categoryIds)
+			.categoryIds(safeCategories)
 			.build();
 	}
 
