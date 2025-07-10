@@ -71,7 +71,7 @@ public class NormalBatchConfig {
     public ItemWriter<Benefit> usageCountResetWriter() {
         return benefits -> {
             for (Benefit benefit : benefits) {
-                int updated = usageCountRepository.resetCntByBenefitId(benefit.getId());
+                int updated = usageCountRepository.resetCountAndIsAvailableByBenefitId(benefit.getId());
                 log.info("benefitId={} usageCount cnt 0으로 초기화 ({}건)", benefit.getId(), updated);
             }
         };

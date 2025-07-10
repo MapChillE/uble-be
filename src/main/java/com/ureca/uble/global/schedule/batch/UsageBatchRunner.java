@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -20,8 +19,7 @@ public class UsageBatchRunner {
     private final Job vipUpdateJob;
     private final Job localUpdateJob;
 
-    @Async
-    public void runNormalBatchAsync(Period period) {
+    public void runNormalBatch(Period period) {
         try {
             log.info("runNormalBatchAsyncRunner 실행");
             jobLauncher.run(
@@ -36,8 +34,7 @@ public class UsageBatchRunner {
         }
     }
 
-    @Async
-    public void runVipBatchAsync() {
+    public void runVipBatch() {
         try {
             log.info("runVipBatchAsyncRunner 실행");
             jobLauncher.run(
@@ -51,8 +48,7 @@ public class UsageBatchRunner {
         }
     }
 
-    @Async
-    public void runLocalBatchAsync() {
+    public void runLocalBatch() {
         try {
             log.info("runLocalBatchAsyncRunner 실행");
             jobLauncher.run(

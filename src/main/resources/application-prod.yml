@@ -3,3 +3,6 @@ jwt:
     domain: .uplait.site
     secure: true
     same-site: None
+
+redis:
+  ssl-enable: true
