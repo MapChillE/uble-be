@@ -19,7 +19,7 @@ public class RedisLockUtil {
     private static final int MAX_RETRY_COUNT = 3;
     private static final int RETRY_DELAY_MS = 1000;
 
-    public <T> void executeWithLockWithRetry(String lockKey, long waitTime, long leaseTime, Supplier<T> task) throws InterruptedException {
+    public <T> void executeWithLockWithRetry(String lockKey, long waitTime, long leaseTime, Supplier<T> task) {
         RLock lock = redissonClient.getLock(lockKey);
         boolean isLocked = false;
 
@@ -48,7 +48,11 @@ public class RedisLockUtil {
         } finally {
             // 항상 락 해제
             if (isLocked && lock.isHeldByCurrentThread()) {
-                Thread.sleep(60000);
+                try {
+                    Thread.sleep(60000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 lock.unlock();
             }
         }
