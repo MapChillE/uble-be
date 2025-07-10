@@ -77,6 +77,9 @@ dependencies {
     // postGIS
     implementation 'org.hibernate.orm:hibernate-spatial:6.4.0.Final'
     implementation 'org.locationtech.jts:jts-core:1.19.0'
+
+    // spring batch
+    implementation 'org.springframework.boot:spring-boot-starter-batch'
 }
 
 tasks.named('test') {
