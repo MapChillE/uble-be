@@ -3,6 +3,7 @@ package com.ureca.uble.domain.store.service;
 import com.ureca.uble.domain.store.dto.response.GetStoreListRes;
 import com.ureca.uble.domain.store.dto.response.GetStoreRes;
 import com.ureca.uble.domain.store.repository.StoreRepository;
+import com.ureca.uble.entity.enums.BenefitType;
 import com.ureca.uble.entity.enums.Season;
 import com.ureca.uble.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
@@ -26,11 +27,11 @@ public class StoreService {
     /**
      * 근처 매장 정보 조회
      */
-    public GetStoreListRes getStores(double latitude, double longitude, int distance, Long categoryId, Long brandId, Season season, Boolean isLocal) {
+    public GetStoreListRes getStores(double latitude, double longitude, int distance, Long categoryId, Long brandId, Season season, BenefitType type) {
         validateRange(latitude, longitude, distance);
 
         Point curPoint = getPoint(latitude, longitude);
-        List<GetStoreRes> storeList = storeRepository.findStoresByFiltering(curPoint, distance, categoryId, brandId, season, isLocal)
+        List<GetStoreRes> storeList = storeRepository.findStoresByFiltering(curPoint, distance, categoryId, brandId, season, type)
             .stream().map(GetStoreRes::from).toList();
 
         return new GetStoreListRes(storeList);

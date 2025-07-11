@@ -2,7 +2,10 @@ package com.ureca.uble.domain.store.service;
 
 import com.ureca.uble.domain.store.dto.response.GetStoreListRes;
 import com.ureca.uble.domain.store.repository.StoreRepository;
+import com.ureca.uble.entity.Brand;
+import com.ureca.uble.entity.Category;
 import com.ureca.uble.entity.Store;
+import com.ureca.uble.entity.enums.BenefitType;
 import com.ureca.uble.entity.enums.Season;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,19 +49,25 @@ class StoreServiceTest {
         Long categoryId = null;
         Long brandId = null;
         Season season = null;
-        Boolean isLocal = null;
+        BenefitType type = null;
 
         Store mockStore = mock(Store.class);
+        Brand mockBrand = mock(Brand.class);
+        Category mockCategory = mock(Category.class);
+
         when(mockStore.getId()).thenReturn(1L);
         when(mockStore.getName()).thenReturn("테스트 선릉점");
         when(mockStore.getLocation()).thenReturn(storeLocation);
+        when(mockStore.getBrand()).thenReturn(mockBrand);
+        when(mockBrand.getCategory()).thenReturn(mockCategory);
+        when(mockCategory.getName()).thenReturn("푸드");
 
         when(storeRepository.findStoresByFiltering(
             any(Point.class), anyInt(), any(), any(), any(), any()))
             .thenReturn(List.of(mockStore));
 
         // when
-        GetStoreListRes result = storeService.getStores(testPoint.getY(), testPoint.getX(), distance, categoryId, brandId, season, isLocal);
+        GetStoreListRes result = storeService.getStores(testPoint.getY(), testPoint.getX(), distance, categoryId, brandId, season, type);
 
         // then
         assertNotNull(result);

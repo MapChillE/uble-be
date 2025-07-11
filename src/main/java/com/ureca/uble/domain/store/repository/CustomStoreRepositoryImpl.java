@@ -4,8 +4,6 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.ureca.uble.entity.QBenefit;
-import com.ureca.uble.entity.QBrand;
 import com.ureca.uble.entity.Store;
 import com.ureca.uble.entity.enums.BenefitType;
 import com.ureca.uble.entity.enums.Rank;
@@ -19,6 +17,7 @@ import java.util.List;
 
 import static com.ureca.uble.entity.QBenefit.benefit;
 import static com.ureca.uble.entity.QBrand.brand;
+import static com.ureca.uble.entity.QCategory.category;
 import static com.ureca.uble.entity.QStore.store;
 
 @Repository
@@ -31,17 +30,18 @@ public class CustomStoreRepositoryImpl implements CustomStoreRepository {
      * 근처 매장 정보 조회
      */
     @Override
-    public List<Store> findStoresByFiltering(Point curPoint, int distance, Long categoryId, Long brandId, Season season, Boolean isLocal) {
+    public List<Store> findStoresByFiltering(Point curPoint, int distance, Long categoryId, Long brandId, Season season, BenefitType type) {
         return jpaQueryFactory
             .select(store)
             .from(store)
-            .innerJoin(store.brand, brand)
+            .innerJoin(store.brand, brand).fetchJoin()
+            .innerJoin(brand.category, category).fetchJoin()
             .where(
                 withinRadius(curPoint, distance),
                 categoryIdEq(categoryId),
                 brandIdEq(brandId),
                 seasonEq(season),
-                isLocalEq(isLocal)
+                typeEq(type)
             )
             .fetch();
     }
@@ -101,7 +101,7 @@ public class CustomStoreRepositoryImpl implements CustomStoreRepository {
         return season == null ? null : brand.season.eq(season);
     }
 
-    private BooleanExpression isLocalEq(Boolean isLocal) {
-        return isLocal == null ? null : brand.isLocal.eq(isLocal);
+    private BooleanExpression typeEq(BenefitType type) {
+        return type == null ? null : getCondition(type);
     }
 }
