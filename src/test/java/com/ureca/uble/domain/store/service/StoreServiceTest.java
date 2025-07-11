@@ -3,6 +3,7 @@ package com.ureca.uble.domain.store.service;
 import com.ureca.uble.domain.store.dto.response.GetStoreListRes;
 import com.ureca.uble.domain.store.repository.StoreRepository;
 import com.ureca.uble.entity.Store;
+import com.ureca.uble.entity.enums.BenefitType;
 import com.ureca.uble.entity.enums.Season;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,7 +47,7 @@ class StoreServiceTest {
         Long categoryId = null;
         Long brandId = null;
         Season season = null;
-        Boolean isLocal = null;
+        BenefitType type = null;
 
         Store mockStore = mock(Store.class);
         when(mockStore.getId()).thenReturn(1L);
@@ -58,7 +59,7 @@ class StoreServiceTest {
             .thenReturn(List.of(mockStore));
 
         // when
-        GetStoreListRes result = storeService.getStores(testPoint.getY(), testPoint.getX(), distance, categoryId, brandId, season, isLocal);
+        GetStoreListRes result = storeService.getStores(testPoint.getY(), testPoint.getX(), distance, categoryId, brandId, season, type);
 
         // then
         assertNotNull(result);

@@ -2,6 +2,7 @@ package com.ureca.uble.domain.store.controller;
 
 import com.ureca.uble.domain.store.dto.response.GetStoreListRes;
 import com.ureca.uble.domain.store.service.StoreService;
+import com.ureca.uble.entity.enums.BenefitType;
 import com.ureca.uble.entity.enums.Season;
 import com.ureca.uble.global.response.CommonResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,7 +29,7 @@ public class StoreController {
      * @param categoryId 카테고리 id
      * @param brandId 제휴처 id
      * @param season 계절 정보
-     * @param isLocal 우리 동네 여부
+     * @param type 혜택 종류 정보
      */
     @Operation(summary = "근처 매장 정보 조회", description = "근처 매장 정보 조회")
     @GetMapping
@@ -45,9 +46,9 @@ public class StoreController {
         @RequestParam(required = false) Long brandId,
         @Parameter(description = "계절 필터링")
         @RequestParam(required = false) Season season,
-        @Parameter(description = "우리 동네 필터링")
-        @RequestParam(required = false) Boolean isLocal) {
-        return CommonResponse.success(storeService.getStores(latitude, longitude, distance, categoryId, brandId, season, isLocal));
+        @Parameter(description = "혜택 타입 필터링(LOCAL/VIP)")
+        @RequestParam(required = false) BenefitType type) {
+        return CommonResponse.success(storeService.getStores(latitude, longitude, distance, categoryId, brandId, season, type));
     }
 
 }
