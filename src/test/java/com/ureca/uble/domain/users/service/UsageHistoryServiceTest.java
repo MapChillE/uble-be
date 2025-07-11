@@ -47,8 +47,6 @@ public class UsageHistoryServiceTest {
 	private BenefitRepository benefitRepository;
 	@Mock
 	private UsageCountRepository usageCountRepository;
-	@Mock
-	private EntityManager em;
 
 	@Test
 	@DisplayName("사용자 ID로 이용내역을 조회한다.")
@@ -91,6 +89,7 @@ public class UsageHistoryServiceTest {
 		UsageHistory savedHistory = mock(UsageHistory.class);
 		when(savedHistory.getId()).thenReturn(10L);
 		when(usageHistoryRepository.save(any())).thenReturn(savedHistory);
+		when(storeRepository.checkStoreBenefitByType(eq(storeId), any())).thenReturn(true);
 
 		// when
 		CreateUsageHistoryRes res = usageHistoryService.createUsageHistory(userId, storeId, new CreateUsageHistoryReq(BenefitType.VIP));
@@ -114,6 +113,7 @@ public class UsageHistoryServiceTest {
 		when(vipUser.getIsVipAvailable()).thenReturn(false);
 		when(userRepository.findById(userId)).thenReturn(Optional.of(vipUser));
 		when(storeRepository.findById(storeId)).thenReturn(Optional.of(store));
+		when(storeRepository.checkStoreBenefitByType(eq(storeId), any())).thenReturn(true);
 
 		// when
 		GlobalException exception = assertThrows(GlobalException.class, () -> {
@@ -143,6 +143,7 @@ public class UsageHistoryServiceTest {
 		UsageHistory savedHistory = mock(UsageHistory.class);
 		when(savedHistory.getId()).thenReturn(10L);
 		when(usageHistoryRepository.save(any())).thenReturn(savedHistory);
+		when(storeRepository.checkStoreBenefitByType(eq(storeId), any())).thenReturn(true);
 
 		// when
 		CreateUsageHistoryRes res = usageHistoryService.createUsageHistory(userId, storeId, new CreateUsageHistoryReq(BenefitType.LOCAL));
@@ -165,6 +166,7 @@ public class UsageHistoryServiceTest {
 		when(localUser.getIsLocalAvailable()).thenReturn(false);
 		when(userRepository.findById(userId)).thenReturn(Optional.of(localUser));
 		when(storeRepository.findById(storeId)).thenReturn(Optional.of(store));
+		when(storeRepository.checkStoreBenefitByType(eq(storeId), any())).thenReturn(true);
 
 		// when
 		GlobalException exception = assertThrows(GlobalException.class, () ->
@@ -197,6 +199,7 @@ public class UsageHistoryServiceTest {
 		UsageHistory savedHistory = mock(UsageHistory.class);
 		when(savedHistory.getId()).thenReturn(10L);
 		when(usageHistoryRepository.save(any())).thenReturn(savedHistory);
+		when(storeRepository.checkStoreBenefitByType(eq(storeId), any())).thenReturn(true);
 
 		// when
 		CreateUsageHistoryRes res = usageHistoryService.createUsageHistory(userId, storeId, new CreateUsageHistoryReq(BenefitType.NORMAL));
@@ -227,6 +230,7 @@ public class UsageHistoryServiceTest {
 		UsageCount usageCount = mock(UsageCount.class);
 		when(usageCount.getCount()).thenReturn(2);
 		when(usageCountRepository.findByUserAndBenefit(normalUser, benefit)).thenReturn(Optional.of(usageCount));
+		when(storeRepository.checkStoreBenefitByType(eq(storeId), any())).thenReturn(true);
 
 		// when
 		GlobalException exception = assertThrows(GlobalException.class, () ->
@@ -236,6 +240,30 @@ public class UsageHistoryServiceTest {
 		// then
 		assertEquals(2001, exception.getResultCode().getCode()); // BENEFIT_NOT_AVAILABLE
 		verify(usageCount, never()).update(anyInt(), anyBoolean());
+		verify(usageHistoryRepository, never()).save(any());
+	}
+
+	@Test
+	@DisplayName("해당 매장에서 사용할 수 없는 혜택을 선택한 경우 에러가 발생한다.")
+	void createUsageHistory_storeBenefitCheck_fails() {
+		// given
+		Long userId = 1L;
+		Long storeId = 2L;
+
+		User mockUser = mock(User.class);
+		Store mockStore = mock(Store.class);
+		when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
+		when(storeRepository.findById(storeId)).thenReturn(Optional.of(mockStore));
+
+		when(storeRepository.checkStoreBenefitByType(eq(storeId), any())).thenReturn(false);
+
+		// when
+		GlobalException exception = assertThrows(GlobalException.class, () ->
+			usageHistoryService.createUsageHistory(userId, storeId, new CreateUsageHistoryReq(BenefitType.NORMAL))
+		);
+
+		// then
+		assertEquals(2001, exception.getResultCode().getCode()); // BENEFIT_NOT_AVAILABLE
 		verify(usageHistoryRepository, never()).save(any());
 	}
 }
