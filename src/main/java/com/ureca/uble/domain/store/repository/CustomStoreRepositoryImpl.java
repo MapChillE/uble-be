@@ -102,7 +102,6 @@ public class CustomStoreRepositoryImpl implements CustomStoreRepository {
     }
 
     private BooleanExpression typeEq(BenefitType type) {
-        if(type == null) return null;
-        return getCondition(type);
+        return type == null ? null : getCondition(type);
     }
 }
