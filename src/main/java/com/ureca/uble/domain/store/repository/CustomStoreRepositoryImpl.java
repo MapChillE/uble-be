@@ -56,12 +56,12 @@ public class CustomStoreRepositoryImpl implements CustomStoreRepository {
             .join(store.brand, brand)
             .where(
                 store.id.eq(storeId),
-                getCondition(brand, benefit, type)
+                getCondition(type)
             )
             .fetchFirst() != null;
     }
 
-    public BooleanExpression getCondition(QBrand brand, QBenefit benefit, BenefitType type) {
+    public BooleanExpression getCondition(BenefitType type) {
         return switch (type) {
             case VIP -> brand.rankType.eq(RankType.VIP)
                 .or(brand.rankType.eq(RankType.VIP_NORMAL).and(
