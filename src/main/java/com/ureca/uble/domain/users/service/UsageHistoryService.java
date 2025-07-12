@@ -54,7 +54,7 @@ public class UsageHistoryService {
 		// store 검증
 		if(!storeRepository.checkStoreBenefitByType(storeId, req.getBenefitType())) {
 			throw new GlobalException(BENEFIT_NOT_AVAILABLE);
-		};
+		}
 
 		// 등급에 따른 추가 작업 처리
 		switch (req.getBenefitType()) {
