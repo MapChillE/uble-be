@@ -4,6 +4,7 @@ import com.ureca.uble.domain.brand.repository.BenefitRepository;
 import com.ureca.uble.domain.store.dto.response.GetStoreDetailRes;
 import com.ureca.uble.domain.store.dto.response.GetStoreListRes;
 import com.ureca.uble.domain.store.repository.StoreRepository;
+import com.ureca.uble.domain.users.repository.UsageCountRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.*;
 import com.ureca.uble.entity.enums.BenefitType;
@@ -42,6 +43,9 @@ class StoreServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private UsageCountRepository usageCountRepository;
 
     @Test
     @DisplayName("반경 500m 내의 매장 중 필터링 조건에 맞는 매장 리스트를 조회한다.")
@@ -91,7 +95,6 @@ class StoreServiceTest {
         Long userId = 1L;
         Long storeId = 10L;
 
-        // Mock 객체 생성 및 세팅
         User mockUser = mock(User.class);
         Brand mockBrand = mock(Brand.class);
         Category mockCategory = mock(Category.class);
@@ -99,8 +102,9 @@ class StoreServiceTest {
         Point mockLocation = mock(Point.class);
         Benefit mockBenefit = mock(Benefit.class);
 
-        when(userRepository.findById(userId)).thenReturn(java.util.Optional.of(mockUser));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
         when(storeRepository.findByIdWithBrandAndCategoryAndBenefits(storeId)).thenReturn(Optional.of(mockStore));
+        when(usageCountRepository.findByUserAndBenefit(any(), any())).thenReturn(Optional.empty());
 
         when(mockStore.getBrand()).thenReturn(mockBrand);
         when(mockStore.getId()).thenReturn(storeId);
@@ -108,10 +112,8 @@ class StoreServiceTest {
         when(mockStore.getAddress()).thenReturn("서울 강남구 테헤란로64길 18");
         when(mockStore.getPhoneNumber()).thenReturn("02-1234-5678");
         when(mockStore.getLocation()).thenReturn(mockLocation);
-
         when(mockLocation.getY()).thenReturn(37.0);
         when(mockLocation.getX()).thenReturn(127.0);
-
         when(mockBrand.getId()).thenReturn(123L);
         when(mockBrand.getDescription()).thenReturn("커피가 맛있는 스타벅스");
         when(mockBrand.getImageUrl()).thenReturn("https://example.com");
