@@ -9,8 +9,7 @@ public enum Rank {
     NORMAL("일반"),
     PREMIUM("우수"),
     VIP("VIP"),
-    VVIP("VVIP"),
-    NONE("VIP콕");
+    VVIP("VVIP");
 
     private final String name;
 }

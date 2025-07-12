@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ureca.uble.entity.Brand;
-import com.ureca.uble.entity.enums.RankType;
 import com.ureca.uble.entity.enums.Season;
 
 import lombok.RequiredArgsConstructor;
@@ -21,14 +20,14 @@ public class CustomBrandRepositoryImpl implements CustomBrandRepository {
 	private final JPAQueryFactory jpaQueryFactory;
 
 	@Override
-	public List<Brand> findWithFilterAndCursor(Long categoryId, Season season, List<RankType> rankTypes, Long lastBrandId, int size) {
+	public List<Brand> findWithFilterAndCursor(Long categoryId, Season season, Boolean isLocal, Long lastBrandId, int size) {
 		return jpaQueryFactory
 			.selectFrom(brand)
 			.leftJoin(brand.benefits).fetchJoin()
 			.where(
 				categoryIdEq(categoryId),
 				seasonEq(season),
-				rankTypeIn(rankTypes),
+				isLocalEq(isLocal),
 				gtBrandId(lastBrandId)
 			)
 			.orderBy(brand.id.asc())
@@ -44,8 +43,8 @@ public class CustomBrandRepositoryImpl implements CustomBrandRepository {
 		return season == null ? null : brand.season.eq(season);
 	}
 
-	private BooleanExpression rankTypeIn(List<RankType> rankTypes) {
-		return (rankTypes == null || rankTypes.isEmpty()) ? null : brand.rankType.in(rankTypes);
+	private BooleanExpression isLocalEq(Boolean isLocal) {
+		return isLocal == null ? null : brand.isLocal.eq(isLocal);
 	}
 
 	private BooleanExpression gtBrandId(Long lastBrandId) {

@@ -45,14 +45,14 @@ public class BrandController {
 		@RequestParam(required=false) Long categoryId,
 		@Parameter(description = "필터링할 계절", example = "ETC")
 		@RequestParam(required=false) Season season,
-		@Parameter(description = "필터링할 타입 : VIP 또는 LOCAL", example = "VIP")
-		@RequestParam(required=false) String type,
+		@Parameter(description = "우리동네멤버십 여부", example = "true")
+		@RequestParam(required=false) Boolean isLocal,
 		@Parameter(description = "마지막 제휴처 ID")
 		@RequestParam(required = false) Long lastBrandId,
 		@Parameter(description = "한 번에 가져올 크기")
 		@RequestParam(defaultValue = "5") int size
 	){
-		return CommonResponse.success(brandService.getBrandList(userId, categoryId, season, type, lastBrandId, size));
+		return CommonResponse.success(brandService.getBrandList(userId, categoryId, season, isLocal, lastBrandId, size));
 	}
 
 }
