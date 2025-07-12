@@ -8,13 +8,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ureca.uble.domain.bookmark.repository.BookmarkRepository;
 import com.ureca.uble.domain.brand.dto.response.BenefitDetailRes;
-import com.ureca.uble.domain.brand.dto.response.BenefitListRes;
 import com.ureca.uble.domain.brand.dto.response.BrandDetailRes;
 import com.ureca.uble.domain.brand.dto.response.BrandListRes;
 import com.ureca.uble.domain.brand.exception.BrandErrorCode;
 import com.ureca.uble.domain.brand.repository.BrandRepository;
 import com.ureca.uble.entity.Bookmark;
 import com.ureca.uble.entity.Brand;
+import com.ureca.uble.entity.enums.Rank;
+import com.ureca.uble.entity.enums.RankType;
 import com.ureca.uble.entity.enums.Season;
 import com.ureca.uble.global.exception.GlobalException;
 import com.ureca.uble.global.response.CursorPageRes;
@@ -45,9 +46,17 @@ public class BrandService {
 	}
 
 	@Transactional(readOnly = true)
-	public CursorPageRes<BrandListRes> getBrandList(Long userId, Long categoryId, Season season, Boolean isLocal, Long lastBrandId, int size) {
+	public CursorPageRes<BrandListRes> getBrandList(Long userId, Long categoryId, Season season, String type, Long lastBrandId, int size) {
 
-		List<Brand> brands = brandRepository.findWithFilterAndCursor(categoryId, season, isLocal, lastBrandId, size+1);
+		List<RankType> rankTypes = null;
+
+		if("VIP".equalsIgnoreCase(type)) {
+			rankTypes = List.of(RankType.VIP, RankType.VIP_NORMAL);
+		}else if("LOCAL".equalsIgnoreCase(type)) {
+			rankTypes = List.of(RankType.LOCAL);
+		}
+
+		List<Brand> brands = brandRepository.findWithFilterAndCursor(categoryId, season, rankTypes, lastBrandId, size+1);
 
 		boolean hasNext = brands.size() > size;
 		if (hasNext) {
@@ -59,11 +68,10 @@ public class BrandService {
 			boolean isBookmarked = optionalBookmark.isPresent();
 			Long bookmarkId = optionalBookmark.map(Bookmark::getId).orElse(null);
 
-			List<BenefitListRes> benefits = brand.getBenefits().stream()
-				.map(BenefitListRes::from)
-				.toList();
+			boolean isVIPcock = brand.isVIPcock();
+			Rank minRank = brand.getMinRank();
 
-			return BrandListRes.of(brand, isBookmarked, bookmarkId, benefits);
+			return BrandListRes.of(brand, isBookmarked, bookmarkId, isVIPcock, minRank);
 		}).toList();
 
 		Long lastCursorId = brandList.isEmpty() ? null : brandList.get(brandList.size() - 1).getBrandId();
