@@ -64,21 +64,9 @@ public class CustomStoreRepositoryImpl implements CustomStoreRepository {
     public BooleanExpression getCondition(BenefitType type) {
         return switch (type) {
             case VIP -> brand.rankType.eq(RankType.VIP)
-                .or(brand.rankType.eq(RankType.VIP_NORMAL).and(
-                    JPAExpressions.selectOne()
-                        .from(benefit)
-                        .where(benefit.brand.eq(brand)
-                            .and(benefit.rank.eq(Rank.VIP)))
-                        .exists()
-                ));
+                .or(brand.rankType.eq(RankType.VIP_NORMAL));
             case NORMAL -> brand.rankType.eq(RankType.NORMAL)
-                .or(brand.rankType.eq(RankType.VIP_NORMAL).and(
-                    JPAExpressions.selectOne()
-                        .from(benefit)
-                        .where(benefit.brand.eq(brand)
-                            .and(benefit.rank.eq(Rank.VIP)))
-                        .notExists()
-                ));
+                .or(brand.rankType.eq(RankType.VIP_NORMAL));
             case LOCAL -> brand.isLocal.isTrue();
         };
     }
