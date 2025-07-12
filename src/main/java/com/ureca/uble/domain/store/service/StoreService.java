@@ -86,7 +86,7 @@ public class StoreService {
         return geometryFactory.createPoint(new Coordinate(longitude, latitude));
     }
 
-    public static double calculateDistance(double latitude1, double longitude1, double latitude2, double longitude2) {
+    private static double calculateDistance(double latitude1, double longitude1, double latitude2, double longitude2) {
         final int RADIUS = 6371000;
 
         double dLat = Math.toRadians(latitude2 - latitude1);
