@@ -1,17 +1,28 @@
 package com.ureca.uble.entity;
 
+import static lombok.AccessLevel.*;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+import com.ureca.uble.entity.enums.Rank;
 import com.ureca.uble.entity.enums.RankType;
 import com.ureca.uble.entity.enums.Season;
-import jakarta.persistence.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import static lombok.AccessLevel.PRIVATE;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name="brand")
@@ -68,5 +79,27 @@ public class Brand extends BaseEntity {
         this.isLocal = isLocal;
         this.reservationUrl = reservationUrl;
         this.rankType = rankType;
+    }
+
+    public boolean isVIPcock(){
+        if(this.rankType == RankType.VIP || this.rankType == RankType.VIP_NORMAL) {
+            return true;
+        }
+        return false;
+    }
+
+    public Rank getMinRank() {
+        if (this.benefits == null || this.benefits.isEmpty()){
+            return Rank.NORMAL;
+        }
+
+        if(this.benefits.size() >= 2){
+            return this.benefits.stream()
+                .map(Benefit::getRank)
+                .min(Comparator.comparingInt(Enum::ordinal))
+                .orElse(Rank.NONE);
+        }
+
+        return this.benefits.get(0).getRank();
     }
 }
