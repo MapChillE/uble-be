@@ -9,8 +9,10 @@ import com.ureca.uble.domain.users.repository.UsageCountRepository;
 import com.ureca.uble.domain.users.repository.UsageHistoryRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.*;
+import com.ureca.uble.entity.enums.BenefitType;
 import com.ureca.uble.entity.enums.Period;
 import com.ureca.uble.entity.enums.Rank;
+import com.ureca.uble.entity.enums.RankType;
 import com.ureca.uble.global.exception.GlobalException;
 import com.ureca.uble.global.response.CursorPageRes;
 import lombok.RequiredArgsConstructor;
@@ -49,12 +51,12 @@ public class UsageHistoryService {
 	public CreateUsageHistoryRes createUsageHistory(Long userId, Long storeId, CreateUsageHistoryReq req) {
 		// 정보 검증
 		User user = findUser(userId);
-		Store store = findStore(storeId);
+		Store store = findByIdWithBrand(storeId);
 
 		// store 검증
-		if(!storeRepository.checkStoreBenefitByType(storeId, req.getBenefitType())) {
+		if(!checkStoreBenefitByType(store, req.getBenefitType())) {
 			throw new GlobalException(BENEFIT_NOT_AVAILABLE);
-		};
+		}
 
 		// 등급에 따른 추가 작업 처리
 		switch (req.getBenefitType()) {
@@ -102,6 +104,15 @@ public class UsageHistoryService {
 		}
 	}
 
+	private boolean checkStoreBenefitByType(Store store, BenefitType type) {
+		RankType rankType = store.getBrand().getRankType();
+		return switch (type) {
+			case VIP -> rankType == RankType.VIP || rankType == RankType.VIP_NORMAL;
+			case LOCAL -> rankType == RankType.LOCAL;
+			case NORMAL -> rankType == RankType.NORMAL || rankType == RankType.VIP_NORMAL;
+		};
+	}
+
 	private Benefit findBenefitByStoreId(Long storeId) {
 		return benefitRepository.findNormalBenefitByStoreId(storeId).orElseThrow(() -> new GlobalException(BENEFIT_NOT_FOUND));
 	}
@@ -110,7 +121,7 @@ public class UsageHistoryService {
 		return userRepository.findById(userId).orElseThrow(() -> new GlobalException(USER_NOT_FOUND));
 	}
 
-	private Store findStore(Long storeId) {
-		return storeRepository.findById(storeId).orElseThrow(() -> new GlobalException(STORE_NOT_FOUND));
+	private Store findByIdWithBrand(Long storeId) {
+		return storeRepository.findByIdWithBrand(storeId).orElseThrow(() -> new GlobalException(STORE_NOT_FOUND));
 	}
 }
