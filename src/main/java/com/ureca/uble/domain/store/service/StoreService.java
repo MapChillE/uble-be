@@ -110,7 +110,7 @@ public class StoreService {
 
     private boolean handleNormalBenefit(User user, Store store) {
         Benefit benefit = store.getBrand().getBenefits().stream()
-            .filter(b -> getBenefitType(store.getBrand(), b) != BenefitType.NORMAL)
+            .filter(b -> getBenefitType(store.getBrand(), b) == BenefitType.NORMAL)
             .findFirst()
             .orElse(null);
 
