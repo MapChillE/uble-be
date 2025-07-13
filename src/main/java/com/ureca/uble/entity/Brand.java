@@ -93,13 +93,9 @@ public class Brand extends BaseEntity {
             return Rank.NORMAL;
         }
 
-        if(this.benefits.size() >= 2){
-            return this.benefits.stream()
-                .map(Benefit::getRank)
-                .min(Comparator.comparingInt(Enum::ordinal))
-                .orElse(Rank.NONE);
-        }
-
-        return this.benefits.get(0).getRank();
+        return this.benefits.stream()
+            .map(Benefit::getRank)
+            .min(Comparator.comparingInt(Enum::ordinal))
+            .orElse(Rank.NORMAL);
     }
 }
