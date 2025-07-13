@@ -31,14 +31,13 @@ public class BenefitDetailRes {
 	private String provisionCount;
 
 	public static BenefitDetailRes of(Benefit benefit, String type) {
-		String provisionCount = benefit.getPeriod().formatProvisionCount(benefit.getNumber());
 		return BenefitDetailRes.builder()
 			.benefitId(benefit.getId())
 			.type(type)
 			.minRank(benefit.getRank())
 			.content(benefit.getContent())
 			.manual(benefit.getManual())
-			.provisionCount(provisionCount)
+			.provisionCount(benefit.getPeriod().formatProvisionCount(benefit.getNumber()))
 			.build();
 	}
 
