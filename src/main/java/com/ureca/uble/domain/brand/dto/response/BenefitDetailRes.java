@@ -9,10 +9,10 @@ import lombok.Getter;
 
 @Getter
 @Builder
-@Schema(description="등급별 택 상세 정보 DTO")
+@Schema(description="등급별 혜택 상세 정보 DTO")
 public class BenefitDetailRes {
 
-	@Schema(des혜ription = "혜택 ID", example = "1")
+	@Schema(description = "혜택 ID", example = "1")
 	private Long benefitId;
 
 	@Schema(description = "기본혜택(NORMAL), VIP콕(VIP)", example = "NORMAL")
