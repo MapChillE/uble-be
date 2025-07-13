@@ -1,5 +1,12 @@
 package com.ureca.uble.entity;
 
+import static lombok.AccessLevel.*;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+import com.ureca.uble.entity.enums.Rank;
 import com.ureca.uble.entity.enums.RankType;
 import com.ureca.uble.entity.enums.Season;
 import jakarta.persistence.*;
@@ -7,11 +14,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import static lombok.AccessLevel.PRIVATE;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name="brand")
@@ -57,7 +59,7 @@ public class Brand extends BaseEntity {
 
     @Builder(access = PRIVATE)
     private Brand(Category category, String name, String csrNumber, String description, String imageUrl, Season season,
-                  Boolean isOnline, Boolean isLocal, String reservationUrl, RankType rankType) {
+        Boolean isOnline, Boolean isLocal, String reservationUrl, RankType rankType) {
         this.category = category;
         this.name = name;
         this.csrNumber = csrNumber;
@@ -68,5 +70,20 @@ public class Brand extends BaseEntity {
         this.isLocal = isLocal;
         this.reservationUrl = reservationUrl;
         this.rankType = rankType;
+    }
+
+    public boolean isVIPcock(){
+        return this.rankType == RankType.VIP || this.rankType == RankType.VIP_NORMAL;
+    }
+
+    public Rank getMinRank() {
+        if (this.benefits == null || this.benefits.isEmpty()){
+            return Rank.NORMAL;
+        }
+
+        return this.benefits.stream()
+            .map(Benefit::getRank)
+            .min(Comparator.comparingInt(Enum::ordinal))
+            .orElse(Rank.NORMAL);
     }
 }

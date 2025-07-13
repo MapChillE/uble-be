@@ -37,17 +37,8 @@ public class GetBenefitInfoRes {
             .minRank(benefit.getRank() == Rank.NONE ? "VIP" : benefit.getRank().toString())
             .content(benefit.getContent())
             .manual(benefit.getManual())
-            .provisionCount(getProvisionString(benefit.getPeriod(), benefit.getNumber()))
+            .provisionCount(benefit.getPeriod().formatProvisionCount(benefit.getNumber()))
             .build();
     }
 
-    private static String getProvisionString(Period period, Integer number) {
-        return switch (period) {
-            case DAILY -> "일 " + number + "회";
-            case WEEKLY -> "주 " + number + "회";
-            case MONTHLY -> "월 " + number + "회";
-            case YEARLY -> "연 " + number + "회";
-            case NONE -> "제한 없음";
-        };
-    }
 }
