@@ -82,10 +82,7 @@ public class Brand extends BaseEntity {
     }
 
     public boolean isVIPcock(){
-        if(this.rankType == RankType.VIP || this.rankType == RankType.VIP_NORMAL) {
-            return true;
-        }
-        return false;
+        return this.rankType == RankType.VIP || this.rankType == RankType.VIP_NORMAL;
     }
 
     public Rank getMinRank() {
