@@ -39,10 +39,15 @@ public class BrandService {
 		Long bookmarkId = optionalBookmark.map(Bookmark::getId).orElse(null);
 
 		List<BenefitDetailRes> benefits = brand.getBenefits().stream()
-			.map(BenefitDetailRes::from)
+			.map(benefit -> {
+				String type = benefit.getRank() == Rank.NONE ? "VIP" : "NORMAL";
+				return BenefitDetailRes.of(benefit, type);
+			})
 			.toList();
 
-		return BrandDetailRes.of(brand, isBookmarked, bookmarkId, benefits);
+		boolean isVIPcock = brand.isVIPcock();
+
+		return BrandDetailRes.of(brand, isBookmarked, bookmarkId, isVIPcock, benefits);
 	}
 
 	@Transactional(readOnly = true)
