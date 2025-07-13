@@ -40,4 +40,5 @@ public class GetBenefitInfoRes {
             .provisionCount(benefit.getPeriod().formatProvisionCount(benefit.getNumber()))
             .build();
     }
+
 }
