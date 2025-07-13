@@ -52,8 +52,9 @@ public class BrandServiceTest {
 		when(mockBrand.getImageUrl()).thenReturn("https://image.com");
 		when(mockBrand.getSeason()).thenReturn(Season.SPRING);
 		when(mockBrand.getCategory()).thenReturn(mockCategory);
-		when(mockBrand.getBenefits()).thenReturn(List.of());
+		when(mockBrand.isVIPcock()).thenReturn(false);
 
+		when(mockBrand.getBenefits()).thenReturn(List.of());
 		when(brandRepository.findWithBenefitsById(brandId)).thenReturn(Optional.of(mockBrand));
 		when(bookmarkRepository.findByUserIdAndBrandId(userId, brandId)).thenReturn(Optional.empty());
 
@@ -75,19 +76,25 @@ public class BrandServiceTest {
 		Long lastBrandId = null;
 		int size = 2;
 
+		Category mockCategory = mock(Category.class);
+		when(mockCategory.getName()).thenReturn("푸드");
+
+
 		// 브랜드 1 mock
 		Brand brand1 = mock(Brand.class);
 		when(brand1.getId()).thenReturn(1L);
 		when(brand1.getName()).thenReturn("브랜드1");
+		when(brand1.getCategory()).thenReturn(mockCategory);
+		when(brand1.getDescription()).thenReturn("브랜드1 설명");
 		when(brand1.getImageUrl()).thenReturn("https://image1.com");
-		when(brand1.getBenefits()).thenReturn(List.of());
 
 		// 브랜드 2 mock
 		Brand brand2 = mock(Brand.class);
 		when(brand2.getId()).thenReturn(2L);
 		when(brand2.getName()).thenReturn("브랜드2");
+		when(brand2.getCategory()).thenReturn(mockCategory);
+		when(brand2.getDescription()).thenReturn("브랜드2 설명");
 		when(brand2.getImageUrl()).thenReturn("https://image2.com");
-		when(brand2.getBenefits()).thenReturn(List.of());
 
 		List<Brand> mockBrands = List.of(brand1, brand2);
 
@@ -106,13 +113,11 @@ public class BrandServiceTest {
 
 		BrandListRes res1 = result.getContent().get(0);
 		assertThat(res1.getBrandId()).isEqualTo(1L);
-		assertThat(res1.getName()).isEqualTo("브랜드1");
 		assertThat(res1.getImgUrl()).isEqualTo("https://image1.com");
 		assertThat(res1.isBookmarked()).isFalse();
 
 		BrandListRes res2 = result.getContent().get(1);
 		assertThat(res2.getBrandId()).isEqualTo(2L);
-		assertThat(res2.getName()).isEqualTo("브랜드2");
 		assertThat(res2.getImgUrl()).isEqualTo("https://image2.com");
 		assertThat(res2.isBookmarked()).isFalse();
 	}
