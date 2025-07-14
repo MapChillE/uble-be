@@ -10,9 +10,6 @@ import org.springframework.data.domain.Page;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * 단일 피드백 항목 응답 DTO
- */
 @Getter
 @Builder
 @AllArgsConstructor
