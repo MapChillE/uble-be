@@ -23,7 +23,6 @@ public class FeedbackService {
 
     private final FeedbackRepository feedbackRepository;
     private final UserRepository userRepository;
-    private final FeedbackRepository repo;
 
     /**
      * 피드백 생성 후 생성된 ID 반환
