@@ -1,6 +1,7 @@
 package com.ureca.uble.domain.feedback.service;
 
 import com.ureca.uble.domain.feedback.dto.request.CreateFeedbackReq;
+import com.ureca.uble.domain.feedback.dto.response.CreateFeedbackRes;
 import com.ureca.uble.domain.feedback.repository.FeedbackRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.Feedback;
@@ -47,7 +48,8 @@ class FeedbackServiceTest {
                 .thenReturn(mockFeedback);
 
         // when
-        Long result = feedbackService.createFeedback(userId, req);
+        CreateFeedbackRes res = feedbackService.createFeedback(userId, req);
+        Long result = res.getFeedbackId();
 
         // then
         assertNotNull(result);

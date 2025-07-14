@@ -7,7 +7,6 @@ import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.Feedback;
 import com.ureca.uble.entity.User;
 import com.ureca.uble.global.exception.GlobalException;
-import com.ureca.uble.global.response.CommonResponse;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,6 @@ import static com.ureca.uble.domain.users.exception.UserErrorCode.USER_NOT_FOUND
 
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class FeedbackService {
 
@@ -26,6 +24,7 @@ public class FeedbackService {
     /**
      * 피드백 생성 후 생성된 ID 반환
      */
+    @Transactional
     public CreateFeedbackRes createFeedback(Long userId, CreateFeedbackReq req) {
         User user = findUser(userId);
         Feedback feedback = Feedback.of(user, req);
