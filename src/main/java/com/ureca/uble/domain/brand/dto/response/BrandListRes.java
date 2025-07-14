@@ -3,7 +3,7 @@ package com.ureca.uble.domain.brand.dto.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ureca.uble.entity.Brand;
-import com.ureca.uble.entity.document.BrandDocument;
+import com.ureca.uble.entity.document.BrandNoriDocument;
 import com.ureca.uble.entity.enums.Rank;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -57,7 +57,7 @@ public class BrandListRes {
 			.build();
 	}
 
-	public static BrandListRes of(BrandDocument brand, boolean isBookmarked, Long bookmarkId) {
+	public static BrandListRes of(BrandNoriDocument brand, boolean isBookmarked, Long bookmarkId) {
 		return BrandListRes.builder()
 			.brandId(brand.getBrandId())
 			.name(brand.getBrandName())
