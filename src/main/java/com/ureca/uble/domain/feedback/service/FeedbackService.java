@@ -3,6 +3,7 @@ package com.ureca.uble.domain.feedback.service;
 import com.ureca.uble.domain.feedback.dto.request.CreateFeedbackReq;
 import com.ureca.uble.domain.feedback.dto.response.AdminFeedbackRes;
 import com.ureca.uble.domain.feedback.dto.response.CreateFeedbackRes;
+import com.ureca.uble.domain.feedback.dto.response.FeedbackInfo;
 import com.ureca.uble.domain.feedback.repository.FeedbackRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.Feedback;
@@ -13,6 +14,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 import static com.ureca.uble.domain.feedback.exception.FeedbackErrorCode.FEEDBACK_SAVE_FAILED;
 import static com.ureca.uble.domain.users.exception.UserErrorCode.USER_NOT_FOUND;
@@ -51,6 +54,24 @@ public class FeedbackService {
     @Transactional(readOnly = true)
     public AdminFeedbackRes getFeedbacks(Pageable pageable) {
         Page<Feedback> page = feedbackRepository.findAll(pageable);
-        return AdminFeedbackRes.from(page);
+        return from(page);
+    }
+
+    public static AdminFeedbackRes from(Page<Feedback> page) {
+        List<FeedbackInfo> items = page.getContent().stream()
+                .map(f -> FeedbackInfo.builder()
+                        .title(f.getTitle())
+                        .content(f.getContent())
+                        .score(f.getScore())
+                        .createdAt(f.getCreatedAt())
+                        .nickname(f.getUser() != null ? f.getUser().getNickname() : "Unknown")
+                        .build()
+                ).toList();
+
+        return AdminFeedbackRes.builder()
+                .content(items)
+                .totalCount(page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .build();
     }
 }
