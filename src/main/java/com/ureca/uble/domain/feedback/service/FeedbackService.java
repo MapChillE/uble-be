@@ -1,12 +1,15 @@
 package com.ureca.uble.domain.feedback.service;
 
 import com.ureca.uble.domain.feedback.dto.request.CreateFeedbackReq;
+import com.ureca.uble.domain.feedback.dto.response.AdminFeedbackRes;
 import com.ureca.uble.domain.feedback.dto.response.CreateFeedbackRes;
 import com.ureca.uble.domain.feedback.repository.FeedbackRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.Feedback;
 import com.ureca.uble.entity.User;
 import com.ureca.uble.global.exception.GlobalException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +23,7 @@ public class FeedbackService {
 
     private final FeedbackRepository feedbackRepository;
     private final UserRepository userRepository;
+    private final FeedbackRepository repo;
 
     /**
      * 피드백 생성 후 생성된 ID 반환
@@ -39,5 +43,11 @@ public class FeedbackService {
     private User findUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new GlobalException(USER_NOT_FOUND));
+    }
+
+    @Transactional(readOnly = true)
+    public AdminFeedbackRes getFeedbacks(Pageable pageable) {
+        Page<Feedback> page = repo.findAll(pageable);
+        return AdminFeedbackRes.from(page);
     }
 }
