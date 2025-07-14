@@ -46,7 +46,7 @@ public class FeedbackService {
 
     @Transactional(readOnly = true)
     public AdminFeedbackRes getFeedbacks(Pageable pageable) {
-        Page<Feedback> page = repo.findAll(pageable);
+        Page<Feedback> page = feedbackRepository.findAll(pageable);
         return AdminFeedbackRes.from(page);
     }
 }
