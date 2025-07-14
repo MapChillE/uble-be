@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import static com.ureca.uble.domain.feedback.exception.FeedbackErrorCode.FEEDBACK_SAVE_FAILED;
 import static com.ureca.uble.domain.users.exception.UserErrorCode.USER_NOT_FOUND;
 
 
@@ -31,9 +32,12 @@ public class FeedbackService {
     public CreateFeedbackRes createFeedback(Long userId, CreateFeedbackReq req) {
         User user = findUser(userId);
         Feedback feedback = Feedback.of(user, req);
-        Long feedbackId = feedbackRepository.save(feedback).getId();
-
-        return new CreateFeedbackRes(feedbackId);
+        try {
+            Long feedbackId = feedbackRepository.save(feedback).getId();
+            return new CreateFeedbackRes(feedbackId);
+        } catch (Exception e) {
+            throw new GlobalException(FEEDBACK_SAVE_FAILED);
+        }
     }
 
     /**

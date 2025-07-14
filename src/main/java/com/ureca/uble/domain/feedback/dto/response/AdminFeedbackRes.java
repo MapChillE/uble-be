@@ -26,13 +26,16 @@ public class AdminFeedbackRes {
     private final int totalPages;
 
     public static AdminFeedbackRes from(Page<Feedback> page) {
+        if (page == null) {
+            throw new IllegalArgumentException("Page cannot be null");
+        }
         List<FeedbackItem> items = page.getContent().stream()
                 .map(f -> FeedbackItem.builder()
                         .title(f.getTitle())
                         .content(f.getContent())
                         .score(f.getScore())
                         .createdAt(f.getCreatedAt())
-                        .nickname(f.getUser().getNickname())
+                        .nickname(f.getUser() != null ? f.getUser().getNickname() : "Unknown")
                         .build()
                 ).toList();
 
