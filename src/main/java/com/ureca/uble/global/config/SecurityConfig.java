@@ -61,11 +61,16 @@ public class SecurityConfig {
 			"http://localhost:3001",
 			"http://localhost:3002",
 			"http://localhost:3003",
+			"https://localhost:3000",
+			"https://localhost:3001",
+			"https://localhost:3002",
+			"https://localhost:3003",
 			domainBaseUrl
 		));
 		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
 		configuration.setAllowCredentials(true);
 		configuration.setAllowedHeaders(List.of("*"));
+		configuration.setExposedHeaders(List.of("Authorization", "Content-Type"));
 		configuration.setMaxAge(3600L);
 
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
