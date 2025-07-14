@@ -34,12 +34,10 @@ public class FeedbackController {
     public CommonResponse<CreateFeedbackRes> createFeedback(
             @Parameter(description = "사용자정보", required = true)
             @AuthenticationPrincipal Long userId,
-
             @Parameter(description = "제목(title), 내용(content), 별점1~5(score)을 담은 요청 객체", required = true)
-
             @Validated @RequestBody CreateFeedbackReq req
     ) {
-        Long feedbackId = feedbackService.createFeedback(userId, req);
-        return CommonResponse.success(new CreateFeedbackRes(feedbackId));
+        CreateFeedbackRes res = feedbackService.createFeedback(userId, req);
+        return CommonResponse.success(res);
     }
 }
