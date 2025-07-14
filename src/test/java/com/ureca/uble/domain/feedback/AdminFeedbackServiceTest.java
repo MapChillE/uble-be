@@ -1,7 +1,8 @@
 package com.ureca.uble.domain.feedback;
 
 import com.ureca.uble.domain.feedback.dto.response.AdminFeedbackRes;
-import com.ureca.uble.domain.feedback.dto.response.AdminFeedbackRes.FeedbackItem;
+
+import com.ureca.uble.domain.feedback.dto.response.FeedbackInfo;
 import com.ureca.uble.domain.feedback.repository.FeedbackRepository;
 import com.ureca.uble.domain.feedback.service.FeedbackService;
 import com.ureca.uble.entity.Feedback;
@@ -69,17 +70,17 @@ class AdminFeedbackServiceTest {
         assertEquals(totalElements, res.getTotalCount());
         assertEquals((int)Math.ceil((double)totalElements / size), res.getTotalPages());
 
-        List<FeedbackItem> items = res.getContent();
+        List<FeedbackInfo> items = res.getContent();
         assertEquals(2, items.size());
 
-        FeedbackItem item1 = items.get(0);
+        FeedbackInfo item1 = items.get(0);
         assertEquals("테스트1", item1.getTitle());
         assertEquals("테스트1", item1.getContent());
         assertEquals(3, item1.getScore());
         assertEquals(LocalDateTime.of(2025,7,14,10,0), item1.getCreatedAt());
         assertEquals("tester", item1.getNickname());
 
-        FeedbackItem item2 = items.get(1);
+        FeedbackInfo item2 = items.get(1);
         assertEquals("테스트2", item2.getTitle());
         assertEquals("테스트2", item2.getContent());
         assertEquals(5, item2.getScore());
