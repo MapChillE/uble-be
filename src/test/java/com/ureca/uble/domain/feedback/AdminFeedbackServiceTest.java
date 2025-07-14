@@ -2,12 +2,10 @@ package com.ureca.uble.domain.feedback;
 
 import com.ureca.uble.domain.feedback.dto.response.AdminFeedbackRes;
 import com.ureca.uble.domain.feedback.dto.response.AdminFeedbackRes.FeedbackItem;
-import com.ureca.uble.domain.feedback.exception.FeedbackErrorCode;
 import com.ureca.uble.domain.feedback.repository.FeedbackRepository;
 import com.ureca.uble.domain.feedback.service.FeedbackService;
 import com.ureca.uble.entity.Feedback;
 import com.ureca.uble.entity.User;
-import com.ureca.uble.global.exception.GlobalException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,7 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;

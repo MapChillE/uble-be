@@ -52,7 +52,7 @@ public class SecurityConfig {
 				.requestMatchers(HttpMethod.POST, "/user/extra-info").hasRole("TMP_USER")
 				.requestMatchers(HttpMethod.GET, "/api/users/userInfo").hasRole("USER")
 				.requestMatchers(HttpMethod.PUT, "/api/users/userInfo").hasAnyRole("TMP_USER", "USER")
-				.requestMatchers("api/admin/**").hasRole("ADMIN")
+				.requestMatchers("/api/admin/**").hasRole("ADMIN")
 				.anyRequest().authenticated()
 			)
 			.addFilterBefore(new JwtAuthenticationFilter(jwtValidator, userRepository), UsernamePasswordAuthenticationFilter.class)

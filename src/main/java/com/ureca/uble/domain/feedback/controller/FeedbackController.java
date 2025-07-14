@@ -47,7 +47,7 @@ public class FeedbackController {
             @Parameter(description = "페이지 번호 (0부터 시작)", example = "0", required = true)
             @RequestParam(value = "page", defaultValue = "0") int page,
             @Parameter(description = "페이지 크기 (한 페이지당 조회 개수)", example = "20", required = true)
-            @RequestParam(value = "size", defaultValue = "100") int size
+            @RequestParam(value = "size", defaultValue = "20") int size
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         AdminFeedbackRes result = feedbackService.getFeedbacks(pageable);

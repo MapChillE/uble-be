@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static com.ureca.uble.domain.feedback.exception.FeedbackErrorCode.FEEDBACK_SAVE_FAILED;
 import static com.ureca.uble.domain.users.exception.UserErrorCode.USER_NOT_FOUND;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -71,5 +72,30 @@ class FeedbackServiceTest {
                 () -> feedbackService.createFeedback(userId, req)
         );
         assertEquals(USER_NOT_FOUND, exception.getResultCode());
+    }
+
+    @Test
+    @DisplayName("피드백 저장 중 예외 발생 시 FEEDBACK_SAVE_FAILED 예외를 던진다.")
+    void createFeedback_saveFail_exception() {
+        // given
+        Long userId = 1L;
+        CreateFeedbackReq req = mock(CreateFeedbackReq.class);
+        when(req.getTitle()).thenReturn("좋아요");
+        when(req.getContent()).thenReturn("잘 쓰고 있어요");
+        when(req.getScore()).thenReturn(5);
+
+        User mockUser = mock(User.class);
+        when(userRepository.findById(userId))
+                .thenReturn(Optional.of(mockUser));
+
+        // 저장 시 예외 발생하도록 설정
+        when(feedbackRepository.save(any(Feedback.class)))
+                .thenThrow(new RuntimeException("DB 오류"));
+
+        // when & then
+        GlobalException exception = assertThrows(GlobalException.class,
+                () -> feedbackService.createFeedback(userId, req)
+        );
+        assertEquals(FEEDBACK_SAVE_FAILED, exception.getResultCode());
     }
 }
