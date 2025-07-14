@@ -3,8 +3,8 @@ package com.ureca.uble.domain.brand.dto.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ureca.uble.entity.Brand;
+import com.ureca.uble.entity.document.BrandDocument;
 import com.ureca.uble.entity.enums.Rank;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,7 +30,7 @@ public class BrandListRes {
 	private boolean vipcock;
 
 	@Schema(description = "최소 이용 등급", example = "NORMAL")
-	private Rank minRank;
+	private String minRank;
 
 	@Schema(description = "제휴처 대표 이미지 url", example = "https://image.com")
 	private String imgUrl;
@@ -50,11 +50,24 @@ public class BrandListRes {
 			.category(brand.getCategory().getName())
 			.description(brand.getDescription())
 			.vipcock(isVIPcock)
-			.minRank(minRank)
+			.minRank(minRank.toString())
 			.imgUrl(brand.getImageUrl())
 			.bookmarked(isBookmarked)
 			.bookmarkId(bookmarkId)
 			.build();
 	}
 
+	public static BrandListRes of(BrandDocument brand, boolean isBookmarked, Long bookmarkId) {
+		return BrandListRes.builder()
+			.brandId(brand.getBrandId())
+			.name(brand.getBrandName())
+			.category(brand.getCategory())
+			.description(brand.getDescription())
+			.vipcock(brand.getIsVipCock())
+			.minRank(brand.getMinRank())
+			.imgUrl(brand.getImageUrl())
+			.bookmarked(isBookmarked)
+			.bookmarkId(bookmarkId)
+			.build();
+	}
 }

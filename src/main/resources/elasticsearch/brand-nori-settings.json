@@ -1,0 +1,42 @@
+{
+  "analysis": {
+    "filter": {
+      "brand_synonym_filter": {
+        "type": "synonym",
+        "synonyms_path": "analysis/brand-synonyms.txt"
+      },
+      "category_synonym_filter": {
+        "type": "synonym",
+        "synonyms_path": "analysis/category-synonyms.txt"
+      },
+      "season_synonym_filter": {
+        "type": "synonym",
+        "synonyms_path": "analysis/season-synonyms.txt"
+      }
+    },
+    "tokenizer": {
+      "my_nori_tokenizer": {
+        "type": "nori_tokenizer",
+        "decompound_mode": "none",
+        "lenient": true
+      }
+    },
+    "analyzer": {
+      "brand_nori_synonym_analyzer": {
+        "type": "custom",
+        "tokenizer": "my_nori_tokenizer",
+        "filter": ["lowercase", "brand_synonym_filter"]
+      },
+      "category_nori_synonym_analyzer": {
+        "type": "custom",
+        "tokenizer": "my_nori_tokenizer",
+        "filter": ["lowercase", "category_synonym_filter"]
+      },
+      "season_nori_synonym_analyzer": {
+        "type": "custom",
+        "tokenizer": "my_nori_tokenizer",
+        "filter": ["lowercase", "season_synonym_filter"]
+      }
+    }
+  }
+}

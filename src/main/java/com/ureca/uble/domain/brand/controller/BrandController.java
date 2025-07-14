@@ -1,24 +1,18 @@
 package com.ureca.uble.domain.brand.controller;
 
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.ureca.uble.domain.brand.dto.response.BrandDetailRes;
 import com.ureca.uble.domain.brand.dto.response.BrandListRes;
+import com.ureca.uble.domain.brand.dto.response.SearchBrandListRes;
 import com.ureca.uble.domain.brand.service.BrandService;
-import com.ureca.uble.entity.Benefit;
 import com.ureca.uble.entity.enums.BenefitType;
 import com.ureca.uble.entity.enums.Season;
 import com.ureca.uble.global.response.CommonResponse;
 import com.ureca.uble.global.response.CursorPageRes;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/brands")
@@ -39,7 +33,7 @@ public class BrandController {
 	}
 
 	@Operation(summary = "제휴처 브랜드 전체 리스트 조회")
-	@GetMapping("/search")
+	@GetMapping
 	public CommonResponse<CursorPageRes<BrandListRes>> getBrandList(
 		@Parameter(description = "사용자정보", required = true)
 		@AuthenticationPrincipal Long userId,
@@ -57,4 +51,23 @@ public class BrandController {
 		return CommonResponse.success(brandService.getBrandList(userId, categoryId, season, type, lastBrandId, size));
 	}
 
+	@Operation(summary = "(검색) 제휴처 브랜드 전체 리스트 조회")
+	@GetMapping("/search")
+	public CommonResponse<SearchBrandListRes> getBrandListBySearch(
+		@Parameter(description = "사용자정보", required = true)
+		@AuthenticationPrincipal Long userId,
+		@Parameter(description = "검색어", example = "할리스")
+		@RequestParam String keyword,
+		@Parameter(description = "필터링할 카테고리", example = "2")
+		@RequestParam(required=false) String category,
+		@Parameter(description = "필터링할 계절", example = "ETC")
+		@RequestParam(required=false) Season season,
+		@Parameter(description = "필터링할 타입 : VIP 또는 LOCAL", example = "VIP")
+		@RequestParam(required=false) BenefitType type,
+		@Parameter(description = "페이지")
+		@RequestParam(required = false) int page,
+		@Parameter(description = "한 번에 가져올 크기")
+		@RequestParam(defaultValue = "5") int size){
+		return CommonResponse.success(brandService.getBrandListBySearch(userId, keyword, category, season, type, page, size));
+	}
 }
