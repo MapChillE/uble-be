@@ -35,7 +35,7 @@ class AdminFeedbackServiceTest {
     void getFeedbacks_success() {
         // given
         int page = 1, size = 2;
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
 
         User mockUser = mock(User.class);
         when(mockUser.getNickname()).thenReturn("tester");
@@ -61,7 +61,7 @@ class AdminFeedbackServiceTest {
                 totalElements
         );
 
-        when(feedbackRepository.findAll(pageable)).thenReturn(pageResult);
+        when(feedbackRepository.listFeedbacks(pageable)).thenReturn(pageResult);
 
         // when
         AdminFeedbackRes res = service.getFeedbacks(pageable);
@@ -88,7 +88,7 @@ class AdminFeedbackServiceTest {
         assertEquals("tester", item2.getNickname());
 
         // verify repository call
-        verify(feedbackRepository, times(1)).findAll(pageable);
+        verify(feedbackRepository, times(1)).listFeedbacks(pageable);
     }
 
     @Test
@@ -97,7 +97,7 @@ class AdminFeedbackServiceTest {
         // given
         Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
         Page<Feedback> emptyPage = new PageImpl<>(List.of(), pageable, 0L);
-        when(feedbackRepository.findAll(pageable)).thenReturn(emptyPage);
+        when(feedbackRepository.listFeedbacks(pageable)).thenReturn(emptyPage);
 
         // when
         AdminFeedbackRes res = service.getFeedbacks(pageable);
@@ -106,6 +106,6 @@ class AdminFeedbackServiceTest {
         assertTrue(res.getContent().isEmpty());
         assertEquals(0L, res.getTotalCount());
         assertEquals(0, res.getTotalPages());
-        verify(feedbackRepository).findAll(pageable);
+        verify(feedbackRepository).listFeedbacks(pageable);
     }
 }
