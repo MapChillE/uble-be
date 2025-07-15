@@ -1,7 +1,7 @@
 package com.ureca.uble.global.service;
 
 import com.ureca.uble.domain.brand.repository.*;
-import com.ureca.uble.domain.store.repository.StoreDocumentRepository;
+import com.ureca.uble.domain.store.repository.StoreNgramDocumentRepository;
 import com.ureca.uble.domain.store.repository.StoreRepository;
 import com.ureca.uble.entity.Brand;
 import com.ureca.uble.entity.Store;
@@ -22,12 +22,12 @@ import java.util.stream.Stream;
 public class GlobalService {
 
     private final StoreRepository storeRepository;
-    private final StoreDocumentRepository storeDocumentRepository;
+    private final StoreNgramDocumentRepository storeNgramDocumentRepository;
     private final BrandRepository brandRepository;
     private final BrandNoriDocumentRepository brandNoriDocumentRepository;
     private final BrandNgramDocumentRepository brandNgramDocumentRepository;
     private final CategoryRepository categoryRepository;
-    private final CategoryDocumentRepository categoryDocumentRepository;
+    private final CategoryNgramDocumentRepository categoryNgramDocumentRepository;
 
     /**
      * ES 전체 정보 삽입 API
@@ -52,7 +52,7 @@ public class GlobalService {
         List<CategoryNgramDocument> categories = categoryRepository.findAll().stream()
             .map(CategoryNgramDocument::from)
             .toList();
-        categoryDocumentRepository.saveAll(categories);
+        categoryNgramDocumentRepository.saveAll(categories);
 
         // store 정보 삽입
         try (Stream<Store> stream = storeRepository.findAllWithBrandAndCategory()) {
@@ -63,12 +63,12 @@ public class GlobalService {
                     stores.add(StoreNgramDocument.from(store));
                 }
                 if (stores.size() == 500) {
-                    storeDocumentRepository.saveAll(stores);
+                    storeNgramDocumentRepository.saveAll(stores);
                     stores.clear();
                 }
             });
             if (!stores.isEmpty()) {
-                storeDocumentRepository.saveAll(stores);
+                storeNgramDocumentRepository.saveAll(stores);
             }
         }
         return "정보 삽입이 완료되었습니다.";
