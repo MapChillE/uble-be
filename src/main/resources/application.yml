@@ -49,3 +49,4 @@ jwt:
 
 domain:
   base-url: ${DOMAIN_BASE_URL}
+  dev-base-url: ${DEV_DOMAIN_BASE_URL}

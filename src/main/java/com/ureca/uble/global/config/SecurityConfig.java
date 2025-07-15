@@ -23,6 +23,9 @@ import com.ureca.uble.global.security.jwt.filter.JwtAuthenticationFilter;
 @EnableWebSecurity
 public class SecurityConfig {
 
+	@Value("${domain.dev-base-url}")
+	private String devDomainBaseUrl;
+
 	@Value("${domain.base-url}")
 	private String domainBaseUrl;
 
@@ -47,6 +50,9 @@ public class SecurityConfig {
 				.requestMatchers("/health").permitAll()
 				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 				.requestMatchers(HttpMethod.POST, "/user/extra-info").hasRole("TMP_USER")
+				.requestMatchers(HttpMethod.GET, "/api/users/userInfo").hasRole("USER")
+				.requestMatchers(HttpMethod.PUT, "/api/users/userInfo").hasAnyRole("TMP_USER", "USER")
+				.requestMatchers("/api/admin/**").hasRole("ADMIN")
 				.anyRequest().authenticated()
 			)
 			.addFilterBefore(new JwtAuthenticationFilter(jwtValidator, userRepository), UsernamePasswordAuthenticationFilter.class)
@@ -65,7 +71,8 @@ public class SecurityConfig {
 			"https://localhost:3001",
 			"https://localhost:3002",
 			"https://localhost:3003",
-			domainBaseUrl
+			domainBaseUrl,
+			devDomainBaseUrl
 		));
 		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
 		configuration.setAllowCredentials(true);
