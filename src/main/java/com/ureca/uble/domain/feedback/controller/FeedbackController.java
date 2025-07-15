@@ -48,13 +48,11 @@ public class FeedbackController {
     @Operation(summary = "관리자: 사용자 피드백 조회", description = "생성일(createdAt) 내림차순으로 피드백 목록을 페이지 단위로 조회합니다.")
     @GetMapping("/admin/feedback")
     public CommonResponse<AdminFeedbackRes> getFeedbacks(
-            @Parameter(description="페이지 번호 (0부터 시작)", example="0", required=true)
-            @RequestParam(name="page", defaultValue="0") int page,
-            @Parameter(description="한 페이지당 조회할 피드백 수", example="2", required=true)
-            @RequestParam(name="size", defaultValue="2") int size
+            @ParameterObject
+            @PageableDefault(sort="createdAt", direction=Sort.Direction.DESC) Pageable pageable
     )
     {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        return CommonResponse.success(feedbackService.getFeedbacks(pageable));
+        AdminFeedbackRes result = feedbackService.getFeedbacks(pageable);
+        return CommonResponse.success(result);
     }
 }
