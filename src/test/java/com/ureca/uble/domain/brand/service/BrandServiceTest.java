@@ -1,11 +1,14 @@
 package com.ureca.uble.domain.brand.service;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-import java.util.List;
-import java.util.Optional;
-
+import com.ureca.uble.domain.bookmark.repository.BookmarkRepository;
+import com.ureca.uble.domain.brand.dto.response.BrandDetailRes;
+import com.ureca.uble.domain.brand.dto.response.BrandListRes;
+import com.ureca.uble.domain.brand.repository.BrandRepository;
+import com.ureca.uble.entity.Brand;
+import com.ureca.uble.entity.Category;
+import com.ureca.uble.entity.enums.Rank;
+import com.ureca.uble.entity.enums.Season;
+import com.ureca.uble.global.response.CursorPageRes;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,14 +16,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.ureca.uble.domain.bookmark.repository.BookmarkRepository;
-import com.ureca.uble.domain.brand.dto.response.BrandDetailRes;
-import com.ureca.uble.domain.brand.dto.response.BrandListRes;
-import com.ureca.uble.domain.brand.repository.BrandRepository;
-import com.ureca.uble.entity.Brand;
-import com.ureca.uble.entity.Category;
-import com.ureca.uble.entity.enums.Season;
-import com.ureca.uble.global.response.CursorPageRes;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class BrandServiceTest {
@@ -77,6 +77,8 @@ public class BrandServiceTest {
 		int size = 2;
 
 		Category mockCategory = mock(Category.class);
+		Rank mockMinRank = mock(Rank.class);
+		when(mockMinRank.toString()).thenReturn("VIP");
 		when(mockCategory.getName()).thenReturn("푸드");
 
 
@@ -85,6 +87,7 @@ public class BrandServiceTest {
 		when(brand1.getId()).thenReturn(1L);
 		when(brand1.getName()).thenReturn("브랜드1");
 		when(brand1.getCategory()).thenReturn(mockCategory);
+		when(brand1.getMinRank()).thenReturn(mockMinRank);
 		when(brand1.getDescription()).thenReturn("브랜드1 설명");
 		when(brand1.getImageUrl()).thenReturn("https://image1.com");
 
@@ -93,6 +96,7 @@ public class BrandServiceTest {
 		when(brand2.getId()).thenReturn(2L);
 		when(brand2.getName()).thenReturn("브랜드2");
 		when(brand2.getCategory()).thenReturn(mockCategory);
+		when(brand2.getMinRank()).thenReturn(mockMinRank);
 		when(brand2.getDescription()).thenReturn("브랜드2 설명");
 		when(brand2.getImageUrl()).thenReturn("https://image2.com");
 
