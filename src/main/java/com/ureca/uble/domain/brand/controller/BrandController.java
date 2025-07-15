@@ -2,7 +2,6 @@ package com.ureca.uble.domain.brand.controller;
 
 import com.ureca.uble.domain.brand.dto.response.BrandDetailRes;
 import com.ureca.uble.domain.brand.dto.response.BrandListRes;
-import com.ureca.uble.domain.brand.dto.response.GetBrandSuggestionRes;
 import com.ureca.uble.domain.brand.dto.response.SearchBrandListRes;
 import com.ureca.uble.domain.brand.service.BrandService;
 import com.ureca.uble.entity.enums.BenefitType;
