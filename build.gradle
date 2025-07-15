@@ -67,8 +67,6 @@ dependencies {
     // test
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
-    // h2
     testImplementation 'com.h2database:h2'
 
     // Mockito
@@ -86,6 +84,9 @@ dependencies {
 
     // elasticache (Redis)
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // elasticsearch
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
 }
 
 tasks.named('test') {
