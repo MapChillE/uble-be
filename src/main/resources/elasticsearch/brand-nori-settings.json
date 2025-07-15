@@ -17,8 +17,7 @@
     "tokenizer": {
       "my_nori_tokenizer": {
         "type": "nori_tokenizer",
-        "decompound_mode": "none",
-        "lenient": true
+        "decompound_mode": "none"
       }
     },
     "analyzer": {
