@@ -53,7 +53,7 @@ public class FeedbackService {
 
     @Transactional(readOnly = true)
     public AdminFeedbackRes getFeedbacks(Pageable pageable) {
-        Page<Feedback> page = feedbackRepository.findAll(pageable);
+        Page<Feedback> page = feedbackRepository.listFeedbacks(pageable);
         return from(page);
     }
 
