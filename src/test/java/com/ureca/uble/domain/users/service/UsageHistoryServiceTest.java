@@ -10,11 +10,10 @@ import com.ureca.uble.domain.users.repository.UsageHistoryRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.*;
 import com.ureca.uble.entity.enums.BenefitType;
-import com.ureca.uble.entity.enums.Period;
 import com.ureca.uble.entity.enums.Rank;
+import com.ureca.uble.entity.enums.RankType;
 import com.ureca.uble.global.exception.GlobalException;
 import com.ureca.uble.global.response.CursorPageRes;
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,8 +46,6 @@ public class UsageHistoryServiceTest {
 	private BenefitRepository benefitRepository;
 	@Mock
 	private UsageCountRepository usageCountRepository;
-	@Mock
-	private EntityManager em;
 
 	@Test
 	@DisplayName("사용자 ID로 이용내역을 조회한다.")
@@ -82,11 +79,14 @@ public class UsageHistoryServiceTest {
 		Long storeId = 100L;
 
 		User vipUser = mock(User.class);
-		Store store = mock(Store.class);
+		Store mockStore = mock(Store.class);
+		Brand mockBrand = mock(Brand.class);
 		when(vipUser.getRank()).thenReturn(Rank.VIP);
+		when(mockStore.getBrand()).thenReturn(mockBrand);
 		when(vipUser.getIsVipAvailable()).thenReturn(true);
+		when(mockBrand.getRankType()).thenReturn(RankType.VIP);
 		when(userRepository.findById(userId)).thenReturn(Optional.of(vipUser));
-		when(storeRepository.findById(storeId)).thenReturn(Optional.of(store));
+		when(storeRepository.findByIdWithBrand(storeId)).thenReturn(Optional.of(mockStore));
 
 		UsageHistory savedHistory = mock(UsageHistory.class);
 		when(savedHistory.getId()).thenReturn(10L);
@@ -109,11 +109,13 @@ public class UsageHistoryServiceTest {
 		Long storeId = 100L;
 
 		User vipUser = mock(User.class);
-		Store store = mock(Store.class);
+		Store mockStore = mock(Store.class);
+		Brand mockBrand = mock(Brand.class);
 		when(vipUser.getRank()).thenReturn(Rank.VIP);
-		when(vipUser.getIsVipAvailable()).thenReturn(false);
+		when(mockStore.getBrand()).thenReturn(mockBrand);
+		when(mockBrand.getRankType()).thenReturn(RankType.VIP);
 		when(userRepository.findById(userId)).thenReturn(Optional.of(vipUser));
-		when(storeRepository.findById(storeId)).thenReturn(Optional.of(store));
+		when(storeRepository.findByIdWithBrand(storeId)).thenReturn(Optional.of(mockStore));
 
 		// when
 		GlobalException exception = assertThrows(GlobalException.class, () -> {
@@ -134,11 +136,15 @@ public class UsageHistoryServiceTest {
 		Long storeId = 100L;
 
 		User localUser = mock(User.class);
-		Store store = mock(Store.class);
-		when(localUser.getRank()).thenReturn(Rank.PREMIUM);
+		Store mockStore = mock(Store.class);
+		Brand mockBrand = mock(Brand.class);
+
+		when(localUser.getRank()).thenReturn(Rank.VIP);
 		when(localUser.getIsLocalAvailable()).thenReturn(true);
+		when(mockStore.getBrand()).thenReturn(mockBrand);
+		when(mockBrand.getRankType()).thenReturn(RankType.LOCAL);
 		when(userRepository.findById(userId)).thenReturn(Optional.of(localUser));
-		when(storeRepository.findById(storeId)).thenReturn(Optional.of(store));
+		when(storeRepository.findByIdWithBrand(storeId)).thenReturn(Optional.of(mockStore));
 
 		UsageHistory savedHistory = mock(UsageHistory.class);
 		when(savedHistory.getId()).thenReturn(10L);
@@ -160,11 +166,12 @@ public class UsageHistoryServiceTest {
 		Long storeId = 100L;
 
 		User localUser = mock(User.class);
-		Store store = mock(Store.class);
-		when(localUser.getRank()).thenReturn(Rank.PREMIUM);
-		when(localUser.getIsLocalAvailable()).thenReturn(false);
+		Store mockStore = mock(Store.class);
+		Brand mockBrand = mock(Brand.class);
+		when(mockStore.getBrand()).thenReturn(mockBrand);
+		when(mockBrand.getRankType()).thenReturn(RankType.LOCAL);
 		when(userRepository.findById(userId)).thenReturn(Optional.of(localUser));
-		when(storeRepository.findById(storeId)).thenReturn(Optional.of(store));
+		when(storeRepository.findByIdWithBrand(storeId)).thenReturn(Optional.of(mockStore));
 
 		// when
 		GlobalException exception = assertThrows(GlobalException.class, () ->
@@ -185,9 +192,12 @@ public class UsageHistoryServiceTest {
 		Long storeId = 100L;
 
 		User normalUser = mock(User.class);
-		Store store = mock(Store.class);
+		Store mockStore = mock(Store.class);
+		Brand mockBrand = mock(Brand.class);
+		when(mockStore.getBrand()).thenReturn(mockBrand);
+		when(mockBrand.getRankType()).thenReturn(RankType.NORMAL);
 		when(userRepository.findById(userId)).thenReturn(Optional.of(normalUser));
-		when(storeRepository.findById(storeId)).thenReturn(Optional.of(store));
+		when(storeRepository.findByIdWithBrand(storeId)).thenReturn(Optional.of(mockStore));
 
 		Benefit benefit = mock(Benefit.class);
 		when(benefit.getNumber()).thenReturn(3);
@@ -215,13 +225,16 @@ public class UsageHistoryServiceTest {
 		Long storeId = 100L;
 
 		User normalUser = mock(User.class);
-		Store store = mock(Store.class);
+		Store mockStore = mock(Store.class);
+		Brand mockBrand = mock(Brand.class);
+
+		when(mockStore.getBrand()).thenReturn(mockBrand);
+		when(mockBrand.getRankType()).thenReturn(RankType.NORMAL);
 		when(userRepository.findById(userId)).thenReturn(Optional.of(normalUser));
-		when(storeRepository.findById(storeId)).thenReturn(Optional.of(store));
+		when(storeRepository.findByIdWithBrand(storeId)).thenReturn(Optional.of(mockStore));
 
 		Benefit benefit = mock(Benefit.class);
 		when(benefit.getNumber()).thenReturn(2);
-		when(benefit.getPeriod()).thenReturn(Period.MONTHLY);
 		when(benefitRepository.findNormalBenefitByStoreId(storeId)).thenReturn(Optional.of(benefit));
 
 		UsageCount usageCount = mock(UsageCount.class);
@@ -236,6 +249,31 @@ public class UsageHistoryServiceTest {
 		// then
 		assertEquals(2001, exception.getResultCode().getCode()); // BENEFIT_NOT_AVAILABLE
 		verify(usageCount, never()).update(anyInt(), anyBoolean());
+		verify(usageHistoryRepository, never()).save(any());
+	}
+
+	@Test
+	@DisplayName("해당 매장에서 사용할 수 없는 혜택을 선택한 경우 에러가 발생한다.")
+	void createUsageHistory_storeBenefitCheck_fails() {
+		// given
+		Long userId = 1L;
+		Long storeId = 2L;
+
+		User mockUser = mock(User.class);
+		Store mockStore = mock(Store.class);
+		Brand mockBrand = mock(Brand.class);
+
+		when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
+		when(storeRepository.findByIdWithBrand(storeId)).thenReturn(Optional.of(mockStore));
+		when(mockStore.getBrand()).thenReturn(mockBrand);
+
+		// when
+		GlobalException exception = assertThrows(GlobalException.class, () ->
+			usageHistoryService.createUsageHistory(userId, storeId, new CreateUsageHistoryReq(BenefitType.NORMAL))
+		);
+
+		// then
+		assertEquals(2001, exception.getResultCode().getCode()); // BENEFIT_NOT_AVAILABLE
 		verify(usageHistoryRepository, never()).save(any());
 	}
 }
