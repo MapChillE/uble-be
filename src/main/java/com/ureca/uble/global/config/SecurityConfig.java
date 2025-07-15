@@ -23,7 +23,10 @@ import com.ureca.uble.global.security.jwt.filter.JwtAuthenticationFilter;
 @EnableWebSecurity
 public class SecurityConfig {
 
-	@Value("${domain.base-url}")
+	@Value("${domain.dev-base-url}")
+	private String devDomainBaseUrl;
+
+	@Value("${domain.dev-base-url}")
 	private String domainBaseUrl;
 
 	@Bean
@@ -68,7 +71,8 @@ public class SecurityConfig {
 			"https://localhost:3001",
 			"https://localhost:3002",
 			"https://localhost:3003",
-			domainBaseUrl
+			domainBaseUrl,
+			devDomainBaseUrl
 		));
 		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
 		configuration.setAllowCredentials(true);
