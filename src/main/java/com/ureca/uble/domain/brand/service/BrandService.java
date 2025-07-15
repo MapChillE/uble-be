@@ -1,6 +1,5 @@
 package com.ureca.uble.domain.brand.service;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -10,8 +9,8 @@ import java.util.stream.Collectors;
 
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
-import com.ureca.uble.domain.brand.dto.response.SearchBrandListRes;
-import com.ureca.uble.entity.document.BrandDocument;
+import com.ureca.uble.domain.brand.dto.response.*;
+import com.ureca.uble.entity.document.BrandNoriDocument;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
@@ -20,9 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ureca.uble.domain.bookmark.repository.BookmarkRepository;
-import com.ureca.uble.domain.brand.dto.response.BenefitDetailRes;
-import com.ureca.uble.domain.brand.dto.response.BrandDetailRes;
-import com.ureca.uble.domain.brand.dto.response.BrandListRes;
 import com.ureca.uble.domain.brand.exception.BrandErrorCode;
 import com.ureca.uble.domain.brand.repository.BrandRepository;
 import com.ureca.uble.entity.Bookmark;
@@ -158,8 +154,8 @@ public class BrandService {
 			.build();
 
 		// 요청 및 결과 수집
-		SearchHits<BrandDocument> searchHits = this.elasticsearchOperations.search(
-			nativeQuery, BrandDocument.class
+		SearchHits<BrandNoriDocument> searchHits = this.elasticsearchOperations.search(
+			nativeQuery, BrandNoriDocument.class
 		);
 
 		// 북마크 정보 수집
@@ -180,10 +176,12 @@ public class BrandService {
 		long totalPage = totalCnt % size == 0 ? totalCnt / size : totalCnt / size + 1;
 		List<BrandListRes> brandList = searchHits.stream()
 			.map(hit -> {
-				BrandDocument document = hit.getContent();
+				BrandNoriDocument document = hit.getContent();
+
 				Bookmark bookmark = bookmarkMap.get(document.getBrandId());
 				boolean isBookmarked = (bookmark != null);
 				Long bookmarkId = (bookmark != null) ? bookmark.getId() : null;
+
 				return BrandListRes.of(document, isBookmarked, bookmarkId);
 			})
 			.toList();

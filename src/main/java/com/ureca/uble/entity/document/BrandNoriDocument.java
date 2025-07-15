@@ -8,7 +8,7 @@ import org.springframework.data.elasticsearch.annotations.*;
 
 @Getter
 @Builder
-@Document(indexName = "brands")
+@Document(indexName = "brand-nori")
 @Setting(settingPath = "/elasticsearch/brand-nori-settings.json")
 public class BrandNoriDocument {
 
@@ -51,7 +51,7 @@ public class BrandNoriDocument {
     @Field(type = FieldType.Keyword, index = false)
     private String imageUrl;
 
-    public static BrandNoriDocument of(Brand brand) {
+    public static BrandNoriDocument from(Brand brand) {
         return BrandNoriDocument.builder()
             .brandId(brand.getId())
             .brandName(brand.getName())
