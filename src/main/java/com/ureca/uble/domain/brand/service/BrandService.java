@@ -1,16 +1,24 @@
 package com.ureca.uble.domain.brand.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
-import com.ureca.uble.domain.brand.dto.response.*;
+import com.ureca.uble.domain.bookmark.repository.BookmarkRepository;
+import com.ureca.uble.domain.brand.dto.response.BenefitDetailRes;
+import com.ureca.uble.domain.brand.dto.response.BrandDetailRes;
+import com.ureca.uble.domain.brand.dto.response.BrandListRes;
+import com.ureca.uble.domain.brand.dto.response.SearchBrandListRes;
+import com.ureca.uble.domain.brand.exception.BrandErrorCode;
+import com.ureca.uble.domain.brand.repository.BrandRepository;
+import com.ureca.uble.entity.Bookmark;
+import com.ureca.uble.entity.Brand;
 import com.ureca.uble.entity.document.BrandNoriDocument;
+import com.ureca.uble.entity.enums.BenefitType;
+import com.ureca.uble.entity.enums.Rank;
+import com.ureca.uble.entity.enums.RankType;
+import com.ureca.uble.entity.enums.Season;
+import com.ureca.uble.global.exception.GlobalException;
+import com.ureca.uble.global.response.CursorPageRes;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
@@ -18,19 +26,12 @@ import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ureca.uble.domain.bookmark.repository.BookmarkRepository;
-import com.ureca.uble.domain.brand.exception.BrandErrorCode;
-import com.ureca.uble.domain.brand.repository.BrandRepository;
-import com.ureca.uble.entity.Bookmark;
-import com.ureca.uble.entity.Brand;
-import com.ureca.uble.entity.enums.BenefitType;
-import com.ureca.uble.entity.enums.Rank;
-import com.ureca.uble.entity.enums.RankType;
-import com.ureca.uble.entity.enums.Season;
-import com.ureca.uble.global.exception.GlobalException;
-import com.ureca.uble.global.response.CursorPageRes;
-
-import lombok.RequiredArgsConstructor;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
