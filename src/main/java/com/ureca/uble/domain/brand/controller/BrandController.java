@@ -2,6 +2,7 @@ package com.ureca.uble.domain.brand.controller;
 
 import com.ureca.uble.domain.brand.dto.response.BrandDetailRes;
 import com.ureca.uble.domain.brand.dto.response.BrandListRes;
+import com.ureca.uble.domain.brand.dto.response.GetBrandSuggestionRes;
 import com.ureca.uble.domain.brand.dto.response.SearchBrandListRes;
 import com.ureca.uble.domain.brand.service.BrandService;
 import com.ureca.uble.entity.enums.BenefitType;
@@ -65,7 +66,7 @@ public class BrandController {
 		@Parameter(description = "필터링할 타입 : VIP 또는 LOCAL", example = "VIP")
 		@RequestParam(required=false) BenefitType type,
 		@Parameter(description = "페이지")
-		@RequestParam(required = false) int page,
+		@RequestParam(defaultValue = "0") int page,
 		@Parameter(description = "한 번에 가져올 크기")
 		@RequestParam(defaultValue = "5") int size){
 		return CommonResponse.success(brandService.getBrandListBySearch(userId, keyword, category, season, type, page, size));
