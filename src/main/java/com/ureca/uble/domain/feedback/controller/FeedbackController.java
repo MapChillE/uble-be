@@ -49,7 +49,7 @@ public class FeedbackController {
     @GetMapping("/admin/feedback")
     public CommonResponse<AdminFeedbackRes> getFeedbacks(
             @ParameterObject
-            @PageableDefault(sort="createdAt", direction=Sort.Direction.DESC) Pageable pageable
+            @PageableDefault(sort="id", direction=Sort.Direction.DESC) Pageable pageable
     )
     {
         AdminFeedbackRes result = feedbackService.getFeedbacks(pageable);
