@@ -26,7 +26,7 @@ public class SecurityConfig {
 	@Value("${domain.dev-base-url}")
 	private String devDomainBaseUrl;
 
-	@Value("${domain.dev-base-url}")
+	@Value("${domain.base-url}")
 	private String domainBaseUrl;
 
 	@Bean
