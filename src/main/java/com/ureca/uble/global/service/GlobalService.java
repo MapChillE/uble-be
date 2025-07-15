@@ -1,6 +1,8 @@
 package com.ureca.uble.global.service;
 
 import com.ureca.uble.domain.brand.repository.*;
+import com.ureca.uble.domain.category.repository.CategoryNgramDocumentRepository;
+import com.ureca.uble.domain.category.repository.CategoryRepository;
 import com.ureca.uble.domain.store.repository.StoreNgramDocumentRepository;
 import com.ureca.uble.domain.store.repository.StoreRepository;
 import com.ureca.uble.entity.Brand;

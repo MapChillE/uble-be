@@ -1,4 +1,4 @@
-package com.ureca.uble.domain.brand.repository;
+package com.ureca.uble.domain.category.repository;
 
 import java.util.List;
 
