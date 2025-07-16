@@ -1,4 +1,4 @@
-package com.ureca.uble.global.response;
+package com.ureca.uble.domain.common.dto.response;
 
 import java.util.List;
 

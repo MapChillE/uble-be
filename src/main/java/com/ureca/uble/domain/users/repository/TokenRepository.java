@@ -1,4 +1,4 @@
-package com.ureca.uble.domain.token.repository;
+package com.ureca.uble.domain.users.repository;
 
 import java.util.Optional;
 

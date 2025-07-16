@@ -8,7 +8,7 @@ import com.ureca.uble.entity.Bookmark;
 import com.ureca.uble.entity.Brand;
 import com.ureca.uble.entity.User;
 import com.ureca.uble.global.exception.GlobalException;
-import com.ureca.uble.global.response.CursorPageRes;
+import com.ureca.uble.domain.common.dto.response.CursorPageRes;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

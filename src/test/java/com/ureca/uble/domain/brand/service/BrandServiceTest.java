@@ -8,7 +8,7 @@ import com.ureca.uble.entity.Brand;
 import com.ureca.uble.entity.Category;
 import com.ureca.uble.entity.enums.Rank;
 import com.ureca.uble.entity.enums.Season;
-import com.ureca.uble.global.response.CursorPageRes;
+import com.ureca.uble.domain.common.dto.response.CursorPageRes;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

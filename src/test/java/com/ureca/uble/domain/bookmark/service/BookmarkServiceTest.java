@@ -9,7 +9,7 @@ import com.ureca.uble.entity.Brand;
 import com.ureca.uble.entity.Category;
 import com.ureca.uble.entity.User;
 import com.ureca.uble.global.exception.GlobalException;
-import com.ureca.uble.global.response.CursorPageRes;
+import com.ureca.uble.domain.common.dto.response.CursorPageRes;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

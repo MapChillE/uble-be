@@ -19,7 +19,7 @@ import com.ureca.uble.domain.auth.dto.response.KakaoUserRes;
 import com.ureca.uble.domain.auth.dto.response.WithdrawRes;
 import com.ureca.uble.domain.bookmark.repository.BookmarkRepository;
 import com.ureca.uble.domain.feedback.repository.FeedbackRepository;
-import com.ureca.uble.domain.token.repository.TokenRepository;
+import com.ureca.uble.domain.users.repository.TokenRepository;
 import com.ureca.uble.domain.users.repository.PinRepository;
 import com.ureca.uble.domain.users.repository.UsageCountRepository;
 import com.ureca.uble.domain.users.repository.UsageHistoryRepository;

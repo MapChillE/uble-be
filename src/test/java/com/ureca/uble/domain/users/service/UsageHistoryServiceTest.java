@@ -13,7 +13,7 @@ import com.ureca.uble.entity.enums.BenefitType;
 import com.ureca.uble.entity.enums.Rank;
 import com.ureca.uble.entity.enums.RankType;
 import com.ureca.uble.global.exception.GlobalException;
-import com.ureca.uble.global.response.CursorPageRes;
+import com.ureca.uble.domain.common.dto.response.CursorPageRes;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
