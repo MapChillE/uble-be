@@ -1,5 +1,10 @@
 # UBLE BACK-END
 
+## 프로젝트 소개
+- 프로젝트명 : Uble
+- 프로젝트 주제 : LG U+ 멤버십 제휴처 안내 지도 서비스
+- 프로젝트 기간 : 2025.06.30 - 2025.08.08
+
 ## 🧑🏻‍💻 팀원 소개
 <div align="center">
   
@@ -16,10 +21,10 @@
 ## 💡 주요 기능
 ### 1. 회원 기능
 - 카카오 소셜 로그인 및 회원가입
-- 회원 정보(멤버십 등급/바코드, 생년월일, 성별, 관심 카테고리) 수정
-- 제휴처 즐겨찾기 등록/삭제/조회
--  카테고리 별 즐겨찾기, 이용 횟수 비율 조회
 - 로그아웃 및 탈퇴 
+- 회원 정보 (멤버십 등급/바코드, 생년월일, 성별, 관심 카테고리) 수정
+- 제휴처 즐겨찾기 등록/삭제/조회
+- (통계) 카테고리 별 즐겨찾기 및 이용 횟수 비율 조회
 
 ### 2. 제휴처 조회 기능
 - 제휴처 전체 조회 및 필터링
@@ -34,23 +39,23 @@
 
 ### 4. 로깅 기능
 - 유저별 검색 기록, 제휴처 조회 기록, 매장 조회 기록을 로깅
-- 오래된 로그들은 주기적으로 S3에 업로드하여 관리
+- 오래된 로그를 정기적으로 S3에 업로드하여 관리
 
 ### 5. 추천 기능
 - 사용자 정보(생년월일, 성별, 관심 카테고리), 로그(클릭/검색), 위치 정보 활용하여 제휴처 매장 추천
 - 추천 결과 캐싱
 
 ### 6. 관리자 기능
-- 사용자 이용 내역 카테고리 내 제휴사 순위 조회
-- 사용자 이용 내역 월단위 조회
-- 즐겨찾기 카테고리 내 제휴사 순위 조회
+- (통계) 사용자 이용 내역 카테고리 내 제휴사 순위 조회
+- (통계) 사용자 이용 내역 월단위 조회
+- (통계) 즐겨찾기 카테고리 내 제휴사 순위 조회
 
 ### 7. 피드백 기능
 - 서비스에 대한 피드백 등록/조회
 
 <br><br><br>
 
-## 📌 ERD
+## 💾 ERD
 <img width="2331" height="1821" alt="Uble ERD" src="https://github.com/user-attachments/assets/187e2db7-844b-488f-b829-ede63f6c01e5" />
 
 <br><br><br>
@@ -65,41 +70,40 @@
 
 ## ⚙️ 사용 기술
 ### BE
-  |  |사용 기술 |역할|
-  |:-----------|:-----------|:---------------|
-  |<img src="https://img.shields.io/badge/Spring_Boot-6DB33F?style=flat&logo=spring-boot&logoColor=white"/>|SpringBoot <br> (ver. ) | Backend FrameWork |
-  |<img src="https://img.shields.io/badge/Spring_Security-6DB33F?style=flat&logo=springsecurity&logoColor=white"/><br><img src="https://img.shields.io/badge/OAuth2-000000?style=flat&logo=OAuth2&logoColor=white"/><br><img src="https://img.shields.io/badge/JWT-000000?style=flat&logo=jsonwebtokens&logoColor=white"/>| Spring Security <br> OAuth2 <br> JWT | 인증/인가 시스템 구축<br>소셜 로그인<br>stateless 인증 구현 |
-  |<img src="https://img.shields.io/badge/Spring_Data_JPA-6DB33F?style=flat&logo=spring-data-jpa&logoColor=white"/>| Spring Data JPA |  |
-  |<img src="https://img.shields.io/badge/QueryDSL-52B0E7?style=flat&logo=querydsl&logoColor=white"/>| QueryDSL |  |
-  |<img src="https://img.shields.io/badge/Spring_Batch-6DB33F?style=flat&logo=spring-batch&logoColor=white"/>| Spring Batch |  |
-  |<img src="https://img.shields.io/badge/Springdoc_Swagger-6DB33F?style=flat&logo=Springdoc_Swagger&logoColor=white"/>| Springdoc Swagger | API 명세 문서 자동 생성 |
-  |<img src="https://img.shields.io/badge/Mockito-6DB33F?style=flat&logo=mockito&logoColor=white"/><br><img src="https://img.shields.io/badge/JUnit5-25A162?style=flat&logo=junit5&logoColor=white"/>| Mockito <br> JUnit5 | 테스트 프레임워크 |
-  |<img src="https://img.shields.io/badge/ElasticSearch-005571?style=flat&logo=elasticsearch&logoColor=white"/>| Elasticsearch |  |
-  |<img src="https://img.shields.io/badge/Kibana-005571?style=flat&logo=kibana&logoColor=white"/>| Kibana |  |
-  |<img src="https://img.shields.io/badge/fastapi-009688?style=flat&logo=FastAPI&logoColor=white"/>| FastAPI | 추천 시스템 서버 구축 |
+  |  | 사용 기술                                                          | 역할                                        |
+  |:-----------|:---------------------------------------------------------------|:------------------------------------------|
+  |<img src="https://img.shields.io/badge/Spring_Boot-6DB33F?style=flat&logo=spring-boot&logoColor=white"/>| SpringBoot (ver. 3.5.3)                                        | Backend FrameWork                         |
+  |<img src="https://img.shields.io/badge/Spring_Security-6DB33F?style=flat&logo=springsecurity&logoColor=white"/><br><img src="https://img.shields.io/badge/OAuth2-000000?style=flat&logo=OAuth2&logoColor=white"/><br><img src="https://img.shields.io/badge/JWT-000000?style=flat&logo=jsonwebtokens&logoColor=white"/>| Spring Security (ver.6.5.1) <br> OAuth2 <br> JWT (ver. 0.12.6) | 인증/인가 시스템 구축<br>소셜 로그인<br>stateless 인증 구현 |
+  | <img src="https://img.shields.io/badge/Spring_Data_JPA-6DB33F?style=flat&logo=spring&logoColor=white"/> | Spring Data JPA (ver. 3.5.1) | 객체 지향적 데이터 처리 로직 구현 |
+  |<img src="https://img.shields.io/badge/QueryDSL-52B0E7?style=flat&logo=querydsl&logoColor=white"/>| QueryDSL (ver. 5.1.0)                                          | 타입 안정성을 보장하는 동적 쿼리 작성                  |
+  |<img src="https://img.shields.io/badge/Spring_Batch-6DB33F?style=flat&logo=spring&logoColor=white"/>| Spring Batch (ver. 3.5.3)                                      | 대량 데이터의 정기적 처리 로직 구현                      |
+  |<img src="https://img.shields.io/badge/Springdoc_Swagger-6DB33F?style=flat&logo=Springdoc_Swagger&logoColor=white"/>| Springdoc Swagger (ver. 2.2.25)                                | API 명세 문서 자동 생성                           |
+  |<img src="https://img.shields.io/badge/Mockito-6DB33F?style=flat&logo=mockito&logoColor=white"/><br><img src="https://img.shields.io/badge/JUnit5-25A162?style=flat&logo=junit5&logoColor=white"/>| Mockito (ver. 5.2.0) <br> JUnit5 (ver. 5.12.2)                 | 테스트 프레임워크                                 |
+  |<img src="https://img.shields.io/badge/ElasticSearch-005571?style=flat&logo=elasticsearch&logoColor=white"/>| Elasticsearch (ver. 8.17.4)                                    | 검색 엔진 및 로깅 시스템 구축                         |
+  |<img src="https://img.shields.io/badge/Kibana-005571?style=flat&logo=kibana&logoColor=white"/>| Kibana (ver. 8.17.4)                                           | 로그/검색 결과 시각화 및 모니터링 지원                    |
+  |<img src="https://img.shields.io/badge/fastapi-009688?style=flat&logo=FastAPI&logoColor=white"/>| FastAPI (ver. 0.116.1)                                         | 추천 시스템 서버 구축                              |
 <br>
 
 ### DataBase
-  |  |사용 기술 | 역할 |
-  |:-----------|:-----------|:---------------|
-  | <img src="https://img.shields.io/badge/postgres-%23316192.svg?style=flat&logo=postgresql&logoColor=white"/>|PostgreSQL <br> (ver. ) | 유저, 제휴처 관련 정보 저장 |
-  | <img src="https://img.shields.io/badge/pgvector-%23316192.svg?style=flat&logo=pgvector&logoColor=white"/> | PGVector | 추천 시스템의 임베딩 기반 유사도 계산 시, vector 정보 저장 |
-  |<img src="https://img.shields.io/badge/postgis-%23316192.svg?style=flat&logo=postgis&logoColor=white"/>| PostGIS | 특정 거리 내 매장 정보 조회 시 사용 |
-  | <img src="https://img.shields.io/badge/Redis-DC382D?style=flat&logo=redis&logoColor=white"/> | Redis | 세션 캐싱 및 응답 속도 개선 |
+  |  | 사용 기술                   | 역할                                   |
+  |:-----------|:------------------------|:-------------------------------------|
+  | <img src="https://img.shields.io/badge/postgres-%23316192.svg?style=flat&logo=postgresql&logoColor=white"/>| PostgreSQL (ver. 15.13) | 전체 데이터 저장                            |
+  | <img src="https://img.shields.io/badge/pgvector-%23316192.svg?style=flat&logo=pgvector&logoColor=white"/> | PGVector                | 추천 시스템의 임베딩 기반 유사도 계산 시 vector 정보 저장 |
+  |<img src="https://img.shields.io/badge/postgis-%23316192.svg?style=flat&logo=postgis&logoColor=white"/>| PostGIS                 | 특정 거리 내 매장 정보 조회 시 사용                |
+  | <img src="https://img.shields.io/badge/Redis-DC382D?style=flat&logo=redis&logoColor=white"/> | Redis                   | 스케줄러 분산 락 적용 및 세션 캐싱을 통한 응답 속도 개선    |
 
 <br>
 
 ### Infra
-|  |사용 기술 | 역할 |
-|:-----------|:-----------|:---------------|
-| <img src="https://img.shields.io/badge/AWS EC2-E5770D?style=flat&logo=amazonaws&logoColor=white"/> |AWS EC2| 서비스 배포 서버 |
-| <img src="https://img.shields.io/badge/AWS RDS-4967E9?style=flat&logo=amazonaws&logoColor=white"/> |AWS RDS| 관계형 DB 호스팅 |
-| <img src="https://img.shields.io/badge/AWS Route 53-8C4FFF?style=flat&logo=amazonaws&logoColor=white"/><br><img src="https://img.shields.io/badge/AWS LoadBalancer-8C4FFF?style=flat&logo=amazonaws&logoColor=white"/><br><img src="https://img.shields.io/badge/AWS Certificate Manager-D7262E?style=flat&logo=amazonaws&logoColor=white"/>| AWS Route53 <br> AWS Loadbalancer<br> AWS Certificate Manager |  |
-| <img src="https://img.shields.io/badge/AWS S3-E25444?style=flat&logo=amazonaws&logoColor=white"/> | AWS S3 |  |
-| <img src="https://img.shields.io/badge/AWS CloudWatch-6F953F?style=flat&logo=amazonaws&logoColor=white"/><br><img src="https://img.shields.io/badge/AWS Lambda-F68536?style=flat&logo=amazonaws&logoColor=white"/>| AWS CloudWatch <br> AWS Lambda |  |
-| <img src="https://img.shields.io/badge/Docker-0db7ed?style=flat&logo=docker&logoColor=white"/> |Docker| 컨테이너 환경 |
-| <img src="https://img.shields.io/badge/GitHub Actions-2671E5?style=flat&logo=githubactions&logoColor=white"/> |GitHub Actions| CI/CD 자동화 |
-
+|  |사용 기술 | 역할                |
+|:-----------|:-----------|:------------------|
+| <img src="https://img.shields.io/badge/AWS EC2-E5770D?style=flat&logo=amazonaws&logoColor=white"/> |AWS EC2| 서비스 배포 서버         |
+| <img src="https://img.shields.io/badge/AWS RDS-4967E9?style=flat&logo=amazonaws&logoColor=white"/> |AWS RDS| 관계형 DB 호스팅        |
+| <img src="https://img.shields.io/badge/AWS Route 53-8C4FFF?style=flat&logo=amazonaws&logoColor=white"/><br><img src="https://img.shields.io/badge/AWS LoadBalancer-8C4FFF?style=flat&logo=amazonaws&logoColor=white"/><br><img src="https://img.shields.io/badge/AWS Certificate Manager-D7262E?style=flat&logo=amazonaws&logoColor=white"/>| AWS Route53 <br> AWS Loadbalancer<br> AWS Certificate Manager | 도메인 및 HTTPS 적용    |
+| <img src="https://img.shields.io/badge/AWS S3-E25444?style=flat&logo=amazonaws&logoColor=white"/> | AWS S3 | 제휴처 로고 및 로깅 내역 저장 |
+| <img src="https://img.shields.io/badge/AWS CloudWatch-6F953F?style=flat&logo=amazonaws&logoColor=white"/><br><img src="https://img.shields.io/badge/AWS Lambda-F68536?style=flat&logo=amazonaws&logoColor=white"/>| AWS CloudWatch <br> AWS Lambda | 서버 모니터링 시스템 구축    |
+| <img src="https://img.shields.io/badge/Docker-0db7ed?style=flat&logo=docker&logoColor=white"/> |Docker (ver. 28.0.1)| 개발 및 배포 환경의 컨테이너 기반 구성           |
+| <img src="https://img.shields.io/badge/GitHub Actions-2671E5?style=flat&logo=githubactions&logoColor=white"/> |GitHub Actions| CI/CD 자동화         |
 
 <br><br><br>
 
@@ -143,6 +147,7 @@
 **기초 규칙**
 
 - 모든 변경은 이슈 및 브랜치 생성 후 develop 브랜치으로 병합
+- main 브랜치로의 PR은 develop 브랜치에서만 생성 가능
 - 생성된 PR은 최소 1명의 리뷰어의 확인 이후 병합 가능
 
 <br>
@@ -220,7 +225,7 @@ Ex. [UBLE-12] fix: 즐겨찾기 DTO 수정
     private final String message;
 
     // 예시
-    STORE_NOT_FOUND(HttpStatus.NOT_FOUND, 5000, "매장 정보를 찾을 수 없습니다."),
+    STORE_NOT_FOUND(HttpStatus.NOT_FOUND, 5000, "매장 정보를 찾을 수 없습니다.")
 ```
 
 - 각 도메인에 대해 시작 번호를 부여하여 고유한 에러 코드를 가질 수 있도록 한다.
