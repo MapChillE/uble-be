@@ -1,7 +1,7 @@
-package com.ureca.uble.global.controller;
+package com.ureca.uble.domain.common.controller;
 
-import com.ureca.uble.global.response.CommonResponse;
-import com.ureca.uble.global.service.GlobalService;
+import com.ureca.uble.domain.common.dto.response.CommonResponse;
+import com.ureca.uble.domain.common.service.CommonService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class GlobalController {
+public class CommonController {
 
-	private final GlobalService globalService;
+	private final CommonService commonService;
 
 	@GetMapping("/health")
 	public CommonResponse<String> healthCheck() {
@@ -24,6 +24,6 @@ public class GlobalController {
 	@Operation(summary = "ES 정보 전체 추가", description = "ES 정보 전체 추가")
 	@GetMapping("/temp/elastic")
 	public CommonResponse<String> updateIndex() {
-		return CommonResponse.success(globalService.updateIndex());
+		return CommonResponse.success(commonService.updateIndex());
 	}
 }

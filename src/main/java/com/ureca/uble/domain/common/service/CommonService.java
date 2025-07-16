@@ -1,4 +1,4 @@
-package com.ureca.uble.global.service;
+package com.ureca.uble.domain.common.service;
 
 import com.ureca.uble.domain.brand.repository.*;
 import com.ureca.uble.domain.category.repository.CategoryNgramDocumentRepository;
@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
-public class GlobalService {
+public class CommonService {
 
     private final StoreRepository storeRepository;
     private final StoreNgramDocumentRepository storeNgramDocumentRepository;

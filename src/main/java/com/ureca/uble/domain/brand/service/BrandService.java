@@ -15,7 +15,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHits;
-import org.springframework.data.elasticsearch.core.SearchHitsImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +28,7 @@ import com.ureca.uble.entity.enums.Rank;
 import com.ureca.uble.entity.enums.RankType;
 import com.ureca.uble.entity.enums.Season;
 import com.ureca.uble.global.exception.GlobalException;
-import com.ureca.uble.global.response.CursorPageRes;
+import com.ureca.uble.domain.common.dto.response.CursorPageRes;
 
 import lombok.RequiredArgsConstructor;
 

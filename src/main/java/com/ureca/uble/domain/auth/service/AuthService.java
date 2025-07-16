@@ -9,9 +9,8 @@ import com.ureca.uble.domain.auth.dto.response.KakaoUserRes;
 import com.ureca.uble.domain.auth.dto.response.WithdrawRes;
 import com.ureca.uble.domain.auth.exception.AuthErrorCode;
 import com.ureca.uble.domain.bookmark.repository.BookmarkRepository;
-import com.ureca.uble.domain.brand.repository.BenefitRepository;
 import com.ureca.uble.domain.feedback.repository.FeedbackRepository;
-import com.ureca.uble.domain.token.repository.TokenRepository;
+import com.ureca.uble.domain.users.repository.TokenRepository;
 import com.ureca.uble.domain.users.exception.UserErrorCode;
 import com.ureca.uble.domain.users.repository.PinRepository;
 import com.ureca.uble.domain.users.repository.UsageCountRepository;
@@ -24,7 +23,6 @@ import com.ureca.uble.global.exception.GlobalException;
 import com.ureca.uble.global.security.jwt.JwtProvider;
 import com.ureca.uble.global.security.jwt.JwtValidator;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

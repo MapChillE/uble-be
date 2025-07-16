@@ -10,7 +10,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ureca.uble.domain.users.dto.response.UsageHistoryRes;
 import com.ureca.uble.entity.QStore;
 import com.ureca.uble.entity.QUsageHistory;
-import com.ureca.uble.global.response.CursorPageRes;
+import com.ureca.uble.domain.common.dto.response.CursorPageRes;
 
 import lombok.RequiredArgsConstructor;
 

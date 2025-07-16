@@ -11,7 +11,7 @@ import com.ureca.uble.domain.users.dto.request.UpdateUserInfoReq;
 import com.ureca.uble.domain.users.dto.response.GetUserInfoRes;
 import com.ureca.uble.domain.users.dto.response.UpdateUserInfoRes;
 import com.ureca.uble.domain.users.service.UserService;
-import com.ureca.uble.global.response.CommonResponse;
+import com.ureca.uble.domain.common.dto.response.CommonResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

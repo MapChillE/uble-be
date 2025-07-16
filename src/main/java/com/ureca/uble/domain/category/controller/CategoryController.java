@@ -2,7 +2,7 @@ package com.ureca.uble.domain.category.controller;
 
 import com.ureca.uble.domain.category.dto.response.GetCategoryListRes;
 import com.ureca.uble.domain.category.service.CategoryService;
-import com.ureca.uble.global.response.CommonResponse;
+import com.ureca.uble.domain.common.dto.response.CommonResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
