@@ -7,7 +7,7 @@
 | :-------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------: |
 |       <img width="160px" src="https://avatars.githubusercontent.com/Yyang-YE" />        |       <img width="160px" src="https://avatars.githubusercontent.com/hayong39" />        |                    <img width="160px" src="https://avatars.githubusercontent.com/Eric-HAN-01"/>                    |
 |                        [@Yyang-YE](https://github.com/Yyang-YE)                         |                        [@hayong39](https://github.com/hayong39)                         |                                   [@Eric-HAN-01](https://github.com/Eric-HAN-01)                                   |
-| 👑 BE 개발 팀장 <br>인프라 관리 <br> 검색 기능 <br> 즐겨찾기 기능 <br> 어드민 통계 기능 | 인프라 관리 <br> 소셜 로그인 기능 <br> 제휴처 목록 조회 기능 <br> 제휴처 매장 추천 기능 | 데이터 전처리 <br>통계 관리 기능 <br> 피드백 등록 및 조회 기능 <br> 나의 위치 관리 기능 <br> 지도 반경 필터링 기능 |
+| 👑 BE 개발 팀장 <br>인프라 관리 <br> 검색 기능 <br> 즐겨찾기 기능 <br> 로깅 기능 | 인프라 관리 <br> 소셜 로그인 기능 <br> 제휴처 목록 조회 기능 <br> 제휴처 매장 추천 기능 <br> 로깅 기능 | 데이터 전처리 <br>통계 관리 기능 <br> 피드백 등록 및 조회 기능 <br> 나의 위치 관리 기능 <br> 지도 반경 필터링 기능 |
 
 </div>
 
@@ -61,6 +61,44 @@
 ---
 
 <br><br><br>
+
+
+## ⚙️ 사용 기술
+### BE
+  |  |사용 기술 |역할|
+  |:-----------|:-----------|:---------------|
+  |<img src="https://img.shields.io/badge/Spring_Boot-6DB33F?style=flat&logo=spring-boot&logoColor=white"/>|SpringBoot <br> (ver. ) | Backend FrameWork |
+  |<img src="https://img.shields.io/badge/Spring_Security-6DB33F?style=flat&logo=springsecurity&logoColor=white"/><br><img src="https://img.shields.io/badge/OAuth2-000000?style=flat&logo=OAuth2&logoColor=white"/><br><img src="https://img.shields.io/badge/JWT-000000?style=flat&logo=jsonwebtokens&logoColor=white"/>| Spring Security <br> OAuth2 <br> JWT | 인증/인가 시스템 구축<br>소셜 로그인<br>stateless 인증 구현 |
+  |<img src="https://img.shields.io/badge/Spring_Data_JPA-6DB33F?style=flat&logo=spring-data-jpa&logoColor=white"/>| Spring Data JPA |  |
+  |<img src="https://img.shields.io/badge/QueryDSL-52B0E7?style=flat&logo=querydsl&logoColor=white"/>| QueryDSL |  |
+  |<img src="https://img.shields.io/badge/Spring_Batch-6DB33F?style=flat&logo=spring-batch&logoColor=white"/>| Spring Batch |  |
+  |<img src="https://img.shields.io/badge/Springdoc_Swagger-6DB33F?style=flat&logo=Springdoc_Swagger&logoColor=white"/>| Springdoc Swagger | API 명세 문서 자동 생성 |
+  |<img src="https://img.shields.io/badge/Mockito-6DB33F?style=flat&logo=mockito&logoColor=white"/><br><img src="https://img.shields.io/badge/JUnit5-25A162?style=flat&logo=junit5&logoColor=white"/>| Mockito <br> JUnit5 | 테스트 프레임워크 |
+  |<img src="https://img.shields.io/badge/ElasticSearch-005571?style=flat&logo=elasticsearch&logoColor=white"/>| Elasticsearch |  |
+  |<img src="https://img.shields.io/badge/Kibana-005571?style=flat&logo=kibana&logoColor=white"/>| Kibana |  |
+  |<img src="https://img.shields.io/badge/fastapi-009688?style=flat&logo=FastAPI&logoColor=white"/>| FastAPI | 추천 시스템 서버 구축 |
+<br>
+
+### DataBase
+  |  |사용 기술 | 역할 |
+  |:-----------|:-----------|:---------------|
+  | <img src="https://img.shields.io/badge/postgres-%23316192.svg?style=flat&logo=postgresql&logoColor=white"/>|PostgreSQL <br> (ver. ) | 유저, 제휴처 관련 정보 저장 |
+  | <img src="https://img.shields.io/badge/pgvector-%23316192.svg?style=flat&logo=pgvector&logoColor=white"/> | PGVector | 추천 시스템의 임베딩 기반 유사도 계산 시, vector 정보 저장 |
+  |<img src="https://img.shields.io/badge/postgis-%23316192.svg?style=flat&logo=postgis&logoColor=white"/>| PostGIS | 특정 거리 내 매장 정보 조회 시 사용 |
+  | <img src="https://img.shields.io/badge/Redis-DC382D?style=flat&logo=redis&logoColor=white"/> | Redis | 세션 캐싱 및 응답 속도 개선 |
+
+<br>
+
+### Infra
+|  |사용 기술 | 역할 |
+|:-----------|:-----------|:---------------|
+| <img src="https://img.shields.io/badge/AWS EC2-E5770D?style=flat&logo=amazonaws&logoColor=white"/> |AWS EC2| 서비스 배포 서버 |
+| <img src="https://img.shields.io/badge/AWS RDS-4967E9?style=flat&logo=amazonaws&logoColor=white"/> |AWS RDS| 관계형 DB 호스팅 |
+| <img src="https://img.shields.io/badge/AWS Route 53-8C4FFF?style=flat&logo=amazonaws&logoColor=white"/><br><img src="https://img.shields.io/badge/AWS LoadBalancer-8C4FFF?style=flat&logo=amazonaws&logoColor=white"/><br><img src="https://img.shields.io/badge/AWS Certificate Manager-D7262E?style=flat&logo=amazonaws&logoColor=white"/>| AWS Route53 <br> AWS Loadbalancer<br> AWS Certificate Manager |  |
+| <img src="https://img.shields.io/badge/AWS S3-E25444?style=flat&logo=amazonaws&logoColor=white"/> | AWS S3 |  |
+| <img src="https://img.shields.io/badge/AWS CloudWatch-6F953F?style=flat&logo=amazonaws&logoColor=white"/><br><img src="https://img.shields.io/badge/AWS Lambda-F68536?style=flat&logo=amazonaws&logoColor=white"/>| AWS CloudWatch <br> AWS Lambda |  |
+| <img src="https://img.shields.io/badge/Docker-0db7ed?style=flat&logo=docker&logoColor=white"/> |Docker| 컨테이너 환경 |
+| <img src="https://img.shields.io/badge/GitHub Actions-2671E5?style=flat&logo=githubactions&logoColor=white"/> |GitHub Actions| CI/CD 자동화 |
 
 
 <br><br><br>
