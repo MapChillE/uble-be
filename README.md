@@ -243,12 +243,16 @@ Ex. [UBLE-12] fix: 즐겨찾기 DTO 수정
 <br><br><br>
 
 ## [📚 Github Wiki]()
-
+**DOCUMENT**
 <ul>
-<li><a href=""> 🛠️ 프로젝트 수행 현황</a></li>
-<li><a href=""> 📑 Team Convention</a></li>
-<li><a href=""> 🏗️ DB 설계 </a></li>
-<li><a href=""> 💬 추천 시스템 개발</a></li>
+  <li><a href=""> 🛠️ 프로젝트 수행 현황</a></li>
+  <li><a href=""> 🏗️ DB 설계 </a></li>
+</ul>
+
+**STUDY**
+<ul>
+  <li><a href="https://github.com/MapChillE/uble-be/wiki/%5BSTUDY%5D-%EC%9D%B4%EC%9A%A9-%EB%82%B4%EC%97%AD-%EC%B4%88%EA%B8%B0%ED%99%94%EB%A5%BC-%EC%9C%84%ED%95%9C-%EC%8A%A4%EC%BC%80%EC%A4%84%EB%9F%AC-%EC%A0%81%EC%9A%A9%EA%B8%B0"> 📆 이용 내역 초기화를 위한 스케줄러 적용기</a></li>
+  <li><a href="http://github.com/MapChillE/uble-be/wiki/%5BSTUDY%5D-%EC%A0%9C%ED%9C%B4%EC%B2%98-%EC%B6%94%EC%B2%9C-%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98-%EA%B0%9C%EB%B0%9C"> ⛓️ 제휴처 추천 알고리즘 개발 </a></li>
 </ul>
 
 ---
