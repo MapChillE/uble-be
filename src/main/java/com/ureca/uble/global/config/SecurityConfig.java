@@ -65,6 +65,7 @@ public class SecurityConfig {
 			"https://localhost:3001",
 			"https://localhost:3002",
 			"https://localhost:3003",
+			"https://u-ble.com",
 			"https://dev.u-ble.com",
 			"https://api.u-ble.com"
 		));
