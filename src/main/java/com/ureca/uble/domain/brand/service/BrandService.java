@@ -10,16 +10,15 @@ import com.ureca.uble.domain.brand.repository.BrandClickLogDocumentRepository;
 import com.ureca.uble.domain.brand.repository.BrandNoriDocumentRepository;
 import com.ureca.uble.domain.brand.repository.BrandRepository;
 import com.ureca.uble.domain.common.dto.response.CursorPageRes;
+import com.ureca.uble.domain.store.repository.SearchLogDocumentRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.Bookmark;
 import com.ureca.uble.entity.Brand;
 import com.ureca.uble.entity.User;
 import com.ureca.uble.entity.document.BrandClickLogDocument;
 import com.ureca.uble.entity.document.BrandNoriDocument;
-import com.ureca.uble.entity.enums.BenefitType;
-import com.ureca.uble.entity.enums.Rank;
-import com.ureca.uble.entity.enums.RankType;
-import com.ureca.uble.entity.enums.Season;
+import com.ureca.uble.entity.document.SearchLogDocument;
+import com.ureca.uble.entity.enums.*;
 import com.ureca.uble.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.elasticsearch.core.SearchHits;
@@ -43,6 +42,7 @@ public class BrandService {
 	private final BrandNoriDocumentRepository brandNoriDocumentRepository;
 	private final BrandClickLogDocumentRepository brandClickLogDocumentRepository;
 	private final UserRepository userRepository;
+	private final SearchLogDocumentRepository searchLogDocumentRepository;
 
 	/**
 	 * 제휴처 상세 조회
@@ -116,6 +116,7 @@ public class BrandService {
 	 */
 	@Transactional(readOnly = true)
 	public SearchBrandListRes getBrandListBySearch(Long userId, String keyword, String category, Season season, BenefitType type, int page, int size) {
+		User user = findUser(userId);
 		SearchHits<BrandNoriDocument> searchHits = brandNoriDocumentRepository.findAllByFilteringAndPage(keyword, category, season, type, page, size);
 
 		// 북마크 정보 수집
@@ -145,6 +146,9 @@ public class BrandService {
 				return BrandListRes.of(document, isBookmarked, bookmarkId);
 			})
 			.toList();
+
+		// 로그 기록
+		searchLogDocumentRepository.save(SearchLogDocument.of(user, SearchType.ENTER, keyword, totalCnt > 0));
 
 		return SearchBrandListRes.of(brandList, totalCnt, totalPage);
 	}
