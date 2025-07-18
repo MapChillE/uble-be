@@ -45,6 +45,9 @@ public class BrandClickLogDocument {
     @Field(type = FieldType.Keyword)
     private List<String> brandBenefitType;
 
+    @Field(type = FieldType.Keyword)
+    private String category;
+
     @Field(type = FieldType.Date, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZZ")
     private LocalDateTime createdAt;
 
@@ -58,6 +61,7 @@ public class BrandClickLogDocument {
             .brandName(brand.getName())
             .brandIsOnline(brand.getIsOnline())
             .brandBenefitType(brand.getRankList())
+            .category(brand.getCategory().getName())
             .createdAt(LocalDateTime.now())
             .build();
     }
