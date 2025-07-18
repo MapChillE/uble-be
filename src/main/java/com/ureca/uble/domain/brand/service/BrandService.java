@@ -103,7 +103,6 @@ public class BrandService {
 	/**
 	 * (검색) 제휴처 전체 조회
 	 */
-	@Transactional
 	public SearchBrandListRes getBrandListBySearch(Long userId, String keyword, String category, Season season, BenefitType type, int page, int size) {
 		// 쿼리 작성
 		Query multiMatchQuery = MultiMatchQuery.of(m -> m
