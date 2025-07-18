@@ -109,6 +109,7 @@ public class BrandService {
 	/**
 	 * (검색) 제휴처 전체 조회
 	 */
+	@Transactional(readOnly = true)
 	public SearchBrandListRes getBrandListBySearch(Long userId, String keyword, String category, Season season, BenefitType type, int page, int size) {
 		SearchHits<BrandNoriDocument> searchHits = brandNoriDocumentRepository.findAllByFilteringAndPage(keyword, category, season, type, page, size);
 
