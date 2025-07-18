@@ -125,6 +125,6 @@ public class UsageHistoryService {
 	}
 
 	private Store findByIdWithBrand(Long storeId) {
-		return storeRepository.findByIdWithBrand(storeId).orElseThrow(() -> new GlobalException(STORE_NOT_FOUND));
+		return storeRepository.findByIdWithBrandAndCategory(storeId).orElseThrow(() -> new GlobalException(STORE_NOT_FOUND));
 	}
 }
