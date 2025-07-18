@@ -34,12 +34,12 @@ public class CommonService {
     /**
      * ES 전체 정보 삽입 API
      */
-    @Transactional
+    @Transactional(readOnly = true)
     public String updateIndex() {
         List<Brand> brandList = brandRepository.findAllWithCategoryAndBenefits();
 
         // Brand-nori 정보 전체 삽입
-        List<BrandNoriDocument> noriBrands =brandList.stream()
+        List<BrandNoriDocument> noriBrands = brandList.stream()
             .map(BrandNoriDocument::from)
             .toList();
         brandNoriDocumentRepository.saveAll(noriBrands);
