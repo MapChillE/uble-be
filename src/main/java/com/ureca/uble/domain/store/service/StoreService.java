@@ -4,10 +4,12 @@ import com.ureca.uble.domain.store.dto.response.GetBenefitInfoRes;
 import com.ureca.uble.domain.store.dto.response.GetStoreDetailRes;
 import com.ureca.uble.domain.store.dto.response.GetStoreListRes;
 import com.ureca.uble.domain.store.dto.response.GetStoreRes;
+import com.ureca.uble.domain.store.repository.StoreClickLogDocumentRepository;
 import com.ureca.uble.domain.store.repository.StoreRepository;
 import com.ureca.uble.domain.users.repository.UsageCountRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.*;
+import com.ureca.uble.entity.document.StoreClickLogDocument;
 import com.ureca.uble.entity.enums.*;
 import com.ureca.uble.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,7 @@ public class StoreService {
     private final UsageCountRepository usageCountRepository;
     private final StoreRepository storeRepository;
     private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+    private final StoreClickLogDocumentRepository storeClickLogDocumentRepository;
 
     /**
      * 근처 매장 정보 조회
@@ -66,6 +69,9 @@ public class StoreService {
         List<GetBenefitInfoRes> benefitList = store.getBrand().getBenefits().stream()
             .map(b -> GetBenefitInfoRes.of(b, getBenefitType(store.getBrand(), b)))
             .toList();
+
+        // 로그 기록
+        storeClickLogDocumentRepository.save(StoreClickLogDocument.of(user, store));
 
         return GetStoreDetailRes.of(store, distance, isNormalAvailable, isVipAvailable, isLocalAvailable, benefitList);
     }
