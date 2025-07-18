@@ -1,13 +1,14 @@
 package com.ureca.uble.entity.document;
 
 import com.ureca.uble.entity.User;
+import com.ureca.uble.entity.enums.SearchType;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Getter
 @Builder
@@ -41,19 +42,19 @@ public class SearchLogDocument {
     @Field(type = FieldType.Boolean)
     private Boolean isResultExists;
 
-    @Field(type = FieldType.Date, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZZ")
-    private LocalDateTime createdAt;
+    @Field(type = FieldType.Date, pattern = "uuuu-MM-dd'T'HH:mm:ss.SSSZZ")
+    private ZonedDateTime createdAt;
 
-    public static SearchLogDocument of(User user, String searchType, String searchKeyword, Boolean isResultExists) {
+    public static SearchLogDocument of(User user, SearchType searchType, String searchKeyword, Boolean isResultExists) {
         return SearchLogDocument.builder()
             .userId(user.getId())
             .userBirthDate(user.getBirthDate())
             .userRank(user.getRank().toString())
             .userGender(user.getGender().toString())
-            .searchType(searchType)
+            .searchType(searchType.toString())
             .searchKeyword(searchKeyword)
             .isResultExists(isResultExists)
-            .createdAt(LocalDateTime.now())
+            .createdAt(ZonedDateTime.now())
             .build();
     }
 }

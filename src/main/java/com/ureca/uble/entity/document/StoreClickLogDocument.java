@@ -8,7 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Getter
@@ -58,8 +58,8 @@ public class StoreClickLogDocument {
     @Field(type = FieldType.Keyword)
     private String category;
 
-    @Field(type = FieldType.Date, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZZ")
-    private LocalDateTime createdAt;
+    @Field(type = FieldType.Date, pattern = "uuuu-MM-dd'T'HH:mm:ss.SSSZZ")
+    private ZonedDateTime createdAt;
 
     public static StoreClickLogDocument of(User user, Store store) {
         return StoreClickLogDocument.builder()
@@ -75,7 +75,7 @@ public class StoreClickLogDocument {
             .brandIsOnline(store.getBrand().getIsOnline())
             .brandBenefitType(store.getBrand().getRankList())
             .category(store.getBrand().getCategory().getName())
-            .createdAt(LocalDateTime.now())
+            .createdAt(ZonedDateTime.now())
             .build();
     }
 }
