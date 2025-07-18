@@ -60,7 +60,7 @@ public class CustomBrandNoriRepositoryImpl implements CustomBrandNoriRepository 
 
             Query typeFilter = TermsQuery.of(t -> t
                 .field("rankType")
-                .terms(terms -> terms.value(rankTypeValues.stream().map(FieldValue::of).toList()))
+                .terms(terms -> terms.value(rankTypeValues))
             )._toQuery();
             filters.add(typeFilter);
         }
