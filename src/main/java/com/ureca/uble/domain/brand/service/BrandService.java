@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import com.ureca.uble.domain.brand.dto.response.*;
+import com.ureca.uble.domain.brand.repository.BrandNoriDocumentRepository;
 import com.ureca.uble.entity.document.BrandNoriDocument;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
@@ -40,9 +41,11 @@ public class BrandService {
 
 	private final BrandRepository brandRepository;
 	private final BookmarkRepository bookmarkRepository;
-	private final ElasticsearchOperations elasticsearchOperations;
+	private final BrandNoriDocumentRepository brandNoriDocumentRepository;
 
-
+	/**
+	 * 제휴처 상세 조회
+	 */
 	@Transactional(readOnly = true)
 	public BrandDetailRes getBrandDetail(Long userId, Long brandId) {
 		Brand brand = brandRepository.findWithBenefitsById(brandId)
@@ -64,6 +67,9 @@ public class BrandService {
 		return BrandDetailRes.of(brand, isBookmarked, bookmarkId, isVIPcock, benefits);
 	}
 
+	/**
+	 * 제휴처 전체 조회
+	 */
 	@Transactional(readOnly = true)
 	public CursorPageRes<BrandListRes> getBrandList(Long userId, Long categoryId, Season season, BenefitType type, Long lastBrandId, int size) {
 
@@ -104,65 +110,7 @@ public class BrandService {
 	 * (검색) 제휴처 전체 조회
 	 */
 	public SearchBrandListRes getBrandListBySearch(Long userId, String keyword, String category, Season season, BenefitType type, int page, int size) {
-		// 쿼리 작성
-		Query multiMatchQuery = MultiMatchQuery.of(m -> m
-			.query(keyword)
-			.fields("brandName^10","category^20", "season^20")
-			.fuzziness("AUTO")
-		)._toQuery();
-
-		// filter 적용
-		List<Query> filters = new ArrayList<>();
-		if (category != null && !category.isEmpty()) {
-			Query categoryFilter = TermQuery.of(t -> t
-				.field("category.raw")
-				.value(category)
-			)._toQuery();
-			filters.add(categoryFilter);
-		}
-
-		if (season != null) {
-			Query seasonFilter = TermQuery.of(t -> t
-				.field("season.raw")
-				.value(season.toString())
-			)._toQuery();
-			filters.add(seasonFilter);
-		}
-
-		if (type != null) {
-			List<FieldValue> rankTypeValues = switch (type) {
-                case VIP -> List.of(FieldValue.of("VIP"), FieldValue.of("VIP_NORMAL"));
-                case NORMAL -> List.of(FieldValue.of("NORMAL"), FieldValue.of("VIP_NORMAL"));
-                case LOCAL -> List.of(FieldValue.of("LOCAL"));
-            };
-
-            Query typeFilter = TermsQuery.of(t -> t
-                .field("rankType")
-                .terms(terms -> terms.value(rankTypeValues.stream().map(FieldValue::of).toList()))
-            )._toQuery();
-            filters.add(typeFilter);
-        }
-
-		// 조합
-		Query boolQuery = BoolQuery.of(b -> b
-			.must(multiMatchQuery)
-			.filter(filters)
-		)._toQuery();
-
-		NativeQuery nativeQuery = NativeQuery.builder()
-			.withQuery(boolQuery)
-			.withPageable(PageRequest.of(page, size))
-			.build();
-
-		// 요청 및 결과 수집
-		SearchHits<BrandNoriDocument> searchHits;
-		try {
-			searchHits = this.elasticsearchOperations.search(
-				nativeQuery, BrandNoriDocument.class
-			);
-		} catch (Exception e) {
-			throw new GlobalException(ELASTIC_INTERNAL_ERROR);
-		}
+		SearchHits<BrandNoriDocument> searchHits = brandNoriDocumentRepository.findAllByFilteringAndPage(keyword, category, season, type, page, size);
 
 		// 북마크 정보 수집
 		List<Long> brandIds = searchHits.stream()
