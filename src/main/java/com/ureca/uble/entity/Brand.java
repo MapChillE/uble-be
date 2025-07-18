@@ -90,8 +90,8 @@ public class Brand extends BaseEntity {
     public List<String> getRankList() {
         return switch (this.rankType) {
             case VIP -> List.of("VIP");
-            case NORMAL -> List.of("NORMA");
-            case VIP_NORMAL -> List.of("NORMA", "VIP");
+            case NORMAL -> List.of("NORMAL");
+            case VIP_NORMAL -> List.of("NORMAL", "VIP");
             case LOCAL -> List.of("LOCAL");
         };
     }
