@@ -5,6 +5,7 @@ import com.ureca.uble.domain.brand.dto.response.BrandDetailRes;
 import com.ureca.uble.domain.brand.dto.response.BrandListRes;
 import com.ureca.uble.domain.brand.repository.BrandClickLogDocumentRepository;
 import com.ureca.uble.domain.brand.repository.BrandRepository;
+import com.ureca.uble.domain.common.dto.response.CursorPageRes;
 import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.Brand;
 import com.ureca.uble.entity.Category;
@@ -13,7 +14,6 @@ import com.ureca.uble.entity.document.BrandClickLogDocument;
 import com.ureca.uble.entity.enums.Gender;
 import com.ureca.uble.entity.enums.Rank;
 import com.ureca.uble.entity.enums.Season;
-import com.ureca.uble.domain.common.dto.response.CursorPageRes;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -81,6 +81,7 @@ public class BrandServiceTest {
 		assertThat(result.isBookmarked()).isFalse();
 		assertThat(result.getBookmarkId()).isNull();
 		assertThat(result.getBenefits()).isEmpty();
+		verify(brandClickLogDocumentRepository).save(any(BrandClickLogDocument.class));
 	}
 
 	@Test

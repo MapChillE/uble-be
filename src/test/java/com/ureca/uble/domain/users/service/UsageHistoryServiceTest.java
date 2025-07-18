@@ -1,6 +1,7 @@
 package com.ureca.uble.domain.users.service;
 
 import com.ureca.uble.domain.brand.repository.BenefitRepository;
+import com.ureca.uble.domain.common.dto.response.CursorPageRes;
 import com.ureca.uble.domain.store.repository.StoreRepository;
 import com.ureca.uble.domain.users.dto.request.CreateUsageHistoryReq;
 import com.ureca.uble.domain.users.dto.response.CreateUsageHistoryRes;
@@ -16,7 +17,6 @@ import com.ureca.uble.entity.enums.Gender;
 import com.ureca.uble.entity.enums.Rank;
 import com.ureca.uble.entity.enums.RankType;
 import com.ureca.uble.global.exception.GlobalException;
-import com.ureca.uble.domain.common.dto.response.CursorPageRes;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -108,8 +108,8 @@ public class UsageHistoryServiceTest {
 		// then
 		assertThat(res.getId()).isEqualTo("savedId");
 		verify(vipUser).updateVipAvailability(false);
+		verify(usageHistoryDocumentRepository).save(any());
 	}
-
 
 	@Test
 	@DisplayName("VIP 혜택을 사용할 수 없는 경우 에러가 발생한다.")
@@ -170,6 +170,7 @@ public class UsageHistoryServiceTest {
 		// then
 		assertThat(res.getId()).isEqualTo("savedId");
 		verify(localUser).updateLocalAvailability(false);
+		verify(usageHistoryDocumentRepository).save(any());
 	}
 
 	@Test

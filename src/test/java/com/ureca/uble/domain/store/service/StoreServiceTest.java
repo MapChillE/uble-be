@@ -7,6 +7,7 @@ import com.ureca.uble.domain.store.repository.StoreRepository;
 import com.ureca.uble.domain.users.repository.UsageCountRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.*;
+import com.ureca.uble.entity.document.StoreClickLogDocument;
 import com.ureca.uble.entity.enums.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,8 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class StoreServiceTest {
@@ -148,5 +148,6 @@ class StoreServiceTest {
         assertThat(result.getBenefitList().get(0).getBenefitId()).isEqualTo(1001L);
         assertThat(result.getBenefitList().get(0).getType()).isEqualTo("NORMAL");
         assertThat(result.getBenefitList().get(0).getContent()).isEqualTo("아메리카노 무료");
+        verify(storeClickLogDocumentRepository).save(any(StoreClickLogDocument.class));
     }
 }
