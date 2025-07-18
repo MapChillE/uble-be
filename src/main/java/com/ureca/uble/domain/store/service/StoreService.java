@@ -13,6 +13,7 @@ import com.ureca.uble.entity.document.StoreClickLogDocument;
 import com.ureca.uble.entity.enums.*;
 import com.ureca.uble.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -26,6 +27,7 @@ import static com.ureca.uble.domain.store.exception.StoreErrorCode.OUT_OF_RANGE_
 import static com.ureca.uble.domain.store.exception.StoreErrorCode.STORE_NOT_FOUND;
 import static com.ureca.uble.domain.users.exception.UserErrorCode.USER_NOT_FOUND;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StoreService {
@@ -71,7 +73,11 @@ public class StoreService {
             .toList();
 
         // 로그 기록
-        storeClickLogDocumentRepository.save(StoreClickLogDocument.of(user, store));
+        try {
+            storeClickLogDocumentRepository.save(StoreClickLogDocument.of(user, store));
+        } catch (Exception e) {
+            log.warn("매장 상세 조회 로그 저장에 실패하였습니다 : {}", e.getMessage());
+        }
 
         return GetStoreDetailRes.of(store, distance, isNormalAvailable, isVipAvailable, isLocalAvailable, benefitList);
     }

@@ -21,6 +21,7 @@ import com.ureca.uble.entity.document.SearchLogDocument;
 import com.ureca.uble.entity.enums.*;
 import com.ureca.uble.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
 
 import static com.ureca.uble.domain.users.exception.UserErrorCode.USER_NOT_FOUND;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BrandService {
@@ -67,7 +69,11 @@ public class BrandService {
 		boolean isVIPcock = brand.isVIPcock();
 
 		// 로그 저장
-		brandClickLogDocumentRepository.save(BrandClickLogDocument.of(user, brand));
+		try {
+			brandClickLogDocumentRepository.save(BrandClickLogDocument.of(user, brand));
+		} catch (Exception e) {
+			log.warn("제휴처 상세 조회 로그 저장에 실패하였습니다 : {}", e.getMessage());
+		}
 
 		return BrandDetailRes.of(brand, isBookmarked, bookmarkId, isVIPcock, benefits);
 	}
@@ -148,7 +154,11 @@ public class BrandService {
 			.toList();
 
 		// 로그 기록
-		searchLogDocumentRepository.save(SearchLogDocument.of(user, SearchType.ENTER, keyword, totalCnt > 0));
+		try {
+			searchLogDocumentRepository.save(SearchLogDocument.of(user, SearchType.ENTER, keyword, totalCnt > 0));
+		} catch (Exception e) {
+			log.warn("검색 로그 저장에 실패하였습니다 : {}", e.getMessage());
+		}
 
 		return SearchBrandListRes.of(brandList, totalCnt, totalPage);
 	}
