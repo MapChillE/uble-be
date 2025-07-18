@@ -6,9 +6,11 @@ import com.ureca.uble.domain.users.dto.request.CreateUsageHistoryReq;
 import com.ureca.uble.domain.users.dto.response.CreateUsageHistoryRes;
 import com.ureca.uble.domain.users.dto.response.UsageHistoryRes;
 import com.ureca.uble.domain.users.repository.UsageCountRepository;
+import com.ureca.uble.domain.users.repository.UsageHistoryDocumentRepository;
 import com.ureca.uble.domain.users.repository.UsageHistoryRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.*;
+import com.ureca.uble.entity.document.UsageHistoryDocument;
 import com.ureca.uble.entity.enums.BenefitType;
 import com.ureca.uble.entity.enums.Period;
 import com.ureca.uble.entity.enums.Rank;
@@ -35,6 +37,7 @@ public class UsageHistoryService {
 	private final UserRepository userRepository;
 	private final BenefitRepository benefitRepository;
 	private final StoreRepository storeRepository;
+	private final UsageHistoryDocumentRepository usageHistoryDocumentRepository;
 
 	/**
 	 * 매장 이용 내역 전체 조회
@@ -67,7 +70,7 @@ public class UsageHistoryService {
 		}
 
 		// 로그 저장
-		UsageHistory savedHistory = usageRepository.save(UsageHistory.of(user, store));
+		UsageHistoryDocument savedHistory = usageHistoryDocumentRepository.save(UsageHistoryDocument.of(user, store));
 
 		return new CreateUsageHistoryRes(savedHistory.getId());
 	}
