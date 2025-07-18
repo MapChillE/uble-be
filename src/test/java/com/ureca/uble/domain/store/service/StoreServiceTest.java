@@ -1,15 +1,13 @@
 package com.ureca.uble.domain.store.service;
 
-import com.ureca.uble.domain.brand.repository.BenefitRepository;
 import com.ureca.uble.domain.store.dto.response.GetStoreDetailRes;
 import com.ureca.uble.domain.store.dto.response.GetStoreListRes;
+import com.ureca.uble.domain.store.repository.StoreClickLogDocumentRepository;
 import com.ureca.uble.domain.store.repository.StoreRepository;
 import com.ureca.uble.domain.users.repository.UsageCountRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.*;
-import com.ureca.uble.entity.enums.BenefitType;
-import com.ureca.uble.entity.enums.RankType;
-import com.ureca.uble.entity.enums.Season;
+import com.ureca.uble.entity.enums.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,6 +44,9 @@ class StoreServiceTest {
 
     @Mock
     private UsageCountRepository usageCountRepository;
+
+    @Mock
+    private StoreClickLogDocumentRepository storeClickLogDocumentRepository;
 
     @Test
     @DisplayName("반경 500m 내의 매장 중 필터링 조건에 맞는 매장 리스트를 조회한다.")
@@ -106,6 +107,8 @@ class StoreServiceTest {
         when(storeRepository.findByIdWithBrandAndCategoryAndBenefits(storeId)).thenReturn(Optional.of(mockStore));
         when(usageCountRepository.findByUserAndBenefit(any(), any())).thenReturn(Optional.empty());
 
+        when(mockUser.getRank()).thenReturn(Rank.VIP);
+        when(mockUser.getGender()).thenReturn(Gender.FEMALE);
         when(mockStore.getBrand()).thenReturn(mockBrand);
         when(mockStore.getId()).thenReturn(storeId);
         when(mockStore.getName()).thenReturn("스타벅스 선릉점");

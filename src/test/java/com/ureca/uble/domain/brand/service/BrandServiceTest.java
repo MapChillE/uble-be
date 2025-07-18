@@ -3,9 +3,14 @@ package com.ureca.uble.domain.brand.service;
 import com.ureca.uble.domain.bookmark.repository.BookmarkRepository;
 import com.ureca.uble.domain.brand.dto.response.BrandDetailRes;
 import com.ureca.uble.domain.brand.dto.response.BrandListRes;
+import com.ureca.uble.domain.brand.repository.BrandClickLogDocumentRepository;
 import com.ureca.uble.domain.brand.repository.BrandRepository;
+import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.Brand;
 import com.ureca.uble.entity.Category;
+import com.ureca.uble.entity.User;
+import com.ureca.uble.entity.document.BrandClickLogDocument;
+import com.ureca.uble.entity.enums.Gender;
 import com.ureca.uble.entity.enums.Rank;
 import com.ureca.uble.entity.enums.Season;
 import com.ureca.uble.domain.common.dto.response.CursorPageRes;
@@ -31,6 +36,12 @@ public class BrandServiceTest {
 	@Mock
 	private BookmarkRepository bookmarkRepository;
 
+	@Mock
+	private UserRepository userRepository;
+
+	@Mock
+	private BrandClickLogDocumentRepository brandClickLogDocumentRepository;
+
 	@InjectMocks
 	private BrandService brandService;
 
@@ -42,7 +53,10 @@ public class BrandServiceTest {
 		Long brandId = 2L;
 
 		Category mockCategory = mock(Category.class);
+		User mockUser = mock(User.class);
 		when(mockCategory.getName()).thenReturn("푸드");
+		when(mockUser.getRank()).thenReturn(Rank.VIP);
+		when(mockUser.getGender()).thenReturn(Gender.FEMALE);
 
 		Brand mockBrand = mock(Brand.class);
 		when(mockBrand.getId()).thenReturn(brandId);
@@ -55,6 +69,7 @@ public class BrandServiceTest {
 		when(mockBrand.isVIPcock()).thenReturn(false);
 
 		when(mockBrand.getBenefits()).thenReturn(List.of());
+		when(userRepository.findById(any())).thenReturn(Optional.of(mockUser));
 		when(brandRepository.findWithBenefitsById(brandId)).thenReturn(Optional.of(mockBrand));
 		when(bookmarkRepository.findByUserIdAndBrandId(userId, brandId)).thenReturn(Optional.empty());
 
