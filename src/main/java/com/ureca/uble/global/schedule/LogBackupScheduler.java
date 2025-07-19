@@ -26,6 +26,9 @@ public class LogBackupScheduler {
     @Value("${spring.elasticsearch.password}")
     private String elasticPassword;
 
+    @Value("${elasticsearch.backup.bucket-name}")
+    private String bucketName;
+
     @Scheduled(cron = "0 0 3 * * *")
     public void backupSearchLog() {
         redisLockUtil.executeWithLockWithRetry("backup-log-lock", 1, 300, () -> {
@@ -92,13 +95,13 @@ public class LogBackupScheduler {
             {
               "type": "s3",
               "settings": {
-                "bucket": "uble-storage",
+                "bucket": "%s",
                 "region": "ap-northeast-2",
                 "base_path": "%s",
                 "compress": true
               }
             }
-            """.formatted(basePath);
+            """.formatted(bucketName, basePath);
 
         try {
             elasticWebClient.put()
