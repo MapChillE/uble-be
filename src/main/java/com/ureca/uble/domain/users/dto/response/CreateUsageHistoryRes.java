@@ -9,5 +9,5 @@ import lombok.Getter;
 @Schema(description="매장 이용내역 생성 DTO 응답")
 public class CreateUsageHistoryRes {
     @Schema(description = "이용내역 ID", example = "1")
-    private Long id;
+    private String id;
 }

@@ -11,7 +11,7 @@ public interface BenefitRepository extends JpaRepository<Benefit, Long> {
     @Query(value = """
         SELECT *
         FROM benefit b
-        WHERE b.rank = 'NORMAL'
+        WHERE b.rank != 'NONE'
           AND b.brand_id = (
             SELECT s.brand_id
             FROM store s

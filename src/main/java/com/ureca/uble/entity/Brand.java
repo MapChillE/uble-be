@@ -1,11 +1,5 @@
 package com.ureca.uble.entity;
 
-import static lombok.AccessLevel.*;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
 import com.ureca.uble.entity.enums.Rank;
 import com.ureca.uble.entity.enums.RankType;
 import com.ureca.uble.entity.enums.Season;
@@ -14,6 +8,12 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+import static lombok.AccessLevel.PRIVATE;
 
 @Entity
 @Table(name="brand")
@@ -85,5 +85,14 @@ public class Brand extends BaseEntity {
             .map(Benefit::getRank)
             .min(Comparator.comparingInt(Enum::ordinal))
             .orElse(Rank.NORMAL);
+    }
+
+    public List<String> getRankList() {
+        return switch (this.rankType) {
+            case VIP -> List.of("VIP");
+            case NORMAL -> List.of("NORMAL");
+            case VIP_NORMAL -> List.of("NORMAL", "VIP");
+            case LOCAL -> List.of("LOCAL");
+        };
     }
 }

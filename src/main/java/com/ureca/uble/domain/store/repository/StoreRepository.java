@@ -10,8 +10,11 @@ import java.util.stream.Stream;
 
 public interface StoreRepository extends JpaRepository<Store, Long>, CustomStoreRepository {
 
-    @Query("SELECT s FROM Store s JOIN FETCH s.brand WHERE s.id = :storeId")
-    Optional<Store> findByIdWithBrand(@Param("storeId") Long storeId);
+    @Query("SELECT s FROM Store s " +
+        "JOIN FETCH s.brand b " +
+        "JOIN FETCH b.category " +
+        "WHERE s.id = :storeId")
+    Optional<Store> findByIdWithBrandAndCategory(@Param("storeId") Long storeId);
 
     @Query("SELECT s FROM Store s " +
         "JOIN FETCH s.brand b " +
