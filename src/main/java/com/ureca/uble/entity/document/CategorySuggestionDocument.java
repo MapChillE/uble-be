@@ -11,9 +11,9 @@ import org.springframework.data.elasticsearch.annotations.Setting;
 
 @Getter
 @Builder
-@Document(indexName = "category-ngram")
-@Setting(settingPath = "/elasticsearch/category-ngram-settings.json")
-public class CategoryNgramDocument {
+@Document(indexName = "category-suggestion")
+@Setting(settingPath = "/elasticsearch/category-suggestion-settings.json")
+public class CategorySuggestionDocument {
 
     @Id
     private String id;
@@ -21,11 +21,11 @@ public class CategoryNgramDocument {
     @Field(type = FieldType.Long)
     private Long categoryId;
 
-    @Field(type = FieldType.Text, analyzer = "category_ngram_synonym_analyzer")
+    @Field(type = FieldType.Search_As_You_Type, analyzer = "category_synonym_analyzer")
     private String categoryName;
 
-    public static CategoryNgramDocument from(Category category) {
-        return CategoryNgramDocument.builder()
+    public static CategorySuggestionDocument from(Category category) {
+        return CategorySuggestionDocument.builder()
             .categoryId(category.getId())
             .categoryName(category.getName())
             .build();
