@@ -8,8 +8,8 @@ import com.ureca.uble.domain.category.repository.CategorySuggestionDocumentRepos
 import com.ureca.uble.domain.common.dto.request.CreateSearchLogReq;
 import com.ureca.uble.domain.common.dto.response.CreateSearchLogRes;
 import com.ureca.uble.domain.store.repository.SearchLogDocumentRepository;
-import com.ureca.uble.domain.store.repository.StoreNgramDocumentRepository;
 import com.ureca.uble.domain.store.repository.StoreRepository;
+import com.ureca.uble.domain.store.repository.StoreSuggestionDocumentRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.Brand;
 import com.ureca.uble.entity.Store;
@@ -31,7 +31,7 @@ import static com.ureca.uble.domain.users.exception.UserErrorCode.USER_NOT_FOUND
 public class CommonService {
 
     private final StoreRepository storeRepository;
-    private final StoreNgramDocumentRepository storeNgramDocumentRepository;
+    private final StoreSuggestionDocumentRepository storeSuggestionDocumentRepository;
     private final BrandRepository brandRepository;
     private final BrandNoriDocumentRepository brandNoriDocumentRepository;
     private final BrandSuggestionDocumentRepository brandSuggestionDocumentRepository;
@@ -67,19 +67,19 @@ public class CommonService {
 
         // store 정보 삽입
         try (Stream<Store> stream = storeRepository.findAllWithBrandAndCategory()) {
-            List<StoreNgramDocument> stores = new ArrayList<>(500);
+            List<StoreSuggestionDocument> stores = new ArrayList<>(500);
             stream.forEach(store -> {
                 // online 아닌 애들 (위경도 있는 애들만, 지도에 표시할 수 있도록)
                 if(!store.getBrand().getIsOnline() && store.getLocation() != null && !store.getLocation().isEmpty()) {
-                    stores.add(StoreNgramDocument.from(store));
+                    stores.add(StoreSuggestionDocument.from(store));
                 }
                 if (stores.size() == 500) {
-                    storeNgramDocumentRepository.saveAll(stores);
+                    storeSuggestionDocumentRepository.saveAll(stores);
                     stores.clear();
                 }
             });
             if (!stores.isEmpty()) {
-                storeNgramDocumentRepository.saveAll(stores);
+                storeSuggestionDocumentRepository.saveAll(stores);
             }
         }
         return "정보 삽입이 완료되었습니다.";
