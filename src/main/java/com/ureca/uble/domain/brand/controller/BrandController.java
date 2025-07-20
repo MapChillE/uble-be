@@ -2,12 +2,13 @@ package com.ureca.uble.domain.brand.controller;
 
 import com.ureca.uble.domain.brand.dto.response.BrandDetailRes;
 import com.ureca.uble.domain.brand.dto.response.BrandListRes;
+import com.ureca.uble.domain.brand.dto.response.BrandSuggestionListRes;
 import com.ureca.uble.domain.brand.dto.response.SearchBrandListRes;
 import com.ureca.uble.domain.brand.service.BrandService;
-import com.ureca.uble.entity.enums.BenefitType;
-import com.ureca.uble.entity.enums.Season;
 import com.ureca.uble.domain.common.dto.response.CommonResponse;
 import com.ureca.uble.domain.common.dto.response.CursorPageRes;
+import com.ureca.uble.entity.enums.BenefitType;
+import com.ureca.uble.entity.enums.Season;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
@@ -69,5 +70,20 @@ public class BrandController {
 		@Parameter(description = "한 번에 가져올 크기")
 		@RequestParam(defaultValue = "5") int size){
 		return CommonResponse.success(brandService.getBrandListBySearch(userId, keyword, category, season, type, page, size));
+	}
+
+	/**
+	 * 제휴처 검색 자동완성
+	 *
+	 * @param keyword 검색어
+	 */
+	@Operation(summary = "(자동완성) 제휴처 전체 검색 자동완성", description = "(자동완성) 제휴처 전체 검색 자동완성")
+	@GetMapping("/suggestions")
+	public CommonResponse<BrandSuggestionListRes> getBrandSuggestionList(
+		@Parameter(description = "검색어", required = true)
+		@RequestParam String keyword,
+		@Parameter(description = "한 번에 가져올 크기")
+		@RequestParam(defaultValue = "5") int size){
+		return CommonResponse.success(brandService.getBrandSuggestionList(keyword, size));
 	}
 }
