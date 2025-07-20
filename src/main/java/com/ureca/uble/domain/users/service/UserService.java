@@ -45,7 +45,8 @@ public class UserService {
 		user.updateUserInfo(
 			request.getRank(),
 			request.getGender(),
-			request.getBirthDate()
+			request.getBirthDate(),
+			request.getBarcode()
 		);
 
 		userCategoryRepository.deleteByUser(user);
