@@ -2,6 +2,7 @@ package com.ureca.uble.domain.brand.controller;
 
 import com.ureca.uble.domain.brand.dto.response.BrandDetailRes;
 import com.ureca.uble.domain.brand.dto.response.BrandListRes;
+import com.ureca.uble.domain.brand.dto.response.InitialDataRes;
 import com.ureca.uble.domain.brand.dto.response.SearchBrandListRes;
 import com.ureca.uble.domain.brand.service.BrandService;
 import com.ureca.uble.entity.enums.BenefitType;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -69,5 +71,13 @@ public class BrandController {
 		@Parameter(description = "한 번에 가져올 크기")
 		@RequestParam(defaultValue = "5") int size){
 		return CommonResponse.success(brandService.getBrandListBySearch(userId, keyword, category, season, type, page, size));
+	}
+
+	@Operation(summary = "지도 초기 데이터 조회")
+	@GetMapping("/map/initial-data")
+	public CommonResponse<InitialDataRes> getInitialData(
+		@Parameter(description = "사용자정보", required = true)
+		@AuthenticationPrincipal Long userId) {
+		return CommonResponse.success(brandService.getInitialData(userId));
 	}
 }

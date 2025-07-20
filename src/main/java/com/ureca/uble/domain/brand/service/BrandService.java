@@ -1,14 +1,9 @@
 package com.ureca.uble.domain.brand.service;
 
 import com.ureca.uble.domain.bookmark.repository.BookmarkRepository;
-import com.ureca.uble.domain.brand.dto.response.BenefitDetailRes;
-import com.ureca.uble.domain.brand.dto.response.BrandDetailRes;
-import com.ureca.uble.domain.brand.dto.response.BrandListRes;
-import com.ureca.uble.domain.brand.dto.response.SearchBrandListRes;
+import com.ureca.uble.domain.brand.dto.response.*;
 import com.ureca.uble.domain.brand.exception.BrandErrorCode;
-import com.ureca.uble.domain.brand.repository.BrandClickLogDocumentRepository;
-import com.ureca.uble.domain.brand.repository.BrandNoriDocumentRepository;
-import com.ureca.uble.domain.brand.repository.BrandRepository;
+import com.ureca.uble.domain.brand.repository.*;
 import com.ureca.uble.domain.common.dto.response.CursorPageRes;
 import com.ureca.uble.domain.store.repository.SearchLogDocumentRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
@@ -45,6 +40,8 @@ public class BrandService {
 	private final BrandClickLogDocumentRepository brandClickLogDocumentRepository;
 	private final UserRepository userRepository;
 	private final SearchLogDocumentRepository searchLogDocumentRepository;
+	private final MapCategoryRepository mapCategoryRepository;
+	private final MapPinRepository mapPinRepository;
 
 	/**
 	 * 제휴처 상세 조회
@@ -161,6 +158,25 @@ public class BrandService {
 		}
 
 		return SearchBrandListRes.of(brandList, totalCnt, totalPage);
+	}
+
+	/**
+	 * 지도 초기 데이터 조회
+	 */
+	public InitialDataRes getInitialData(Long userId) {
+		User user = findUser(userId);
+		List<CategoryRes> categories = mapCategoryRepository.findByOrderByIdAsc() .stream()
+				.map(category -> CategoryRes.of(category.getId(), category.getName()))
+				.collect(Collectors.toList());
+
+		List<LocationRes> locations = mapPinRepository.findByUserIdOrderByIdAsc(userId).stream()
+				.map(pin -> LocationRes.of(
+						pin.getId(), pin.getName(),
+						pin.getLocation().getX(), pin.getLocation().getY()
+				))
+				.collect(Collectors.toList());
+
+		return InitialDataRes.builder().categories(categories).locations(locations).build();
 	}
 
 	private User findUser(Long userId) {
