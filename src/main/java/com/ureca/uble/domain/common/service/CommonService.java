@@ -1,10 +1,10 @@
 package com.ureca.uble.domain.common.service;
 
-import com.ureca.uble.domain.brand.repository.BrandNgramDocumentRepository;
 import com.ureca.uble.domain.brand.repository.BrandNoriDocumentRepository;
 import com.ureca.uble.domain.brand.repository.BrandRepository;
-import com.ureca.uble.domain.category.repository.CategoryNgramDocumentRepository;
+import com.ureca.uble.domain.brand.repository.BrandSuggestionDocumentRepository;
 import com.ureca.uble.domain.category.repository.CategoryRepository;
+import com.ureca.uble.domain.category.repository.CategorySuggestionDocumentRepository;
 import com.ureca.uble.domain.common.dto.request.CreateSearchLogReq;
 import com.ureca.uble.domain.common.dto.response.CreateSearchLogRes;
 import com.ureca.uble.domain.store.repository.SearchLogDocumentRepository;
@@ -34,9 +34,9 @@ public class CommonService {
     private final StoreNgramDocumentRepository storeNgramDocumentRepository;
     private final BrandRepository brandRepository;
     private final BrandNoriDocumentRepository brandNoriDocumentRepository;
-    private final BrandNgramDocumentRepository brandNgramDocumentRepository;
+    private final BrandSuggestionDocumentRepository brandSuggestionDocumentRepository;
     private final CategoryRepository categoryRepository;
-    private final CategoryNgramDocumentRepository categoryNgramDocumentRepository;
+    private final CategorySuggestionDocumentRepository categorySuggestionDocumentRepository;
     private final SearchLogDocumentRepository searchLogDocumentRepository;
     private final UserRepository userRepository;
 
@@ -53,17 +53,17 @@ public class CommonService {
             .toList();
         brandNoriDocumentRepository.saveAll(noriBrands);
 
-        // Brand-ngram 정보 삽입
-        List<BrandNgramDocument> ngramBrands = brandList.stream()
-            .map(BrandNgramDocument::from)
+        // Brand-suggestion 정보 삽입
+        List<BrandSuggestionDocument> ngramBrands = brandList.stream()
+            .map(BrandSuggestionDocument::from)
             .toList();
-        brandNgramDocumentRepository.saveAll(ngramBrands);
+        brandSuggestionDocumentRepository.saveAll(ngramBrands);
 
         // category 정보 삽입
-        List<CategoryNgramDocument> categories = categoryRepository.findAll().stream()
-            .map(CategoryNgramDocument::from)
+        List<CategorySuggestionDocument> categories = categoryRepository.findAll().stream()
+            .map(CategorySuggestionDocument::from)
             .toList();
-        categoryNgramDocumentRepository.saveAll(categories);
+        categorySuggestionDocumentRepository.saveAll(categories);
 
         // store 정보 삽입
         try (Stream<Store> stream = storeRepository.findAllWithBrandAndCategory()) {
