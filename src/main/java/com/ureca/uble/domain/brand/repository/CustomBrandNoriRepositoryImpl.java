@@ -16,7 +16,7 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.ureca.uble.domain.brand.exception.BrandErrorCode.ELASTIC_INTERNAL_ERROR;
+import static com.ureca.uble.global.exception.GlobalErrorCode.ELASTIC_INTERNAL_ERROR;
 
 @Repository
 @RequiredArgsConstructor
