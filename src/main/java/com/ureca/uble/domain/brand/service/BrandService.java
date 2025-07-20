@@ -1,23 +1,20 @@
 package com.ureca.uble.domain.brand.service;
 
 import com.ureca.uble.domain.bookmark.repository.BookmarkRepository;
-import com.ureca.uble.domain.brand.dto.response.BenefitDetailRes;
-import com.ureca.uble.domain.brand.dto.response.BrandDetailRes;
-import com.ureca.uble.domain.brand.dto.response.BrandListRes;
-import com.ureca.uble.domain.brand.dto.response.SearchBrandListRes;
+import com.ureca.uble.domain.brand.dto.response.*;
 import com.ureca.uble.domain.brand.exception.BrandErrorCode;
 import com.ureca.uble.domain.brand.repository.BrandClickLogDocumentRepository;
 import com.ureca.uble.domain.brand.repository.BrandNoriDocumentRepository;
 import com.ureca.uble.domain.brand.repository.BrandRepository;
+import com.ureca.uble.domain.brand.repository.BrandSuggestionDocumentRepository;
+import com.ureca.uble.domain.category.repository.CategorySuggestionDocumentRepository;
 import com.ureca.uble.domain.common.dto.response.CursorPageRes;
 import com.ureca.uble.domain.store.repository.SearchLogDocumentRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.Bookmark;
 import com.ureca.uble.entity.Brand;
 import com.ureca.uble.entity.User;
-import com.ureca.uble.entity.document.BrandClickLogDocument;
-import com.ureca.uble.entity.document.BrandNoriDocument;
-import com.ureca.uble.entity.document.SearchLogDocument;
+import com.ureca.uble.entity.document.*;
 import com.ureca.uble.entity.enums.*;
 import com.ureca.uble.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +23,7 @@ import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -45,6 +43,8 @@ public class BrandService {
 	private final BrandClickLogDocumentRepository brandClickLogDocumentRepository;
 	private final UserRepository userRepository;
 	private final SearchLogDocumentRepository searchLogDocumentRepository;
+	private final CategorySuggestionDocumentRepository categorySuggestionDocumentRepository;
+	private final BrandSuggestionDocumentRepository brandSuggestionDocumentRepository;
 
 	/**
 	 * 제휴처 상세 조회
@@ -161,6 +161,25 @@ public class BrandService {
 		}
 
 		return SearchBrandListRes.of(brandList, totalCnt, totalPage);
+	}
+
+	/**
+	 * 제휴처 검색 자동완성
+	 */
+	public BrandSuggestionListRes getBrandSuggestionList(String keyword, int size) {
+		// category 조회
+		SearchHits<CategorySuggestionDocument> categoryHits = categorySuggestionDocumentRepository.findByKeywordAndLimit(keyword, 2);
+		List<SuggestionRes> res = new ArrayList<>(categoryHits.getSearchHits().stream()
+            .map(hit -> SuggestionRes.from(hit.getContent().getCategoryName(), SuggestionType.CATEGORY))
+            .toList());
+
+		// brand 조회
+		SearchHits<BrandSuggestionDocument> brandHits = brandSuggestionDocumentRepository.findByKeywordAndLimit(keyword, size - res.size());
+		res.addAll(brandHits.getSearchHits().stream()
+			.map(hit -> SuggestionRes.from(hit.getContent().getBrandName(), SuggestionType.BRAND))
+			.toList());
+
+		return new BrandSuggestionListRes(res);
 	}
 
 	private User findUser(Long userId) {
