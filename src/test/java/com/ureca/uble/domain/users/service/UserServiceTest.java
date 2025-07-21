@@ -98,6 +98,7 @@ public class UserServiceTest {
 		when(request.getRank()).thenReturn(Rank.VIP);
 		when(request.getGender()).thenReturn(Gender.FEMALE);
 		when(request.getBirthDate()).thenReturn(LocalDate.of(1999, 1, 1));
+		when(request.getBarcode()).thenReturn("123456787654321");
 		when(request.getCategoryIds()).thenReturn(categoryIds);
 
 		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
@@ -107,7 +108,7 @@ public class UserServiceTest {
 		UpdateUserInfoRes result = userService.updateUserInfo(userId, request);
 
 		//then
-		verify(user).updateUserInfo(Rank.VIP, Gender.FEMALE, LocalDate.of(1999, 1, 1));
+		verify(user).updateUserInfo(Rank.VIP, Gender.FEMALE, LocalDate.of(1999, 1, 1), "123456787654321");
 		verify(userCategoryRepository).deleteByUser(user);
 		verify(userCategoryRepository, times(2)).save(any(UserCategory.class));
 
