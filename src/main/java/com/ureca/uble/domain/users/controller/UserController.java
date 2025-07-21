@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ureca.uble.domain.users.dto.request.UpdateUserInfoReq;
-import com.ureca.uble.domain.users.dto.response.GetRecommmendationListRes;
+import com.ureca.uble.domain.users.dto.response.GetRecommendationListRes;
 import com.ureca.uble.domain.users.dto.response.GetUserInfoRes;
 import com.ureca.uble.domain.users.dto.response.UpdateUserInfoRes;
 import com.ureca.uble.domain.users.service.UserService;
@@ -46,7 +46,7 @@ public class UserController {
 
 	@Operation(summary = "제휴처 매장 추천 정보 조회", description = "사용자에게 맞는 제휴처 매장 추천 정보를 조회합니다.")
 	@GetMapping("/recommendation")
-	public CommonResponse<GetRecommmendationListRes>getRecommendations(
+	public CommonResponse<GetRecommendationListRes>getRecommendations(
 		@Parameter(description = "사용자정보", required = true)
 		@AuthenticationPrincipal Long userId
 	){

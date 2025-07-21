@@ -8,7 +8,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.ureca.uble.domain.category.repository.CategoryRepository;
 import com.ureca.uble.domain.users.dto.request.UpdateUserInfoReq;
-import com.ureca.uble.domain.users.dto.response.GetRecommmendationListRes;
+import com.ureca.uble.domain.users.dto.response.GetRecommendationListRes;
 import com.ureca.uble.domain.users.dto.response.GetUserInfoRes;
 import com.ureca.uble.domain.users.dto.response.UpdateUserInfoRes;
 import com.ureca.uble.domain.users.exception.UserErrorCode;
@@ -68,14 +68,14 @@ public class UserService {
 			.orElseThrow(() -> new GlobalException(UserErrorCode.USER_NOT_FOUND));
 	}
 
-	public GetRecommmendationListRes getRecommendations(Long userId) {
+	public GetRecommendationListRes getRecommendations(Long userId) {
 		return fastapiWebClient.get()
 			.uri(uriBuilder -> uriBuilder
 				.path("api/recommend/hybrid")
 				.queryParam("user_id", userId)
 				.build())
 			.retrieve()
-			.bodyToMono(GetRecommmendationListRes.class)
+			.bodyToMono(GetRecommendationListRes.class)
 			.block();
 	}
 }
