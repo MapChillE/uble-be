@@ -14,6 +14,9 @@ public class WebClientConfig {
 	@Value("${spring.elasticsearch.uris}")
 	private String elasticUris;
 
+	@Value("${fastapi.uris}")
+	private String fastapiUris;
+
 	@Bean
 	public WebClient kakaoAuthWebClient(){
 		return WebClient.builder()
@@ -35,6 +38,13 @@ public class WebClientConfig {
 		return WebClient.builder()
 			.baseUrl(elasticUris)
 			.defaultHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+			.build();
+	}
+
+	@Bean
+	public WebClient fastapiWebClient() {
+		return WebClient.builder()
+			.baseUrl(fastapiUris)
 			.build();
 	}
 }

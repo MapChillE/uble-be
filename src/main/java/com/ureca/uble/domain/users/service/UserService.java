@@ -4,9 +4,11 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.ureca.uble.domain.category.repository.CategoryRepository;
 import com.ureca.uble.domain.users.dto.request.UpdateUserInfoReq;
+import com.ureca.uble.domain.users.dto.response.GetRecommmendationListRes;
 import com.ureca.uble.domain.users.dto.response.GetUserInfoRes;
 import com.ureca.uble.domain.users.dto.response.UpdateUserInfoRes;
 import com.ureca.uble.domain.users.exception.UserErrorCode;
@@ -26,6 +28,7 @@ public class UserService {
 	private final UserRepository userRepository;
 	private final UserCategoryRepository userCategoryRepository;
 	private final CategoryRepository categoryRepository;
+	private final WebClient fastapiWebClient;
 
 	@Transactional(readOnly = true)
 	public GetUserInfoRes getUserInfo(Long userId) {
@@ -63,5 +66,16 @@ public class UserService {
 	private User findUser(Long userId){
 		return userRepository.findById(userId)
 			.orElseThrow(() -> new GlobalException(UserErrorCode.USER_NOT_FOUND));
+	}
+
+	public GetRecommmendationListRes getRecommendations(Long userId) {
+		return fastapiWebClient.get()
+			.uri(uriBuilder -> uriBuilder
+				.path("api/recommend/hybrid")
+				.queryParam("user_id", userId)
+				.build())
+			.retrieve()
+			.bodyToMono(GetRecommmendationListRes.class)
+			.block();
 	}
 }
