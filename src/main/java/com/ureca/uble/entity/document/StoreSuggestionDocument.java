@@ -18,7 +18,7 @@ public class StoreSuggestionDocument {
     @Field(type = FieldType.Long)
     private Long storeId;
 
-    @Field(type = FieldType.Text, analyzer = "standard")
+    @Field(type = FieldType.Search_As_You_Type, analyzer = "address_synonym_analyzer")
     private String storeName;
 
     @Field(type = FieldType.Search_As_You_Type, analyzer = "brand_synonym_analyzer")
@@ -30,7 +30,7 @@ public class StoreSuggestionDocument {
     @Field(type = FieldType.Search_As_You_Type, analyzer = "season_synonym_analyzer")
     private String season;
 
-    @Field(type = FieldType.Text, analyzer = "standard")
+    @Field(type = FieldType.Text, analyzer = "address_synonym_analyzer")
     private String address;
 
     @GeoPointField
