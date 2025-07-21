@@ -1,6 +1,6 @@
 jwt:
   cookie:
-    domain: .uplait.site
+    domain: .u-ble.com
     secure: true
     same-site: None
 
