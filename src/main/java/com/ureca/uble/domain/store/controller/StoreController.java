@@ -5,7 +5,7 @@ import com.ureca.uble.domain.store.dto.response.GetStoreListRes;
 import com.ureca.uble.domain.store.service.StoreService;
 import com.ureca.uble.entity.enums.BenefitType;
 import com.ureca.uble.entity.enums.Season;
-import com.ureca.uble.global.response.CommonResponse;
+import com.ureca.uble.domain.common.dto.response.CommonResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;

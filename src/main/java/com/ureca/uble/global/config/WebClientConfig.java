@@ -1,14 +1,18 @@
 package com.ureca.uble.global.config;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
-
-import lombok.RequiredArgsConstructor;
 
 @Configuration
 @RequiredArgsConstructor
 public class WebClientConfig {
+
+	@Value("${spring.elasticsearch.uris}")
+	private String elasticUris;
 
 	@Bean
 	public WebClient kakaoAuthWebClient(){
@@ -26,4 +30,11 @@ public class WebClientConfig {
 			.build();
 	}
 
+	@Bean
+	public WebClient elasticWebClient() {
+		return WebClient.builder()
+			.baseUrl(elasticUris)
+			.defaultHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+			.build();
+	}
 }

@@ -4,13 +4,16 @@ import com.ureca.uble.domain.store.dto.response.GetBenefitInfoRes;
 import com.ureca.uble.domain.store.dto.response.GetStoreDetailRes;
 import com.ureca.uble.domain.store.dto.response.GetStoreListRes;
 import com.ureca.uble.domain.store.dto.response.GetStoreRes;
+import com.ureca.uble.domain.store.repository.StoreClickLogDocumentRepository;
 import com.ureca.uble.domain.store.repository.StoreRepository;
 import com.ureca.uble.domain.users.repository.UsageCountRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.*;
+import com.ureca.uble.entity.document.StoreClickLogDocument;
 import com.ureca.uble.entity.enums.*;
 import com.ureca.uble.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -24,6 +27,7 @@ import static com.ureca.uble.domain.store.exception.StoreErrorCode.OUT_OF_RANGE_
 import static com.ureca.uble.domain.store.exception.StoreErrorCode.STORE_NOT_FOUND;
 import static com.ureca.uble.domain.users.exception.UserErrorCode.USER_NOT_FOUND;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StoreService {
@@ -32,6 +36,7 @@ public class StoreService {
     private final UsageCountRepository usageCountRepository;
     private final StoreRepository storeRepository;
     private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+    private final StoreClickLogDocumentRepository storeClickLogDocumentRepository;
 
     /**
      * 근처 매장 정보 조회
@@ -66,6 +71,13 @@ public class StoreService {
         List<GetBenefitInfoRes> benefitList = store.getBrand().getBenefits().stream()
             .map(b -> GetBenefitInfoRes.of(b, getBenefitType(store.getBrand(), b)))
             .toList();
+
+        // 로그 기록
+        try {
+            storeClickLogDocumentRepository.save(StoreClickLogDocument.of(user, store));
+        } catch (Exception e) {
+            log.warn("매장 상세 조회 로그 저장에 실패하였습니다 : {}", e.getMessage());
+        }
 
         return GetStoreDetailRes.of(store, distance, isNormalAvailable, isVipAvailable, isLocalAvailable, benefitList);
     }

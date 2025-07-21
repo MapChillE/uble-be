@@ -1,5 +1,7 @@
 package com.ureca.uble.global.config;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -8,6 +10,13 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+@OpenAPIDefinition(
+    servers={
+        @Server(url="https://dev.u-ble.com", description="Dev server URL"),
+        @Server(url="http://localhost:8080", description="Local Host URL"),
+        @Server(url="https://api.u-ble.com", description = "Release server URL")
+    }
+)
 @Configuration
 public class SwaggerConfig {
 

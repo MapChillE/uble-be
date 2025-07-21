@@ -53,9 +53,12 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
+    @Column
+    private String barcode;
+
     @Builder(access = PRIVATE)
     private User(String nickname, Rank rank, Role role, String providerId, Boolean isVipAvailable,
-                 Boolean isLocalAvailable, Boolean isDeleted, LocalDate birthDate, Gender gender) {
+                 Boolean isLocalAvailable, Boolean isDeleted, LocalDate birthDate, Gender gender, String barcode) {
         this.nickname = nickname;
         this.rank = rank;
         this.role = role;
@@ -65,6 +68,7 @@ public class User extends BaseEntity {
         this.isDeleted = isDeleted;
         this.birthDate = birthDate;
         this.gender = gender;
+        this.barcode = barcode;
     }
 
     public static User createTmpUser(String kakaoId, String nickname){
@@ -74,10 +78,11 @@ public class User extends BaseEntity {
             .rank(Rank.NORMAL)
             .role(Role.TMP_USER)
             .isDeleted(false)
-            .isVipAvailable(false)
-            .isLocalAvailable(false)
+            .isVipAvailable(true)
+            .isLocalAvailable(true)
             .birthDate(null)
             .gender(null)
+            .barcode(null)
             .build();
     }
 
@@ -89,10 +94,11 @@ public class User extends BaseEntity {
         this.isLocalAvailable = isLocalAvailable;
     }
 
-    public void updateUserInfo(Rank rank, Gender gender, LocalDate birthDate) {
+    public void updateUserInfo(Rank rank, Gender gender, LocalDate birthDate, String barcode) {
         this.rank = rank;
         this.gender = gender;
         this.birthDate = birthDate;
+        this.barcode = barcode;
 
         if(this.role == Role.TMP_USER){
             this.role = Role.USER;

@@ -1,0 +1,20 @@
+{
+  "analysis": {
+    "filter": {
+      "custom_nori_stop_filter": {
+        "type": "stop",
+        "stopwords": "_noristop_"
+      }
+    },
+    "analyzer": {
+      "nori_custom": {
+        "type": "custom",
+        "tokenizer": "nori_tokenizer",
+        "filter": [
+          "lowercase",
+          "custom_nori_stop_filter"
+        ]
+      }
+    }
+  }
+}

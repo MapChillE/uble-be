@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ureca.uble.domain.brand.repository.CategoryRepository;
+import com.ureca.uble.domain.category.repository.CategoryRepository;
 import com.ureca.uble.domain.users.dto.request.UpdateUserInfoReq;
 import com.ureca.uble.domain.users.dto.response.GetUserInfoRes;
 import com.ureca.uble.domain.users.dto.response.UpdateUserInfoRes;
@@ -45,7 +45,8 @@ public class UserService {
 		user.updateUserInfo(
 			request.getRank(),
 			request.getGender(),
-			request.getBirthDate()
+			request.getBirthDate(),
+			request.getBarcode()
 		);
 
 		userCategoryRepository.deleteByUser(user);

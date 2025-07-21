@@ -1,19 +1,22 @@
 package com.ureca.uble.domain.users.service;
 
 import com.ureca.uble.domain.brand.repository.BenefitRepository;
+import com.ureca.uble.domain.common.dto.response.CursorPageRes;
 import com.ureca.uble.domain.store.repository.StoreRepository;
 import com.ureca.uble.domain.users.dto.request.CreateUsageHistoryReq;
 import com.ureca.uble.domain.users.dto.response.CreateUsageHistoryRes;
 import com.ureca.uble.domain.users.dto.response.UsageHistoryRes;
 import com.ureca.uble.domain.users.repository.UsageCountRepository;
+import com.ureca.uble.domain.users.repository.UsageHistoryDocumentRepository;
 import com.ureca.uble.domain.users.repository.UsageHistoryRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.*;
+import com.ureca.uble.entity.document.UsageHistoryDocument;
 import com.ureca.uble.entity.enums.BenefitType;
+import com.ureca.uble.entity.enums.Gender;
 import com.ureca.uble.entity.enums.Rank;
 import com.ureca.uble.entity.enums.RankType;
 import com.ureca.uble.global.exception.GlobalException;
-import com.ureca.uble.global.response.CursorPageRes;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,6 +49,8 @@ public class UsageHistoryServiceTest {
 	private BenefitRepository benefitRepository;
 	@Mock
 	private UsageCountRepository usageCountRepository;
+	@Mock
+	private UsageHistoryDocumentRepository usageHistoryDocumentRepository;
 
 	@Test
 	@DisplayName("사용자 ID로 이용내역을 조회한다.")
@@ -81,25 +86,30 @@ public class UsageHistoryServiceTest {
 		User vipUser = mock(User.class);
 		Store mockStore = mock(Store.class);
 		Brand mockBrand = mock(Brand.class);
-		when(vipUser.getRank()).thenReturn(Rank.VIP);
-		when(mockStore.getBrand()).thenReturn(mockBrand);
-		when(vipUser.getIsVipAvailable()).thenReturn(true);
-		when(mockBrand.getRankType()).thenReturn(RankType.VIP);
-		when(userRepository.findById(userId)).thenReturn(Optional.of(vipUser));
-		when(storeRepository.findByIdWithBrand(storeId)).thenReturn(Optional.of(mockStore));
+		Category mockCategory = mock(Category.class);
 
-		UsageHistory savedHistory = mock(UsageHistory.class);
-		when(savedHistory.getId()).thenReturn(10L);
-		when(usageHistoryRepository.save(any())).thenReturn(savedHistory);
+		when(vipUser.getRank()).thenReturn(Rank.VIP);
+		when(vipUser.getIsVipAvailable()).thenReturn(true);
+		when(vipUser.getGender()).thenReturn(Gender.FEMALE);
+		when(mockStore.getBrand()).thenReturn(mockBrand);
+		when(mockBrand.getRankType()).thenReturn(RankType.VIP);
+		when(mockBrand.getCategory()).thenReturn(mockCategory);
+		when(mockCategory.getName()).thenReturn("푸드");
+		when(userRepository.findById(userId)).thenReturn(Optional.of(vipUser));
+		when(storeRepository.findByIdWithBrandAndCategory(storeId)).thenReturn(Optional.of(mockStore));
+
+		UsageHistoryDocument savedHistory = mock(UsageHistoryDocument.class);
+		when(savedHistory.getId()).thenReturn("savedId");
+		when(usageHistoryDocumentRepository.save(any())).thenReturn(savedHistory);
 
 		// when
 		CreateUsageHistoryRes res = usageHistoryService.createUsageHistory(userId, storeId, new CreateUsageHistoryReq(BenefitType.VIP));
 
 		// then
-		assertThat(res.getId()).isEqualTo(10L);
+		assertThat(res.getId()).isEqualTo("savedId");
 		verify(vipUser).updateVipAvailability(false);
+		verify(usageHistoryDocumentRepository).save(any());
 	}
-
 
 	@Test
 	@DisplayName("VIP 혜택을 사용할 수 없는 경우 에러가 발생한다.")
@@ -115,7 +125,7 @@ public class UsageHistoryServiceTest {
 		when(mockStore.getBrand()).thenReturn(mockBrand);
 		when(mockBrand.getRankType()).thenReturn(RankType.VIP);
 		when(userRepository.findById(userId)).thenReturn(Optional.of(vipUser));
-		when(storeRepository.findByIdWithBrand(storeId)).thenReturn(Optional.of(mockStore));
+		when(storeRepository.findByIdWithBrandAndCategory(storeId)).thenReturn(Optional.of(mockStore));
 
 		// when
 		GlobalException exception = assertThrows(GlobalException.class, () -> {
@@ -125,7 +135,7 @@ public class UsageHistoryServiceTest {
 		// then
 		assertEquals(2001, exception.getResultCode().getCode());
 		verify(vipUser, never()).updateVipAvailability(anyBoolean());
-		verify(usageHistoryRepository, never()).save(any());
+		verify(usageHistoryDocumentRepository, never()).save(any());
 	}
 
 	@Test
@@ -138,24 +148,29 @@ public class UsageHistoryServiceTest {
 		User localUser = mock(User.class);
 		Store mockStore = mock(Store.class);
 		Brand mockBrand = mock(Brand.class);
+		Category mockCategory = mock(Category.class);
 
 		when(localUser.getRank()).thenReturn(Rank.VIP);
 		when(localUser.getIsLocalAvailable()).thenReturn(true);
+		when(localUser.getGender()).thenReturn(Gender.FEMALE);
 		when(mockStore.getBrand()).thenReturn(mockBrand);
 		when(mockBrand.getRankType()).thenReturn(RankType.LOCAL);
+		when(mockBrand.getCategory()).thenReturn(mockCategory);
+		when(mockCategory.getName()).thenReturn("푸드");
 		when(userRepository.findById(userId)).thenReturn(Optional.of(localUser));
-		when(storeRepository.findByIdWithBrand(storeId)).thenReturn(Optional.of(mockStore));
+		when(storeRepository.findByIdWithBrandAndCategory(storeId)).thenReturn(Optional.of(mockStore));
 
-		UsageHistory savedHistory = mock(UsageHistory.class);
-		when(savedHistory.getId()).thenReturn(10L);
-		when(usageHistoryRepository.save(any())).thenReturn(savedHistory);
+		UsageHistoryDocument savedHistory = mock(UsageHistoryDocument.class);
+		when(savedHistory.getId()).thenReturn("savedId");
+		when(usageHistoryDocumentRepository.save(any())).thenReturn(savedHistory);
 
 		// when
 		CreateUsageHistoryRes res = usageHistoryService.createUsageHistory(userId, storeId, new CreateUsageHistoryReq(BenefitType.LOCAL));
 
 		// then
-		assertThat(res.getId()).isEqualTo(10L);
+		assertThat(res.getId()).isEqualTo("savedId");
 		verify(localUser).updateLocalAvailability(false);
+		verify(usageHistoryDocumentRepository).save(any());
 	}
 
 	@Test
@@ -171,7 +186,7 @@ public class UsageHistoryServiceTest {
 		when(mockStore.getBrand()).thenReturn(mockBrand);
 		when(mockBrand.getRankType()).thenReturn(RankType.LOCAL);
 		when(userRepository.findById(userId)).thenReturn(Optional.of(localUser));
-		when(storeRepository.findByIdWithBrand(storeId)).thenReturn(Optional.of(mockStore));
+		when(storeRepository.findByIdWithBrandAndCategory(storeId)).thenReturn(Optional.of(mockStore));
 
 		// when
 		GlobalException exception = assertThrows(GlobalException.class, () ->
@@ -181,7 +196,7 @@ public class UsageHistoryServiceTest {
 		// then
 		assertEquals(2001, exception.getResultCode().getCode()); // BENEFIT_NOT_AVAILABLE
 		verify(localUser, never()).updateLocalAvailability(anyBoolean());
-		verify(usageHistoryRepository, never()).save(any());
+		verify(usageHistoryDocumentRepository, never()).save(any());
 	}
 
 	@Test
@@ -194,27 +209,33 @@ public class UsageHistoryServiceTest {
 		User normalUser = mock(User.class);
 		Store mockStore = mock(Store.class);
 		Brand mockBrand = mock(Brand.class);
+		Category mockCategory = mock(Category.class);
+
 		when(mockStore.getBrand()).thenReturn(mockBrand);
 		when(mockBrand.getRankType()).thenReturn(RankType.NORMAL);
+		when(normalUser.getGender()).thenReturn(Gender.FEMALE);
+		when(normalUser.getRank()).thenReturn(Rank.VIP);
+		when(mockBrand.getCategory()).thenReturn(mockCategory);
+		when(mockCategory.getName()).thenReturn("푸드");
 		when(userRepository.findById(userId)).thenReturn(Optional.of(normalUser));
-		when(storeRepository.findByIdWithBrand(storeId)).thenReturn(Optional.of(mockStore));
+		when(storeRepository.findByIdWithBrandAndCategory(storeId)).thenReturn(Optional.of(mockStore));
 
 		Benefit benefit = mock(Benefit.class);
 		when(benefit.getNumber()).thenReturn(3);
 		when(benefitRepository.findNormalBenefitByStoreId(storeId)).thenReturn(Optional.of(benefit));
 		when(usageCountRepository.findByUserAndBenefit(normalUser, benefit)).thenReturn(Optional.empty());
 
-		UsageHistory savedHistory = mock(UsageHistory.class);
-		when(savedHistory.getId()).thenReturn(10L);
-		when(usageHistoryRepository.save(any())).thenReturn(savedHistory);
+		UsageHistoryDocument savedHistory = mock(UsageHistoryDocument.class);
+		when(savedHistory.getId()).thenReturn("savedId");
+		when(usageHistoryDocumentRepository.save(any())).thenReturn(savedHistory);
 
 		// when
 		CreateUsageHistoryRes res = usageHistoryService.createUsageHistory(userId, storeId, new CreateUsageHistoryReq(BenefitType.NORMAL));
 
 		// then
-		assertThat(res.getId()).isEqualTo(10L);
+		assertThat(res.getId()).isEqualTo("savedId");
 		verify(usageCountRepository).save(any());
-		verify(usageHistoryRepository).save(any());
+		verify(usageHistoryDocumentRepository).save(any());
 	}
 
 	@Test
@@ -231,7 +252,7 @@ public class UsageHistoryServiceTest {
 		when(mockStore.getBrand()).thenReturn(mockBrand);
 		when(mockBrand.getRankType()).thenReturn(RankType.NORMAL);
 		when(userRepository.findById(userId)).thenReturn(Optional.of(normalUser));
-		when(storeRepository.findByIdWithBrand(storeId)).thenReturn(Optional.of(mockStore));
+		when(storeRepository.findByIdWithBrandAndCategory(storeId)).thenReturn(Optional.of(mockStore));
 
 		Benefit benefit = mock(Benefit.class);
 		when(benefit.getNumber()).thenReturn(2);
@@ -249,7 +270,7 @@ public class UsageHistoryServiceTest {
 		// then
 		assertEquals(2001, exception.getResultCode().getCode()); // BENEFIT_NOT_AVAILABLE
 		verify(usageCount, never()).update(anyInt(), anyBoolean());
-		verify(usageHistoryRepository, never()).save(any());
+		verify(usageHistoryDocumentRepository, never()).save(any());
 	}
 
 	@Test
@@ -264,7 +285,7 @@ public class UsageHistoryServiceTest {
 		Brand mockBrand = mock(Brand.class);
 
 		when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
-		when(storeRepository.findByIdWithBrand(storeId)).thenReturn(Optional.of(mockStore));
+		when(storeRepository.findByIdWithBrandAndCategory(storeId)).thenReturn(Optional.of(mockStore));
 		when(mockStore.getBrand()).thenReturn(mockBrand);
 
 		// when
@@ -274,6 +295,6 @@ public class UsageHistoryServiceTest {
 
 		// then
 		assertEquals(2001, exception.getResultCode().getCode()); // BENEFIT_NOT_AVAILABLE
-		verify(usageHistoryRepository, never()).save(any());
+		verify(usageHistoryDocumentRepository, never()).save(any());
 	}
 }

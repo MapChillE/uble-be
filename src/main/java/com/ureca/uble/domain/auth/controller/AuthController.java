@@ -17,7 +17,7 @@ import com.ureca.uble.domain.auth.exception.AuthErrorCode;
 import com.ureca.uble.domain.auth.service.AuthService;
 import com.ureca.uble.entity.User;
 import com.ureca.uble.global.exception.GlobalException;
-import com.ureca.uble.global.response.CommonResponse;
+import com.ureca.uble.domain.common.dto.response.CommonResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

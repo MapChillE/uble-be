@@ -29,6 +29,14 @@ spring:
       port: ${REDIS_PORT}
       ssl:
         enabled: true
+  elasticsearch:
+    uris: ${ELASTIC_URIS}
+    username: ${ELASTIC_USERNAME}
+    password: ${ELASTIC_PASSWORD}
+
+logging:
+  level:
+    org.elasticsearch.client: TRACE
 
 kakao:
   client-id: ${KAKAO_CLIENT_ID}
@@ -42,3 +50,7 @@ jwt:
 domain:
   base-url: ${DOMAIN_BASE_URL}
   dev-base-url: ${DEV_DOMAIN_BASE_URL}
+
+elasticsearch:
+  backup:
+      bucket-name: ${BUCKET_NAME}

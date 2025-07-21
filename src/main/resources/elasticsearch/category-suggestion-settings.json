@@ -1,0 +1,20 @@
+{
+  "analysis": {
+    "filter": {
+      "category_synonym_filter": {
+        "type": "synonym",
+        "synonyms_path": "analysis/category-synonyms.txt"
+      }
+    },
+    "analyzer": {
+      "category_synonym_analyzer": {
+        "type": "custom",
+        "tokenizer": "standard",
+        "filter": [
+          "lowercase",
+          "category_synonym_filter"
+        ]
+      }
+    }
+  }
+}
