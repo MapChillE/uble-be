@@ -1,22 +1,19 @@
 {
-  "index.max_ngram_diff": 9,
   "analysis": {
     "filter": {
       "category_synonym_filter": {
         "type": "synonym",
         "synonyms_path": "analysis/category-synonyms.txt"
-      },
-      "ngram_filter": {
-        "type": "ngram",
-        "min_gram": 1,
-        "max_gram": 10
       }
     },
     "analyzer": {
-      "category_ngram_synonym_analyzer": {
+      "category_synonym_analyzer": {
         "type": "custom",
         "tokenizer": "standard",
-        "filter": ["lowercase", "category_synonym_filter", "ngram_filter"]
+        "filter": [
+          "lowercase",
+          "category_synonym_filter"
+        ]
       }
     }
   }
