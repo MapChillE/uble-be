@@ -170,13 +170,13 @@ public class BrandService {
 		// category 조회
 		SearchHits<CategorySuggestionDocument> categoryHits = categorySuggestionDocumentRepository.findByKeywordAndLimit(keyword, 2);
 		List<SuggestionRes> res = new ArrayList<>(categoryHits.getSearchHits().stream()
-            .map(hit -> SuggestionRes.from(hit.getContent().getCategoryName(), SuggestionType.CATEGORY))
+            .map(hit -> SuggestionRes.of(hit.getContent().getCategoryName(), SuggestionType.CATEGORY))
             .toList());
 
 		// brand 조회
 		SearchHits<BrandSuggestionDocument> brandHits = brandSuggestionDocumentRepository.findByKeywordAndLimit(keyword, size - res.size());
 		res.addAll(brandHits.getSearchHits().stream()
-			.map(hit -> SuggestionRes.from(hit.getContent().getBrandName(), SuggestionType.BRAND))
+			.map(hit -> SuggestionRes.of(hit.getContent().getBrandName(), SuggestionType.BRAND))
 			.toList());
 
 		return new BrandSuggestionListRes(res);

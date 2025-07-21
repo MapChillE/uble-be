@@ -16,7 +16,7 @@ public class SuggestionRes {
     @Schema(description = "자동완성 타입", example = "12")
     private SuggestionType type;
 
-    public static SuggestionRes from(String suggestion, SuggestionType type) {
+    public static SuggestionRes of(String suggestion, SuggestionType type) {
         return SuggestionRes.builder()
             .suggestion(suggestion)
             .type(type)
