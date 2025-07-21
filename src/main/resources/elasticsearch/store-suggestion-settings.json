@@ -12,6 +12,10 @@
       "season_synonym_filter": {
         "type": "synonym",
         "synonyms_path": "analysis/season-synonyms.txt"
+      },
+      "address_synonym_filter": {
+        "type": "synonym",
+        "synonyms_path": "analysis/address-synonyms.txt"
       }
     },
     "analyzer": {
@@ -37,6 +41,14 @@
         "filter": [
           "lowercase",
           "season_synonym_filter"
+        ]
+      },
+      "address_synonym_analyzer": {
+        "type": "custom",
+        "tokenizer": "standard",
+        "filter": [
+          "lowercase",
+          "address_synonym_filter"
         ]
       }
     }
