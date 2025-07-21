@@ -11,6 +11,6 @@ import java.util.List;
 @Schema(description="제휴처 자동완성 조회 응답 DTO")
 public class BrandSuggestionListRes {
 
-    @Schema(description = "자동완성 목록", example = "12")
+    @Schema(description = "자동완성 목록", example = "자동완성 전체 List")
     private List<SuggestionRes> suggestionList;
 }
