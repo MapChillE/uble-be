@@ -110,18 +110,38 @@ public class UserService {
 		ElasticsearchAggregations usageResult = usageHistoryDocumentRepository.getUsageDateAndDiffAndCount(user);
 
 		// 카테고리 순위
-		List<CategoryRankRes> categoryRankList = rankResult.aggregationsAsMap().get("category_rank").aggregation()
+		List<CategoryRankRes> categoryRankList = getCategoryRankList(rankResult);
+
+		// 제휴처 순위
+		List<BrandRankRes> brandRankList = getBrandRankList(rankResult);
+
+		// 가장 많이 사용한 날(일)
+		BenefitUsagePatternRes benefitUsagePatternRes = getBenefitPattern(usageResult);
+
+		// 성별나이 평균 대비 사용 횟수
+		BenefitUsageComparisonRes benefitUsageComparisonRes = getBenefitUsageComparison(usageResult);
+
+		// 월별 사용 횟수 (6개월)
+		List<MonthlyBenefitUsageRes> monthlyBenefitUsageList = getMonthlyBenefitUsageList(usageResult);
+
+		return GetUserStatisticsRes.of(categoryRankList, brandRankList, benefitUsagePatternRes, benefitUsageComparisonRes, monthlyBenefitUsageList);
+	}
+
+	private List<CategoryRankRes> getCategoryRankList(ElasticsearchAggregations rankResult) {
+		return rankResult.aggregationsAsMap().get("category_rank").aggregation()
 			.getAggregate().sterms().buckets().array().stream()
 			.map(b -> CategoryRankRes.of(b.key().stringValue(), b.docCount()))
 			.toList();
+	}
 
-		// 제휴처 순위
-		List<BrandRankRes> brandRankList = rankResult.aggregationsAsMap().get("brand_rank").aggregation()
+	private List<BrandRankRes> getBrandRankList(ElasticsearchAggregations rankResult) {
+		return rankResult.aggregationsAsMap().get("brand_rank").aggregation()
 			.getAggregate().sterms().buckets().array().stream()
 			.map(b -> BrandRankRes.of(b.key().stringValue(), b.docCount()))
 			.toList();
+	}
 
-		// 가장 많이 사용한 날(일)
+	private BenefitUsagePatternRes getBenefitPattern(ElasticsearchAggregations usageResult) {
 		String mostUsedDay = usageResult.aggregationsAsMap().get("most_used_day_of_month").aggregation().getAggregate().filter().aggregations()
 			.get("by_day").sterms().buckets().array().stream().findFirst().map(b -> b.key().stringValue()).orElse(null);
 
@@ -131,27 +151,29 @@ public class UserService {
 		String mostUsedTime = usageResult.aggregationsAsMap().get("most_used_hour").aggregation().getAggregate().filter().aggregations()
 			.get("hour").sterms().buckets().array().stream().findFirst().map(b -> b.key().stringValue()).orElse(null);
 
-		BenefitUsagePatternRes benefitUsagePatternRes = BenefitUsagePatternRes.of(mostUsedDay, mostUsedWeekDay, mostUsedTime);
+		return BenefitUsagePatternRes.of(mostUsedDay, mostUsedWeekDay, mostUsedTime);
+	}
 
-		// 성별나이 평균 대비 사용 횟수
+	private BenefitUsageComparisonRes getBenefitUsageComparison(ElasticsearchAggregations usageResult) {
 		double totalCount = usageResult.aggregationsAsMap().get("target_group").aggregation()
 			.getAggregate().filter().aggregations().get("total_count").valueCount().value();
+
 		double totalUserCount = usageResult.aggregationsAsMap().get("target_group").aggregation()
 			.getAggregate().filter().aggregations().get("user_count").cardinality().value();
+
 		int userHistoryCount = (int) usageResult.aggregationsAsMap().get("my_usage_count").aggregation()
 			.getAggregate().filter().aggregations().get("total_history_count").valueCount().value();
 
-		BenefitUsageComparisonRes benefitUsageComparisonRes = BenefitUsageComparisonRes.of(totalCount / totalUserCount, userHistoryCount);
+		return BenefitUsageComparisonRes.of(totalUserCount > 0 ? totalCount / totalUserCount : 0, userHistoryCount);
+	}
 
-		// 월별 사용 횟수 (6개월)
-		List<MonthlyBenefitUsageRes> monthlyBenefitUsageList = usageResult.aggregationsAsMap().get("monthly_usage").aggregation().getAggregate().filter().aggregations()
+	private List<MonthlyBenefitUsageRes> getMonthlyBenefitUsageList(ElasticsearchAggregations usageResult) {
+		return usageResult.aggregationsAsMap().get("monthly_usage").aggregation().getAggregate().filter().aggregations()
 			.get("monthly").dateHistogram().buckets().array().stream()
 			.map(b -> {
 				YearMonth ym = YearMonth.parse(b.keyAsString(), DateTimeFormatter.ofPattern("yyyy-MM"));
 				return MonthlyBenefitUsageRes.of(ym.getYear(), ym.getMonthValue(), b.docCount());
 			}).toList();
-
-		return GetUserStatisticsRes.of(categoryRankList, brandRankList, benefitUsagePatternRes, benefitUsageComparisonRes, monthlyBenefitUsageList);
 	}
 
 	private User findUser(Long userId){
