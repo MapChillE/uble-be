@@ -52,7 +52,7 @@ public class UserController {
 		@AuthenticationPrincipal Long userId,
 		@Parameter(description = "위도", example = "37.5")
 		@RequestParam Double latitude,
-		@Parameter(description = "경도", example = "127/04")
+		@Parameter(description = "경도", example = "127.04")
 		@RequestParam Double longitude
 	){
 		return CommonResponse.success(userService.getRecommendations(userId, latitude, longitude));
