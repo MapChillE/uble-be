@@ -22,7 +22,7 @@ public class BenefitUsageComparisonRes {
         return BenefitUsageComparisonRes.builder()
             .averageUsageCount(averageUsageCount)
             .userUsageCount(userUsageCount)
-            .averageDiffPercent(((userUsageCount - averageUsageCount) / averageUsageCount) * 100)
+            .averageDiffPercent(averageUsageCount == 0.0 ? 0.0 : ((userUsageCount - averageUsageCount) / averageUsageCount) * 100)
             .build();
     }
 }
