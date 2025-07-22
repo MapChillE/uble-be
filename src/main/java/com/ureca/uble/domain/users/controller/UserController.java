@@ -57,7 +57,7 @@ public class UserController {
 	 *
 	 * @param userId 사용자 정보
 	 */
-	@Operation(summary = "사용자 통계 정보 조회", description = "마이페이지에 표시될 사용자 정보를 조회합니다.")
+	@Operation(summary = "사용자 통계 정보 조회", description = "사용자의 개인 통계 데이터를 조회합니다.")
 	@GetMapping("/statistics")
 	public CommonResponse<GetUserStatisticsRes> getUserStatistics(
 		@Parameter(description = "사용자정보", required = true)
