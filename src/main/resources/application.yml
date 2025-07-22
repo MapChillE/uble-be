@@ -34,6 +34,13 @@ spring:
     username: ${ELASTIC_USERNAME}
     password: ${ELASTIC_PASSWORD}
 
+springdoc:
+  swagger-ui:
+    enabled: true
+    tagsSorter: alpha
+    operations-sorter: alpha
+    display-request-duration: true
+
 logging:
   level:
     org.elasticsearch.client: TRACE
@@ -44,8 +51,11 @@ kakao:
 
 jwt:
   secret: ${JWT_SECRET}
-  access-token-validity: 5000
+  access-token-validity: 1800000
   refresh-token-validity: 604800000
+
+fastapi:
+  uris: ${FASTAPI_URIS}
 
 domain:
   base-url: ${DOMAIN_BASE_URL}

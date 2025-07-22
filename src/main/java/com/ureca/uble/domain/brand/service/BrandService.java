@@ -7,9 +7,11 @@ import com.ureca.uble.domain.brand.repository.BrandClickLogDocumentRepository;
 import com.ureca.uble.domain.brand.repository.BrandNoriDocumentRepository;
 import com.ureca.uble.domain.brand.repository.BrandRepository;
 import com.ureca.uble.domain.brand.repository.BrandSuggestionDocumentRepository;
+import com.ureca.uble.domain.category.repository.CategoryRepository;
 import com.ureca.uble.domain.category.repository.CategorySuggestionDocumentRepository;
 import com.ureca.uble.domain.common.dto.response.CursorPageRes;
 import com.ureca.uble.domain.store.repository.SearchLogDocumentRepository;
+import com.ureca.uble.domain.users.repository.PinRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.Bookmark;
 import com.ureca.uble.entity.Brand;
@@ -45,6 +47,8 @@ public class BrandService {
 	private final SearchLogDocumentRepository searchLogDocumentRepository;
 	private final CategorySuggestionDocumentRepository categorySuggestionDocumentRepository;
 	private final BrandSuggestionDocumentRepository brandSuggestionDocumentRepository;
+	private final CategoryRepository categoryRepository;
+	private final PinRepository pinRepository;
 
 	/**
 	 * 제휴처 상세 조회
@@ -182,7 +186,45 @@ public class BrandService {
 		return new BrandSuggestionListRes(res);
 	}
 
+
+	/**
+	 * 지도 초기 데이터 조회
+	 */
+	@Transactional(readOnly = true)
+	public InitialDataRes getInitialData(Long userId) {
+		User user = findUser(userId);
+		List<CategoryRes> categories = categoryRepository.findByOrderByIdAsc() .stream()
+				.map(category -> CategoryRes.of(category.getId(), category.getName()))
+				.toList();
+
+		List<LocationRes> locations = pinRepository.findByUserIdOrderByIdAsc(userId).stream()
+				.map(pin -> LocationRes.of(
+						pin.getId(), pin.getName(),
+						pin.getLocation().getX(), pin.getLocation().getY()
+				))
+				.toList();
+
+		return InitialDataRes.of(categories, locations);
+	}
+
 	private User findUser(Long userId) {
 		return userRepository.findById(userId).orElseThrow(() -> new GlobalException(USER_NOT_FOUND));
+	}
+
+	/**
+	 * offline 브랜드 목록(이름+이미지) 조회
+	 */
+	@Transactional(readOnly = true)
+	public CursorPageRes<OfflineBrandRes> getOfflineBrands(Long lastBrandId, int size) {
+		List<Brand> brands = brandRepository.findOfflineAfterCursor(lastBrandId, size + 1);
+
+		List<OfflineBrandRes> content = brands.stream()
+				.map(b -> OfflineBrandRes.of(b.getId(), b.getName(), b.getImageUrl()))
+				.toList();
+		boolean hasNext = content.size() > size;
+		if (hasNext) {content = content.subList(0, size);}
+
+		Long newLastId = content.isEmpty() ? null : content.get(content.size() - 1).getId();
+		return CursorPageRes.of(content, hasNext, newLastId);
 	}
 }

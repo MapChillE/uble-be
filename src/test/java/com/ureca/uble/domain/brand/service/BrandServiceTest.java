@@ -3,12 +3,17 @@ package com.ureca.uble.domain.brand.service;
 import com.ureca.uble.domain.bookmark.repository.BookmarkRepository;
 import com.ureca.uble.domain.brand.dto.response.BrandDetailRes;
 import com.ureca.uble.domain.brand.dto.response.BrandListRes;
+import com.ureca.uble.domain.brand.dto.response.InitialDataRes;
+import com.ureca.uble.domain.brand.dto.response.OfflineBrandRes;
 import com.ureca.uble.domain.brand.repository.BrandClickLogDocumentRepository;
 import com.ureca.uble.domain.brand.repository.BrandRepository;
+import com.ureca.uble.domain.category.repository.CategoryRepository;
 import com.ureca.uble.domain.common.dto.response.CursorPageRes;
+import com.ureca.uble.domain.users.repository.PinRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.Brand;
 import com.ureca.uble.entity.Category;
+import com.ureca.uble.entity.Pin;
 import com.ureca.uble.entity.User;
 import com.ureca.uble.entity.document.BrandClickLogDocument;
 import com.ureca.uble.entity.enums.Gender;
@@ -17,6 +22,9 @@ import com.ureca.uble.entity.enums.Season;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -25,6 +33,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,6 +53,12 @@ public class BrandServiceTest {
 
 	@InjectMocks
 	private BrandService brandService;
+
+	@Mock
+	private CategoryRepository categoryRepository;
+
+	@Mock
+	private PinRepository pinRepository;
 
 	@Test
 	@DisplayName("브랜드 상세 정보를 조회한다.")
@@ -140,5 +155,95 @@ public class BrandServiceTest {
 		assertThat(res2.getBrandId()).isEqualTo(2L);
 		assertThat(res2.getImgUrl()).isEqualTo("https://image2.com");
 		assertThat(res2.isBookmarked()).isFalse();
+	}
+
+	@Test
+	@DisplayName("지도 초기 데이터를 조회한다.")
+	void getInitialDataSuccess() {
+		// given
+		Long userId = 111L;
+
+		User mockUser = mock(User.class);
+		when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
+
+		Category cat1 = mock(Category.class);
+		when(cat1.getId()).thenReturn(1L);
+		when(cat1.getName()).thenReturn("푸드");
+
+		Category cat2 = mock(Category.class);
+		when(cat2.getId()).thenReturn(2L);
+		when(cat2.getName()).thenReturn("액티비티");
+		when(categoryRepository.findByOrderByIdAsc()).thenReturn(List.of(cat1, cat2));
+
+		GeometryFactory gf = new GeometryFactory();
+		Point p1 = gf.createPoint(new Coordinate(127.0, 37.0));
+		Point p2 = gf.createPoint(new Coordinate(128.0, 36.0));
+
+		Pin pin1 = mock(Pin.class);
+		when(pin1.getId()).thenReturn(10L);
+		when(pin1.getName()).thenReturn("집");
+		when(pin1.getLocation()).thenReturn(p1);
+
+		Pin pin2 = mock(Pin.class);
+		when(pin2.getId()).thenReturn(11L);
+		when(pin2.getName()).thenReturn("회사");
+		when(pin2.getLocation()).thenReturn(p2);
+		when(pinRepository.findByUserIdOrderByIdAsc(userId)).thenReturn(List.of(pin1, pin2));
+
+		// when
+		InitialDataRes result = brandService.getInitialData(userId);
+
+		// then
+		assertThat(result.getCategories())
+				.extracting("id", "name")
+				.containsExactly(tuple(1L, "푸드"), tuple(2L, "액티비티"));
+
+		assertThat(result.getLocations())
+				.extracting("id", "name", "longitude", "latitude")
+				.containsExactly(tuple(10L, "집",   127.0, 37.0), tuple(11L, "회사", 128.0, 36.0));
+
+		verify(categoryRepository).findByOrderByIdAsc();
+		verify(pinRepository).findByUserIdOrderByIdAsc(userId);
+	}
+
+	@Test
+	@DisplayName("오프라인 브랜드 목록을 커서 방식으로 조회한다.")
+	void getOfflineBrandsSuccess() {
+		// given
+		Long lastBrandId = 50L;
+		int size = 2;
+
+		Brand b1 = mock(Brand.class);
+		when(b1.getId()).thenReturn(51L);
+		when(b1.getName()).thenReturn("스타벅스");
+		when(b1.getImageUrl()).thenReturn("https://.../starbucks.png");
+
+		Brand b2 = mock(Brand.class);
+		when(b2.getId()).thenReturn(52L);
+		when(b2.getName()).thenReturn("투썸플레이스");
+		when(b2.getImageUrl()).thenReturn("https://.../twosome.png");
+
+		Brand b3 = mock(Brand.class);
+		when(b3.getId()).thenReturn(53L);
+		when(b3.getName()).thenReturn("할리스");
+		when(b3.getImageUrl()).thenReturn("https://.../hollys.png");
+
+		when(brandRepository.findOfflineAfterCursor(lastBrandId, size + 1))
+				.thenReturn(List.of(b1, b2, b3));
+
+		// when
+		CursorPageRes<OfflineBrandRes> result = brandService.getOfflineBrands(lastBrandId, size);
+
+		// then
+		assertThat(result.getContent()).hasSize(size);
+		assertThat(result.isHasNext()).isTrue();
+		assertThat(result.getLastCursorId()).isEqualTo(52L);
+		assertThat(result.getContent())
+				.extracting("id", "name", "imageUrl")
+				.containsExactly(
+						tuple(51L, "스타벅스", "https://.../starbucks.png"),
+						tuple(52L, "투썸플레이스", "https://.../twosome.png")
+				);
+		verify(brandRepository).findOfflineAfterCursor(lastBrandId, size + 1);
 	}
 }

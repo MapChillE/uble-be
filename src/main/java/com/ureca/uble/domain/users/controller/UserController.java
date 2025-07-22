@@ -1,21 +1,17 @@
 package com.ureca.uble.domain.users.controller;
 
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import com.ureca.uble.domain.common.dto.response.CommonResponse;
 import com.ureca.uble.domain.users.dto.request.UpdateUserInfoReq;
+import com.ureca.uble.domain.users.dto.response.GetRecommendationListRes;
 import com.ureca.uble.domain.users.dto.response.GetUserInfoRes;
+import com.ureca.uble.domain.users.dto.response.GetUserStatisticsRes;
 import com.ureca.uble.domain.users.dto.response.UpdateUserInfoRes;
 import com.ureca.uble.domain.users.service.UserService;
-import com.ureca.uble.domain.common.dto.response.CommonResponse;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/users")
@@ -41,5 +37,31 @@ public class UserController {
 		@RequestBody UpdateUserInfoReq request
 	){
 		return CommonResponse.success(userService.updateUserInfo(userId, request));
+	}
+
+	@Operation(summary = "제휴처 매장 추천 정보 조회", description = "사용자에게 맞는 제휴처 매장 추천 정보를 조회합니다.")
+	@GetMapping("/recommendation")
+	public CommonResponse<GetRecommendationListRes>getRecommendations(
+		@Parameter(description = "사용자정보", required = true)
+		@AuthenticationPrincipal Long userId,
+		@Parameter(description = "위도", example = "37.5")
+		@RequestParam Double latitude,
+		@Parameter(description = "경도", example = "127.04")
+		@RequestParam Double longitude
+	){
+		return CommonResponse.success(userService.getRecommendations(userId, latitude, longitude));
+	}
+
+	/**
+	 * 사용자 통계 정보 조회
+	 *
+	 * @param userId 사용자 정보
+	 */
+	@Operation(summary = "사용자 통계 정보 조회", description = "사용자의 개인 통계 데이터를 조회합니다.")
+	@GetMapping("/statistics")
+	public CommonResponse<GetUserStatisticsRes> getUserStatistics(
+		@Parameter(description = "사용자정보", required = true)
+		@AuthenticationPrincipal Long userId) {
+		return CommonResponse.success(userService.getUserStatistics(userId));
 	}
 }
