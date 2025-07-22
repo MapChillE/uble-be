@@ -4,12 +4,14 @@ import com.ureca.uble.domain.bookmark.dto.response.CreateBookmarkRes;
 import com.ureca.uble.domain.bookmark.dto.response.DeleteBookmarkRes;
 import com.ureca.uble.domain.bookmark.dto.response.GetBookmarkRes;
 import com.ureca.uble.domain.bookmark.repository.BookmarkRepository;
+import com.ureca.uble.domain.brand.repository.BrandRepository;
+import com.ureca.uble.domain.common.dto.response.CursorPageRes;
 import com.ureca.uble.entity.Bookmark;
 import com.ureca.uble.entity.Brand;
 import com.ureca.uble.entity.Category;
 import com.ureca.uble.entity.User;
+import com.ureca.uble.entity.enums.Rank;
 import com.ureca.uble.global.exception.GlobalException;
-import com.ureca.uble.domain.common.dto.response.CursorPageRes;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,6 +30,9 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class BookmarkServiceTest {
+
+    @Mock
+    private BrandRepository brandRepository;
 
     @Mock
     private BookmarkRepository bookmarkRepository;
@@ -57,7 +62,7 @@ class BookmarkServiceTest {
 
         when(bookmarkRepository.existsByBrand_IdAndUser_Id(brandId, userId)).thenReturn(false);
         when(em.getReference(User.class, userId)).thenReturn(mockUser);
-        when(em.getReference(Brand.class, brandId)).thenReturn(mockBrand);
+        when(brandRepository.findById(brandId)).thenReturn(Optional.ofNullable(mockBrand));
         when(bookmarkRepository.save(any(Bookmark.class))).thenReturn(savedBookmark);
 
         // when
@@ -69,7 +74,7 @@ class BookmarkServiceTest {
 
         verify(bookmarkRepository).existsByBrand_IdAndUser_Id(brandId, userId);
         verify(em).getReference(User.class, userId);
-        verify(em).getReference(Brand.class, brandId);
+        verify(brandRepository).findById(brandId);
         verify(bookmarkRepository).save(any(Bookmark.class));
     }
 
@@ -131,6 +136,7 @@ class BookmarkServiceTest {
 
         Brand mockBrand = mock(Brand.class);
         when(mockBrand.getId()).thenReturn(1L);
+        when(mockBrand.getMinRank()).thenReturn(Rank.NORMAL);
 
         Category mockCategory = mock(Category.class);
         when(mockCategory.getName()).thenReturn("tmpCategory");
