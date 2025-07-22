@@ -79,9 +79,6 @@ dependencies {
     // spring batch
     implementation 'org.springframework.boot:spring-boot-starter-batch'
 
-    // Redisson
-    implementation 'org.redisson:redisson-spring-boot-starter:3.27.0'
-
     // elasticache (Redis)
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
