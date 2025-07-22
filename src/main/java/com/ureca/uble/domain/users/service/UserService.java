@@ -20,6 +20,7 @@ import com.ureca.uble.entity.UserCategory;
 import com.ureca.uble.global.exception.GlobalException;
 
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
@@ -69,15 +70,25 @@ public class UserService {
 	}
 
 	public GetRecommendationListRes getRecommendations(Long userId, Double latitude, Double longitude) {
-		return fastapiWebClient.get()
-			.uri(uriBuilder -> uriBuilder
-				.path("api/recommend/hybrid")
-				.queryParam("user_id", userId)
-				.queryParam("lat", latitude)
-				.queryParam("lng", longitude)
-				.build())
-			.retrieve()
-			.bodyToMono(GetRecommendationListRes.class)
-			.block();
+		if (userId == null || latitude == null || longitude == null){
+			throw new GlobalException(UserErrorCode.INVALID_PARAMETER);
+		}
+		try {
+			return fastapiWebClient.get()
+				.uri(uriBuilder -> uriBuilder
+					.path("api/recommend/hybrid")
+					.queryParam("user_id", userId)
+					.queryParam("lat", latitude)
+					.queryParam("lng", longitude)
+					.build())
+				.retrieve()
+				.onStatus(status -> status.isError(), response ->
+					Mono.error(new GlobalException(UserErrorCode.EXTERNAL_API_ERROR)))
+				.bodyToMono(GetRecommendationListRes.class)
+				.blockOptional()
+				.orElseThrow(() -> new GlobalException(UserErrorCode.RECOMMENDATION_NOT_FOUND));
+		} catch (Exception e) {
+			throw new GlobalException(UserErrorCode.EXTERNAL_API_ERROR);
+		}
 	}
 }
