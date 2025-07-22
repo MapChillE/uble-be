@@ -68,11 +68,13 @@ public class UserService {
 			.orElseThrow(() -> new GlobalException(UserErrorCode.USER_NOT_FOUND));
 	}
 
-	public GetRecommendationListRes getRecommendations(Long userId) {
+	public GetRecommendationListRes getRecommendations(Long userId, Double latitude, Double longitude) {
 		return fastapiWebClient.get()
 			.uri(uriBuilder -> uriBuilder
 				.path("api/recommend/hybrid")
 				.queryParam("user_id", userId)
+				.queryParam("lat", latitude)
+				.queryParam("lng", longitude)
 				.build())
 			.retrieve()
 			.bodyToMono(GetRecommendationListRes.class)

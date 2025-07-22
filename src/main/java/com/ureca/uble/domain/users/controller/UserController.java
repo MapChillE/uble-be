@@ -5,14 +5,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ureca.uble.domain.common.dto.response.CommonResponse;
 import com.ureca.uble.domain.users.dto.request.UpdateUserInfoReq;
 import com.ureca.uble.domain.users.dto.response.GetRecommendationListRes;
 import com.ureca.uble.domain.users.dto.response.GetUserInfoRes;
 import com.ureca.uble.domain.users.dto.response.UpdateUserInfoRes;
 import com.ureca.uble.domain.users.service.UserService;
-import com.ureca.uble.domain.common.dto.response.CommonResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -48,8 +49,12 @@ public class UserController {
 	@GetMapping("/recommendation")
 	public CommonResponse<GetRecommendationListRes>getRecommendations(
 		@Parameter(description = "사용자정보", required = true)
-		@AuthenticationPrincipal Long userId
+		@AuthenticationPrincipal Long userId,
+		@Parameter(description = "위도", example = "37.5")
+		@RequestParam Double latitude,
+		@Parameter(description = "경도", example = "127/04")
+		@RequestParam Double longitude
 	){
-		return CommonResponse.success(userService.getRecommendations(userId));
+		return CommonResponse.success(userService.getRecommendations(userId, latitude, longitude));
 	}
 }
