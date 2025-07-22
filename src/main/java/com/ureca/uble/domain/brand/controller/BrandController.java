@@ -1,9 +1,6 @@
 package com.ureca.uble.domain.brand.controller;
 
-import com.ureca.uble.domain.brand.dto.response.BrandDetailRes;
-import com.ureca.uble.domain.brand.dto.response.BrandListRes;
-import com.ureca.uble.domain.brand.dto.response.BrandSuggestionListRes;
-import com.ureca.uble.domain.brand.dto.response.SearchBrandListRes;
+import com.ureca.uble.domain.brand.dto.response.*;
 import com.ureca.uble.domain.brand.service.BrandService;
 import com.ureca.uble.domain.common.dto.response.CommonResponse;
 import com.ureca.uble.domain.common.dto.response.CursorPageRes;
@@ -72,6 +69,14 @@ public class BrandController {
 		return CommonResponse.success(brandService.getBrandListBySearch(userId, keyword, category, season, type, page, size));
 	}
 
+	@Operation(summary = "지도 초기 데이터 조회")
+	@GetMapping("/map/initial-data")
+	public CommonResponse<InitialDataRes> getInitialData(
+			@Parameter(description = "사용자정보", required = true)
+			@AuthenticationPrincipal Long userId) {
+		return CommonResponse.success(brandService.getInitialData(userId));
+	}
+
 	/**
 	 * 제휴처 검색 자동완성
 	 *
@@ -85,5 +90,15 @@ public class BrandController {
 		@Parameter(description = "한 번에 가져올 크기")
 		@RequestParam(defaultValue = "5") int size){
 		return CommonResponse.success(brandService.getBrandSuggestionList(keyword, size));
+	}
+
+	@Operation(summary = "오프라인 브랜드 이름+이미지 리스트 (커서 페이징)")
+	@GetMapping("/names")
+	public CommonResponse<CursorPageRes<OfflineBrandRes>> getOfflineBrands(
+			@Parameter(description = "이전 호출의 마지막 브랜드 ID", example = "50")
+			@RequestParam(required = false) Long lastBrandId,
+			@Parameter(description = "한 번에 가져올 개수", example = "20")
+			@RequestParam(defaultValue = "20") int size) {
+		return CommonResponse.success(brandService.getOfflineBrands(lastBrandId, size));
 	}
 }
