@@ -4,9 +4,11 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.ureca.uble.domain.category.repository.CategoryRepository;
 import com.ureca.uble.domain.users.dto.request.UpdateUserInfoReq;
+import com.ureca.uble.domain.users.dto.response.GetRecommendationListRes;
 import com.ureca.uble.domain.users.dto.response.GetUserInfoRes;
 import com.ureca.uble.domain.users.dto.response.UpdateUserInfoRes;
 import com.ureca.uble.domain.users.exception.UserErrorCode;
@@ -18,6 +20,7 @@ import com.ureca.uble.entity.UserCategory;
 import com.ureca.uble.global.exception.GlobalException;
 
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +29,7 @@ public class UserService {
 	private final UserRepository userRepository;
 	private final UserCategoryRepository userCategoryRepository;
 	private final CategoryRepository categoryRepository;
+	private final WebClient fastapiWebClient;
 
 	@Transactional(readOnly = true)
 	public GetUserInfoRes getUserInfo(Long userId) {
@@ -63,5 +67,28 @@ public class UserService {
 	private User findUser(Long userId){
 		return userRepository.findById(userId)
 			.orElseThrow(() -> new GlobalException(UserErrorCode.USER_NOT_FOUND));
+	}
+
+	public GetRecommendationListRes getRecommendations(Long userId, Double latitude, Double longitude) {
+		if (userId == null || latitude == null || longitude == null){
+			throw new GlobalException(UserErrorCode.INVALID_PARAMETER);
+		}
+		try {
+			return fastapiWebClient.get()
+				.uri(uriBuilder -> uriBuilder
+					.path("api/recommend/hybrid")
+					.queryParam("user_id", userId)
+					.queryParam("lat", latitude)
+					.queryParam("lng", longitude)
+					.build())
+				.retrieve()
+				.onStatus(status -> status.isError(), response ->
+					Mono.error(new GlobalException(UserErrorCode.EXTERNAL_API_ERROR)))
+				.bodyToMono(GetRecommendationListRes.class)
+				.blockOptional()
+				.orElseThrow(() -> new GlobalException(UserErrorCode.RECOMMENDATION_NOT_FOUND));
+		} catch (Exception e) {
+			throw new GlobalException(UserErrorCode.EXTERNAL_API_ERROR);
+		}
 	}
 }
