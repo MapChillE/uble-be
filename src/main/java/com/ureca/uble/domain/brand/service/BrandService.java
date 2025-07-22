@@ -204,7 +204,7 @@ public class BrandService {
 				))
 				.toList();
 
-		return InitialDataRes.builder().categories(categories).locations(locations).build();
+		return InitialDataRes.of(categories, locations);
 	}
 
 	private User findUser(Long userId) {
