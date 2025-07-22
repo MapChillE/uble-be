@@ -36,6 +36,16 @@ public class CustomBrandRepositoryImpl implements CustomBrandRepository {
 			.fetch();
 	}
 
+	@Override
+	public List<Brand> findOfflineAfterCursor(Long lastBrandId, int size){
+		return jpaQueryFactory
+				.selectFrom(brand)
+				.where(brand.isOnline.eq(false), gtBrandId(lastBrandId))
+				.orderBy(brand.id.asc())
+				.limit(size)
+				.fetch();
+	}
+
 	private BooleanExpression categoryIdEq(Long categoryId) {
 		return categoryId == null ? null : brand.category.id.eq(categoryId);
 	}
