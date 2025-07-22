@@ -10,6 +10,6 @@ import lombok.Getter;
 @AllArgsConstructor
 @Schema(description = "추천 리스트 반환 DTO")
 public class GetRecommendationListRes {
-    @Schema(description = "추천 리스트", example = "추천 리스트")
+    @Schema(description = "추천 리스트")
     private List<GetRecommendationsRes> recommendationsList;
 }
