@@ -3,6 +3,8 @@ package com.ureca.uble.global.security.jwt;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.ureca.uble.global.security.jwt.dto.JwtUserInfo;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -27,13 +29,17 @@ public class JwtValidator {
 		}
 	}
 
-	public Long getUserIdFromToken(String token) {
+	public JwtUserInfo getUserIdAndRole(String token) {
 		Claims claims = Jwts.parser()
 			.verifyWith(Keys.hmacShaKeyFor(secret.getBytes()))
 			.build()
 			.parseSignedClaims(token)
 			.getPayload();
-		return Long.valueOf(claims.getSubject());
+
+		Long userId = Long.valueOf(claims.getSubject());
+		String role = claims.get("role", String.class);
+
+		return JwtUserInfo.of(userId, role);
 	}
 
 	public String extractAccessToken(HttpServletRequest request) {
