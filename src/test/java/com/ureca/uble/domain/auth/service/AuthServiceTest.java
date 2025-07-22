@@ -19,8 +19,8 @@ import com.ureca.uble.domain.auth.dto.response.KakaoUserRes;
 import com.ureca.uble.domain.auth.dto.response.WithdrawRes;
 import com.ureca.uble.domain.bookmark.repository.BookmarkRepository;
 import com.ureca.uble.domain.feedback.repository.FeedbackRepository;
-import com.ureca.uble.domain.users.repository.TokenRepository;
 import com.ureca.uble.domain.users.repository.PinRepository;
+import com.ureca.uble.domain.users.repository.TokenRepository;
 import com.ureca.uble.domain.users.repository.UsageCountRepository;
 import com.ureca.uble.domain.users.repository.UsageHistoryRepository;
 import com.ureca.uble.domain.users.repository.UserCategoryRepository;
@@ -30,6 +30,7 @@ import com.ureca.uble.entity.User;
 import com.ureca.uble.global.exception.GlobalException;
 import com.ureca.uble.global.security.jwt.JwtProvider;
 import com.ureca.uble.global.security.jwt.JwtValidator;
+import com.ureca.uble.global.security.jwt.dto.JwtUserInfo;
 
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -79,6 +80,8 @@ public class AuthServiceTest {
 	private final String refreshToken = "refresh-token";
 	private final LocalDateTime expiry = LocalDateTime.now().plusDays(7);
 	private final Long userId = 1L;
+	private final String role = "USER";
+	private final JwtUserInfo jwtUserInfo = JwtUserInfo.of(userId, role);
 
 	@Test
 	@DisplayName("신규 유저의 경우 유저 저장 후 토큰을 발급한다.")
@@ -123,7 +126,7 @@ public class AuthServiceTest {
 		User user = User.createTmpUser("12345", "tester");
 		Token token = Token.of(user, refreshToken, expiry);
 		when(jwtValidator.validateToken(refreshToken)).thenReturn(true);
-		when(jwtValidator.getUserIdFromToken(refreshToken)).thenReturn(userId);
+		when(jwtValidator.getUserIdAndRole(refreshToken)).thenReturn(jwtUserInfo);
 		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 		when(tokenRepository.findByRefreshToken(refreshToken)).thenReturn(Optional.of(token));
 		when(jwtProvider.createAccessToken(user)).thenReturn(accessToken);
@@ -145,7 +148,7 @@ public class AuthServiceTest {
 		// given
 		User user = User.createTmpUser("12345", "tester");
 		when(jwtValidator.validateToken(refreshToken)).thenReturn(true);
-		when(jwtValidator.getUserIdFromToken(refreshToken)).thenReturn(userId);
+		when(jwtValidator.getUserIdAndRole(refreshToken)).thenReturn(jwtUserInfo);
 		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
 		// when
