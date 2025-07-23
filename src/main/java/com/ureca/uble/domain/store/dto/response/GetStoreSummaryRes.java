@@ -1,7 +1,5 @@
 package com.ureca.uble.domain.store.dto.response;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ureca.uble.entity.Store;
 
@@ -11,8 +9,8 @@ import lombok.Getter;
 
 @Getter
 @Builder
-@Schema(description = "매장 상세 정보 반환 DTO")
-public class GetStoreDetailRes {
+@Schema(description = "매장 소모달 정보 반환 DTO")
+public class GetStoreSummaryRes {
     @Schema(description = "제휴처 id", example = "123")
     private Long brandId;
 
@@ -25,11 +23,11 @@ public class GetStoreDetailRes {
     @Schema(description = "매장 설명", example = "커피가 맛있는 스타벅스")
     private String description;
 
-    @Schema(description = "매장 주소", example = "서울 강남구 테헤란로64길 18")
-    private String address;
-
     @Schema(description = "매장 대표 연락처", example = "02-1234-5678")
     private String phoneNumber;
+
+    @Schema(description = "매장 주소", example = "서울 강남구 테헤란로64길 18")
+    private String address;
 
     @Schema(description = "매장까지의 거리 (m 기준)", example = "900.123")
     private Double distance;
@@ -40,39 +38,22 @@ public class GetStoreDetailRes {
     @Schema(description = "대표 이미지 URL", example = "https://example.com")
     private String imageUrl;
 
-    @Schema(description = "(사용자) 기본 혜택 사용 가능 여부", example = "true")
-    private boolean isNormalAvailable;
-
-    @Schema(description = "(사용자) VIP 콕 혜택 사용 가능 여부", example = "true")
-    private boolean isVipAvailable;
-
-    @Schema(description = "(사용자) 우리 동네 멤버십 혜택 사용 가능 여부", example = "false")
-    private boolean isLocalAvailable;
-
     @Schema(description = "북마크 여부", example = "true")
     @JsonProperty("isBookmarked")
     private boolean bookmarked;
 
-    @Schema(description = "혜택 리스트", example = "혜택 리스트")
-    private List<GetBenefitInfoRes> benefitList;
-
-    public static GetStoreDetailRes of(Store store,Double distance, boolean isNormalAvailable, boolean isVipAvailable,
-                                       boolean isLocalAvailable, boolean bookmarked, List<GetBenefitInfoRes> benefitList) {
-        return GetStoreDetailRes.builder()
+    public static GetStoreSummaryRes of(Store store, Double distance, boolean bookmarked) {
+        return GetStoreSummaryRes.builder()
             .brandId(store.getBrand().getId())
             .storeId(store.getId())
             .storeName(store.getName())
             .description(store.getBrand().getDescription())
-            .address(store.getAddress())
             .phoneNumber(store.getPhoneNumber())
+            .address(store.getAddress())
             .distance(distance)
             .category(store.getBrand().getCategory().getName())
             .imageUrl(store.getBrand().getImageUrl())
-            .isNormalAvailable(isNormalAvailable)
-            .isVipAvailable(isVipAvailable)
-            .isLocalAvailable(isLocalAvailable)
             .bookmarked(bookmarked)
-            .benefitList(benefitList)
             .build();
     }
 }

@@ -104,7 +104,7 @@ class BookmarkServiceTest {
     void deleteBookmark_delete_check() {
         // given
         Long userId = 1L;
-        Long bookmarkId = 10L;
+        Long brandId = 10L;
 
         User mockUser = mock(User.class);
         when(mockUser.getId()).thenReturn(userId);
@@ -112,14 +112,14 @@ class BookmarkServiceTest {
         Bookmark mockBookmark = mock(Bookmark.class);
         when(mockBookmark.getUser()).thenReturn(mockUser);
 
-        when(bookmarkRepository.findById(bookmarkId)).thenReturn(Optional.of(mockBookmark));
+        when(bookmarkRepository.findByUserIdAndBrandId(userId, brandId)).thenReturn(Optional.of(mockBookmark));
 
         // when
-        DeleteBookmarkRes res = bookmarkService.deleteBookmark(userId, bookmarkId);
+        DeleteBookmarkRes res = bookmarkService.deleteBookmark(userId, brandId);
 
         // then
         assertNotNull(res);
-        verify(bookmarkRepository).findById(bookmarkId);
+        verify(bookmarkRepository).findByUserIdAndBrandId(userId, brandId);
         verify(bookmarkRepository).delete(mockBookmark);
     }
 
