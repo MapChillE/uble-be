@@ -79,7 +79,7 @@ public class UsageHistoryDocument {
     }
 
     private static String getLocal(String address) {
-        if(!address.startsWith("서울")) return null;
+        if(address == null || !address.startsWith("서울")) return null;
         return address.split(" ")[1];
     }
 }
