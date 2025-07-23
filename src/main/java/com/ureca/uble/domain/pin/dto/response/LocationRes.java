@@ -1,4 +1,4 @@
-package com.ureca.uble.domain.brand.dto.response;
+package com.ureca.uble.domain.pin.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -20,12 +20,16 @@ public class LocationRes {
     @Schema(description = "위도(latitude)", example = "37.497943")
     private double latitude;
 
-    public static LocationRes of(Long id, String name, double longitude, double latitude) {
+    @Schema(description = "저장 위치 주소", example = "서울 강남구 테헤란로 340")
+    private String address;
+
+    public static LocationRes of(Long id, String name, double longitude, double latitude, String address) {
         return LocationRes.builder()
                 .id(id)
                 .name(name)
                 .longitude(longitude)
                 .latitude(latitude)
+                .address(address)
                 .build();
     }
 }
