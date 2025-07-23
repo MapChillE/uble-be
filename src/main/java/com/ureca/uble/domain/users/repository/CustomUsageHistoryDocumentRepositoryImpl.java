@@ -6,8 +6,13 @@ import co.elastic.clients.elasticsearch._types.aggregations.CalendarInterval;
 import co.elastic.clients.elasticsearch._types.query_dsl.DateRangeQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.util.NamedValue;
+import com.ureca.uble.domain.common.util.SearchFilterUtils;
 import com.ureca.uble.entity.User;
 import com.ureca.uble.entity.document.UsageHistoryDocument;
+import com.ureca.uble.entity.enums.BenefitType;
+import com.ureca.uble.entity.enums.Gender;
+import com.ureca.uble.entity.enums.Rank;
+import com.ureca.uble.entity.enums.RankTarget;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchAggregations;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
@@ -15,6 +20,7 @@ import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +35,6 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
     public ElasticsearchAggregations getUsageDateAndDiffAndCount(User user) {
         long userId = user.getId();
         int currentYear = LocalDate.now().getYear();
-
 
         // userId 필터
         Query userFilter = Query.of(u -> u
@@ -80,6 +85,7 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
             .field("createdAt")
             .gte(fromDate)
             .lte("now")
+            .timeZone("+09:00")
         )._toRangeQuery()._toQuery();
 
         Aggregation monthlyUsageAgg = Aggregation.of(a -> a
@@ -105,7 +111,7 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
             .aggregations("by_day", Aggregation.of(aa -> aa
                 .terms(t -> t
                     .script(s -> s
-                        .source("doc['createdAt'].value.getDayOfMonth()")
+                        .source("doc['createdAt'].value.plusHours(9).getDayOfMonth()")
                         .lang("painless")
                     )
                     .size(1)
@@ -121,7 +127,7 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
                 .terms(t -> t
                     .script(s -> s
                         .source("""
-                            int d = doc['createdAt'].value.getDayOfWeek().getValue();
+                            int d = doc['createdAt'].value.plusHours(9).getDayOfWeek().getValue();
                             if (d == 1) return '월';
                             if (d == 2) return '화';
                             if (d == 3) return '수';
@@ -145,7 +151,7 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
             .aggregations("hour", Aggregation.of(aa -> aa
                 .terms(t -> t
                     .script(s -> s
-                        .source("doc['createdAt'].value.getHour()")
+                        .source("doc['createdAt'].value.plusHours(9).getHour()")
                         .lang("painless")
                     )
                     .size(1)
@@ -166,6 +172,70 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
             .build();
 
         // 검색 및 반환
+        return (ElasticsearchAggregations) elasticsearchOperations.search(query, UsageHistoryDocument.class).getAggregations();
+    }
+
+    /**
+     * (Admin) 제휴처/카테고리 이용 순위
+     */
+    @Override
+    public ElasticsearchAggregations getUsageRankByFiltering(RankTarget rankTarget, Gender gender, Integer ageRange, Rank rank, BenefitType benefitType) {
+        // filter 설정
+        List<Query> filters = SearchFilterUtils.getAdminStatisticFilters(gender, ageRange, rank, benefitType);
+
+        // 통계 쿼리
+        String fieldName = switch (rankTarget) {
+            case BRAND -> "brandName";
+            case CATEGORY -> "category";
+        };
+
+        Aggregation aggregation = Aggregation.of(a -> a
+            .filter(f -> f
+                .bool(b -> b.filter(filters))
+            )
+            .aggregations("rank", Aggregation.of(sub -> sub
+                .terms(t -> t
+                    .field(fieldName)
+                    .size(10)
+                    .order(List.of(NamedValue.of("_count", SortOrder.Desc)))
+                )
+            ))
+        );
+
+        // 최종 쿼리 생성
+        NativeQuery query = NativeQuery.builder()
+            .withAggregation("usage_rank", aggregation)
+            .withMaxResults(0)
+            .build();
+
+        return (ElasticsearchAggregations) elasticsearchOperations.search(query, UsageHistoryDocument.class).getAggregations();
+    }
+
+    @Override
+    public ElasticsearchAggregations getLocalRankByFiltering(Gender gender, Integer ageRange, Rank rank, BenefitType benefitType) {
+        // filter 설정
+        List<Query> filters = SearchFilterUtils.getAdminStatisticFilters(gender, ageRange, rank, benefitType);
+
+        // 통계 쿼리
+        Aggregation aggregation = Aggregation.of(a -> a
+            .filter(f -> f
+                .bool(b -> b.filter(filters))
+            )
+            .aggregations("rank", Aggregation.of(sub -> sub
+                .terms(t -> t
+                    .field("storeLocal")
+                    .size(25)
+                    .order(List.of(NamedValue.of("_count", SortOrder.Desc)))
+                )
+            ))
+        );
+
+        // 최종 쿼리 생성
+        NativeQuery query = NativeQuery.builder()
+            .withAggregation("local_rank", aggregation)
+            .withMaxResults(0)
+            .build();
+
         return (ElasticsearchAggregations) elasticsearchOperations.search(query, UsageHistoryDocument.class).getAggregations();
     }
 }

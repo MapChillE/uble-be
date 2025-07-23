@@ -5,7 +5,9 @@ import com.ureca.uble.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.*;
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -37,11 +39,8 @@ public class UsageHistoryDocument {
     @Field(type = FieldType.Keyword)
     private String storeName;
 
-    @MultiField(
-        mainField = @Field(type = FieldType.Text, analyzer = "standard"),
-        otherFields = { @InnerField(suffix = "raw", type = FieldType.Keyword) }
-    )
-    private String storeAddress;
+    @Field(type = FieldType.Keyword)
+    private String storeLocal;
 
     @Field(type = FieldType.Long)
     private Long brandId;
@@ -69,7 +68,7 @@ public class UsageHistoryDocument {
             .userGender(user.getGender().toString())
             .storeId(store.getId())
             .storeName(store.getName())
-            .storeAddress(store.getAddress())
+            .storeLocal(getLocal(store.getAddress()))
             .brandId(store.getBrand().getId())
             .brandName(store.getBrand().getName())
             .brandIsOnline(store.getBrand().getIsOnline())
@@ -77,5 +76,10 @@ public class UsageHistoryDocument {
             .category(store.getBrand().getCategory().getName())
             .createdAt(ZonedDateTime.now())
             .build();
+    }
+
+    private static String getLocal(String address) {
+        if(address == null || !address.startsWith("서울")) return null;
+        return address.split(" ")[1];
     }
 }
