@@ -54,8 +54,8 @@ public class BookmarkService {
      * 즐겨찾기 삭제
      */
     @Transactional
-    public DeleteBookmarkRes deleteBookmark(Long userId, Long bookmarkId) {
-        Bookmark bookmark = findBookmark(bookmarkId);
+    public DeleteBookmarkRes deleteBookmark(Long userId, Long brandId) {
+        Bookmark bookmark = findBookmarkByUserAndBrand(userId, brandId);
         checkAuthority(userId, bookmark);
 
         bookmarkRepository.delete(bookmark);
@@ -75,7 +75,7 @@ public class BookmarkService {
         boolean hasNext = (bookmarkList.size() > size);
         if (hasNext) bookmarkList.remove(bookmarkList.size() - 1);
 
-        long lastCursorId = bookmarkList.get(bookmarkList.size() - 1).getBookmarkId();
+        long lastCursorId = bookmarkList.isEmpty() ? 0 : bookmarkList.get(bookmarkList.size() - 1).getBookmarkId();
 
         return CursorPageRes.of(bookmarkList, hasNext, lastCursorId);
     }
@@ -86,8 +86,8 @@ public class BookmarkService {
         }
     }
 
-    private Bookmark findBookmark(Long bookmarkId) {
-        return bookmarkRepository.findById(bookmarkId).orElseThrow(() -> new GlobalException(BOOKMARK_NOT_FOUND));
+    private Bookmark findBookmarkByUserAndBrand(Long userId, Long brandId) {
+        return bookmarkRepository.findByUserIdAndBrandId(userId, brandId).orElseThrow(() -> new GlobalException(BOOKMARK_NOT_FOUND));
     }
 
     private Brand findBrand(Long brandId) {

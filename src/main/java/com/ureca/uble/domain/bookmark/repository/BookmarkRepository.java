@@ -9,8 +9,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BookmarkRepository extends JpaRepository<Bookmark, Long>, CustomBookmarkRepository {
+
     boolean existsByBrand_IdAndUser_Id(Long brandId, Long userId);
+
     Optional<Bookmark> findByUserIdAndBrandId(Long userId, Long brandId);
+
     void deleteByUser(User user);
 
     @Query("SELECT b FROM Bookmark b JOIN FETCH b.brand WHERE b.user.id = :userId AND b.brand.id IN :brandIds")
