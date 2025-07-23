@@ -1,14 +1,15 @@
 package com.ureca.uble.domain.pin.service;
 
 import com.ureca.uble.domain.pin.dto.request.CreatePinReq;
-import com.ureca.uble.domain.pin.dto.response.InitialDataRes;
 import com.ureca.uble.domain.pin.dto.response.GetPinRes;
+import com.ureca.uble.domain.pin.dto.response.CreatePinRes;
 import com.ureca.uble.domain.pin.exception.PinErrorCode;
 import com.ureca.uble.domain.pin.repository.PinRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.Pin;
 import com.ureca.uble.entity.User;
 import com.ureca.uble.global.exception.GlobalException;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,15 +33,15 @@ import static org.mockito.Mockito.*;
 public class PinServiceTest {
 
     @Mock
-    private UserRepository userRepository;
+    private PinRepository pinRepository;
 
     @Mock
-    private PinRepository pinRepository;
+    private EntityManager em;
 
     @InjectMocks
     private PinService pinService;
 
-    GeometryFactory gf = new GeometryFactory();
+    private final GeometryFactory gf = new GeometryFactory();
 
     @Test
     @DisplayName("자주 가는 곳 조회")
@@ -48,10 +49,6 @@ public class PinServiceTest {
         // given
         Long userId = 111L;
 
-        User mockUser = mock(User.class);
-        when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
-
-        GeometryFactory gf = new GeometryFactory();
         Point p1 = gf.createPoint(new Coordinate(127.0, 37.0));
         Point p2 = gf.createPoint(new Coordinate(128.0, 36.0));
 
@@ -65,11 +62,11 @@ public class PinServiceTest {
         when(pin2.getId()).thenReturn(11L);
         when(pin2.getName()).thenReturn("회사");
         when(pin2.getLocation()).thenReturn(p2);
-        when(pin1.getAddress()).thenReturn("서울시 서초구");
+        when(pin2.getAddress()).thenReturn("서울시 서초구");
         when(pinRepository.findByUserIdOrderByIdAsc(userId)).thenReturn(List.of(pin1, pin2));
 
         // when
-        InitialDataRes result = pinService.getInitialData(userId);
+        GetPinRes result = pinService.getInitialData(userId);
 
         // then
         assertThat(result.getLocations())
@@ -84,8 +81,8 @@ public class PinServiceTest {
         // given
         Long userId = 222L;
         User mockUser = mock(User.class);
-        when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
-        when(pinRepository.countByUserId(userId)).thenReturn(1L);
+        when(em.getReference(User.class, userId)).thenReturn(mockUser);
+        when(pinRepository.countByUserId(userId)).thenReturn(1);
 
         CreatePinReq req = CreatePinReq.builder()
                 .name("카페").longitude(128.0)
@@ -100,7 +97,7 @@ public class PinServiceTest {
         when(pinRepository.save(any(Pin.class))).thenReturn(spyPin);
 
         // when
-        GetPinRes res = pinService.createPin(userId, req);
+        CreatePinRes res = pinService.createPin(userId, req);
 
         // then
         assertThat(res.getPinId()).isEqualTo(99L);
@@ -116,8 +113,7 @@ public class PinServiceTest {
     void createPinLimitExceeded() {
         // given
         Long userId = 333L;
-        when(userRepository.findById(userId)).thenReturn(Optional.of(mock(User.class)));
-        when(pinRepository.countByUserId(userId)).thenReturn(2L);
+        when(pinRepository.countByUserId(userId)).thenReturn(2);
 
         CreatePinReq req = CreatePinReq.builder()
                 .name("집").longitude(127.0)

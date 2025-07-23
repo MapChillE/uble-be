@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @Schema(description = "저장 위치 정보 DTO")
-public class LocationRes {
+public class GetPinDetailRes {
     @Schema(description = "저장 위치 ID", example = "10")
     private Long id;
 
@@ -23,8 +23,8 @@ public class LocationRes {
     @Schema(description = "저장 위치 주소", example = "서울 강남구 테헤란로 340")
     private String address;
 
-    public static LocationRes of(Long id, String name, double longitude, double latitude, String address) {
-        return LocationRes.builder()
+    public static GetPinDetailRes of(Long id, String name, double longitude, double latitude, String address) {
+        return GetPinDetailRes.builder()
                 .id(id)
                 .name(name)
                 .longitude(longitude)
