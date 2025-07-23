@@ -1,31 +1,42 @@
 package com.ureca.uble.domain.store.service;
 
-import com.ureca.uble.domain.store.dto.response.GetBenefitInfoRes;
-import com.ureca.uble.domain.store.dto.response.GetStoreDetailRes;
-import com.ureca.uble.domain.store.dto.response.GetStoreListRes;
-import com.ureca.uble.domain.store.dto.response.GetStoreRes;
-import com.ureca.uble.domain.store.repository.StoreClickLogDocumentRepository;
-import com.ureca.uble.domain.store.repository.StoreRepository;
-import com.ureca.uble.domain.users.repository.UsageCountRepository;
-import com.ureca.uble.domain.users.repository.UserRepository;
-import com.ureca.uble.entity.*;
-import com.ureca.uble.entity.document.StoreClickLogDocument;
-import com.ureca.uble.entity.enums.*;
-import com.ureca.uble.global.exception.GlobalException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import static com.ureca.uble.domain.store.exception.StoreErrorCode.*;
+import static com.ureca.uble.domain.users.exception.UserErrorCode.*;
+
+import java.util.List;
+import java.util.Optional;
+
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import com.ureca.uble.domain.bookmark.repository.BookmarkRepository;
+import com.ureca.uble.domain.store.dto.response.GetBenefitInfoRes;
+import com.ureca.uble.domain.store.dto.response.GetStoreDetailRes;
+import com.ureca.uble.domain.store.dto.response.GetStoreListRes;
+import com.ureca.uble.domain.store.dto.response.GetStoreRes;
+import com.ureca.uble.domain.store.dto.response.GetStoreSummaryRes;
+import com.ureca.uble.domain.store.repository.StoreClickLogDocumentRepository;
+import com.ureca.uble.domain.store.repository.StoreRepository;
+import com.ureca.uble.domain.users.repository.UsageCountRepository;
+import com.ureca.uble.domain.users.repository.UserRepository;
+import com.ureca.uble.entity.Benefit;
+import com.ureca.uble.entity.Brand;
+import com.ureca.uble.entity.Store;
+import com.ureca.uble.entity.UsageCount;
+import com.ureca.uble.entity.User;
+import com.ureca.uble.entity.document.StoreClickLogDocument;
+import com.ureca.uble.entity.enums.BenefitType;
+import com.ureca.uble.entity.enums.Period;
+import com.ureca.uble.entity.enums.Rank;
+import com.ureca.uble.entity.enums.RankType;
+import com.ureca.uble.entity.enums.Season;
+import com.ureca.uble.global.exception.GlobalException;
 
-import static com.ureca.uble.domain.store.exception.StoreErrorCode.OUT_OF_RANGE_INPUT;
-import static com.ureca.uble.domain.store.exception.StoreErrorCode.STORE_NOT_FOUND;
-import static com.ureca.uble.domain.users.exception.UserErrorCode.USER_NOT_FOUND;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -35,6 +46,7 @@ public class StoreService {
     private final UserRepository userRepository;
     private final UsageCountRepository usageCountRepository;
     private final StoreRepository storeRepository;
+    private final BookmarkRepository bookmarkRepository;
     private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
     private final StoreClickLogDocumentRepository storeClickLogDocumentRepository;
 
@@ -49,6 +61,22 @@ public class StoreService {
             .stream().map(GetStoreRes::from).toList();
 
         return new GetStoreListRes(storeList);
+    }
+
+    /**
+     * 매장 소모달 정보 조회
+     */
+    public GetStoreSummaryRes getStoreSummary(double latitude, double longitude, Long userId, Long storeId) {
+        User user = findUser(userId);
+        Store store = findByIdWithBrandAndCategoryAndBenefits(storeId);
+
+        // 좌표 기준 거리 계산
+        Double distance = calculateDistance(store.getLocation().getY(), store.getLocation().getX(), latitude, longitude);
+
+        // 북마크 여부
+        boolean isBookmarked = bookmarkRepository.existsByBrand_IdAndUser_Id(userId, store.getBrand().getId());
+
+        return GetStoreSummaryRes.of(store, distance, isBookmarked);
     }
 
     /**
@@ -67,6 +95,9 @@ public class StoreService {
         boolean isVipAvailable = (type == RankType.VIP || type == RankType.VIP_NORMAL) && handleVipBenefit(user);
         boolean isLocalAvailable = (type == RankType.LOCAL) && handleLocalBenefit(user);
 
+        // 북마크 여부
+        boolean isBookmarked = bookmarkRepository.existsByBrand_IdAndUser_Id(userId, store.getBrand().getId());
+
         // 혜택 List 계산
         List<GetBenefitInfoRes> benefitList = store.getBrand().getBenefits().stream()
             .map(b -> GetBenefitInfoRes.of(b, getBenefitType(store.getBrand(), b)))
@@ -79,7 +110,7 @@ public class StoreService {
             log.warn("매장 상세 조회 로그 저장에 실패하였습니다 : {}", e.getMessage());
         }
 
-        return GetStoreDetailRes.of(store, distance, isNormalAvailable, isVipAvailable, isLocalAvailable, benefitList);
+        return GetStoreDetailRes.of(store, distance, isNormalAvailable, isVipAvailable, isLocalAvailable, isBookmarked, benefitList);
     }
 
     private BenefitType getBenefitType(Brand brand, Benefit benefit) {
@@ -140,4 +171,6 @@ public class StoreService {
     private User findUser(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new GlobalException(USER_NOT_FOUND));
     }
+
+
 }
