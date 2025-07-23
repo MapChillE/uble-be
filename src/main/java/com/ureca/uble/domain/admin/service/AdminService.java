@@ -1,7 +1,9 @@
 package com.ureca.uble.domain.admin.service;
 
+import com.ureca.uble.domain.admin.dto.response.GetClickRankListRes;
 import com.ureca.uble.domain.admin.dto.response.GetUsageRankListRes;
-import com.ureca.uble.domain.admin.dto.response.UsageRankDetailRes;
+import com.ureca.uble.domain.admin.dto.response.RankDetailRes;
+import com.ureca.uble.domain.brand.repository.BrandClickLogDocumentRepository;
 import com.ureca.uble.domain.users.repository.UsageHistoryDocumentRepository;
 import com.ureca.uble.entity.enums.BenefitType;
 import com.ureca.uble.entity.enums.Gender;
@@ -18,6 +20,7 @@ import java.util.List;
 public class AdminService {
 
     private final UsageHistoryDocumentRepository usageHistoryDocumentRepository;
+    private final BrandClickLogDocumentRepository brandClickLogDocumentRepository;
 
     /**
      * (통계) 제휴처/카테고리 이용 순위
@@ -25,12 +28,24 @@ public class AdminService {
     public GetUsageRankListRes getUsageRank(RankTarget rankTarget, Gender gender, Integer ageRange, Rank rank, BenefitType benefitType) {
         ElasticsearchAggregations rankResult = usageHistoryDocumentRepository.getUsageRankByFiltering(rankTarget, gender, ageRange, rank, benefitType);
 
-        List<UsageRankDetailRes> rankList = rankResult.aggregationsAsMap()
+        List<RankDetailRes> rankList = rankResult.aggregationsAsMap()
             .get("usage_rank").aggregation().getAggregate().filter().aggregations()
-            .get("brand_rank").sterms().buckets().array().stream()
-            .map(b -> UsageRankDetailRes.of(b.key().stringValue(), b.docCount()))
+            .get("rank").sterms().buckets().array().stream()
+            .map(b -> RankDetailRes.of(b.key().stringValue(), b.docCount()))
             .toList();
 
         return GetUsageRankListRes.of(rankTarget, rankList);
+    }
+
+    public GetClickRankListRes getClickRank(RankTarget rankTarget, Gender gender, Integer ageRange, Rank rank, BenefitType benefitType) {
+        ElasticsearchAggregations rankResult = brandClickLogDocumentRepository.getUsageRankByFiltering(rankTarget, gender, ageRange, rank, benefitType);
+
+        List<RankDetailRes> rankList = rankResult.aggregationsAsMap()
+            .get("click_rank").aggregation().getAggregate().filter().aggregations()
+            .get("rank").sterms().buckets().array().stream()
+            .map(b -> RankDetailRes.of(b.key().stringValue(), b.docCount()))
+            .toList();
+
+        return GetClickRankListRes.of(rankTarget, rankList);
     }
 }

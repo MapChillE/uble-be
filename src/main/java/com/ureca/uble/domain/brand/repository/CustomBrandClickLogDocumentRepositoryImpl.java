@@ -2,7 +2,13 @@ package com.ureca.uble.domain.brand.repository;
 
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.util.NamedValue;
+import com.ureca.uble.domain.common.util.SearchFilterUtils;
+import com.ureca.uble.entity.enums.BenefitType;
+import com.ureca.uble.entity.enums.Gender;
+import com.ureca.uble.entity.enums.Rank;
+import com.ureca.uble.entity.enums.RankTarget;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchAggregations;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
@@ -52,6 +58,41 @@ public class CustomBrandClickLogDocumentRepositoryImpl implements CustomBrandCli
             .build();
 
         // 실행 및 결과 반환
+        return (ElasticsearchAggregations) elasticsearchOperations
+            .search(query, Map.class, IndexCoordinates.of("brand-click-log", "store-click-log"))
+            .getAggregations();
+    }
+
+    @Override
+    public ElasticsearchAggregations getUsageRankByFiltering(RankTarget rankTarget, Gender gender, Integer ageRange, Rank rank, BenefitType benefitType) {
+        // filter 설정
+        List<Query> filters = SearchFilterUtils.getAdminStatisticFilters(gender, ageRange, rank, benefitType);
+
+        // 통계 쿼리
+        String fieldName = switch (rankTarget) {
+            case BRAND -> "brandName";
+            case CATEGORY -> "category";
+        };
+
+        Aggregation aggregation = Aggregation.of(a -> a
+            .filter(f -> f
+                .bool(b -> b.filter(filters))
+            )
+            .aggregations("rank", Aggregation.of(sub -> sub
+                .terms(t -> t
+                    .field(fieldName)
+                    .size(10)
+                    .order(List.of(NamedValue.of("_count", SortOrder.Desc)))
+                )
+            ))
+        );
+
+        // 최종 쿼리 생성
+        NativeQuery query = NativeQuery.builder()
+            .withAggregation("click_rank", aggregation)
+            .withMaxResults(0)
+            .build();
+
         return (ElasticsearchAggregations) elasticsearchOperations
             .search(query, Map.class, IndexCoordinates.of("brand-click-log", "store-click-log"))
             .getAggregations();
