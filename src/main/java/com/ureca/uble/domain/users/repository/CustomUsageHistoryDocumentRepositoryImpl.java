@@ -1,14 +1,12 @@
 package com.ureca.uble.domain.users.repository;
 
-import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
 import co.elastic.clients.elasticsearch._types.aggregations.CalendarInterval;
 import co.elastic.clients.elasticsearch._types.query_dsl.DateRangeQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.TermsQuery;
 import co.elastic.clients.util.NamedValue;
+import com.ureca.uble.domain.common.util.SearchFilterUtils;
 import com.ureca.uble.entity.User;
 import com.ureca.uble.entity.document.UsageHistoryDocument;
 import com.ureca.uble.entity.enums.BenefitType;
@@ -23,10 +21,8 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 @Repository
 @RequiredArgsConstructor
@@ -183,50 +179,8 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
      */
     @Override
     public ElasticsearchAggregations getUsageRankByFiltering(RankTarget rankTarget, Gender gender, Integer ageRange, Rank rank, BenefitType benefitType) {
-        List<Query> filters = new ArrayList<>();
-
-        // 성별 Filter
-        if(gender != null) {
-            filters.add(TermQuery.of(t -> t
-                .field("userGender")
-                .value(gender.toString())
-            )._toQuery());
-        }
-
-        // 나이 Filter
-        if(ageRange != null) {
-            int currentYear = LocalDate.now().getYear();
-            String fromBirthDate = LocalDate.of(currentYear - ageRange - 10, 12, 31).format(DateTimeFormatter.ISO_DATE);
-            String toBirthDate = LocalDate.of(currentYear - ageRange + 1, 1, 1).format(DateTimeFormatter.ISO_DATE);
-
-            filters.add(DateRangeQuery.of(r -> r
-                .field("userBirthDate")
-                .gte(fromBirthDate)
-                .lte(toBirthDate)
-            )._toRangeQuery()._toQuery());
-        }
-
-        // Rank Filter
-        if(rank != null) {
-            filters.add(TermQuery.of(t -> t
-                .field("userRank")
-                .value(rank.toString())
-            )._toQuery());
-        }
-
-        // 혜택 종류 Filter
-        if (benefitType != null) {
-            filters.add(TermsQuery.of(t -> t
-                .field("brandBenefitType")
-                .terms(v -> v.value(
-                    switch (benefitType) {
-                        case VIP -> Stream.of("VIP", "VIP_NORMAL").map(FieldValue::of).toList();
-                        case NORMAL -> Stream.of("NORMAL", "VIP_NORMAL").map(FieldValue::of).toList();
-                        case LOCAL -> Stream.of("LOCAL").map(FieldValue::of).toList();
-                    }
-                ))
-            )._toQuery());
-        }
+        // filter 설정
+        List<Query> filters = SearchFilterUtils.getAdminStatisticFilters(gender, ageRange, rank, benefitType);
 
         // 통계 쿼리
         String fieldName = switch (rankTarget) {
@@ -238,7 +192,7 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
             .filter(f -> f
                 .bool(b -> b.filter(filters))
             )
-            .aggregations("brand_rank", Aggregation.of(sub -> sub
+            .aggregations("rank", Aggregation.of(sub -> sub
                 .terms(t -> t
                     .field(fieldName)
                     .size(10)
