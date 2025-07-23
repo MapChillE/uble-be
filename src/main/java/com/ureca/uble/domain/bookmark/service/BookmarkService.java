@@ -87,7 +87,7 @@ public class BookmarkService {
     }
 
     private Bookmark findBookmarkByUserAndBrand(Long userId, Long brandId) {
-        return bookmarkRepository.findByUser_IdAndBrand_Id(userId, brandId).orElseThrow(() -> new GlobalException(BOOKMARK_NOT_FOUND));
+        return bookmarkRepository.findByUserIdAndBrandId(userId, brandId).orElseThrow(() -> new GlobalException(BOOKMARK_NOT_FOUND));
     }
 
     private Brand findBrand(Long brandId) {
