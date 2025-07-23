@@ -10,9 +10,9 @@ import com.ureca.uble.domain.auth.dto.response.WithdrawRes;
 import com.ureca.uble.domain.auth.exception.AuthErrorCode;
 import com.ureca.uble.domain.bookmark.repository.BookmarkRepository;
 import com.ureca.uble.domain.feedback.repository.FeedbackRepository;
-import com.ureca.uble.domain.users.repository.TokenRepository;
 import com.ureca.uble.domain.users.exception.UserErrorCode;
-import com.ureca.uble.domain.users.repository.PinRepository;
+import com.ureca.uble.domain.pin.repository.PinRepository;
+import com.ureca.uble.domain.users.repository.TokenRepository;
 import com.ureca.uble.domain.users.repository.UsageCountRepository;
 import com.ureca.uble.domain.users.repository.UsageHistoryRepository;
 import com.ureca.uble.domain.users.repository.UserCategoryRepository;
@@ -52,17 +52,17 @@ public class AuthService {
 		String nickname = userInfo.getKakao_account().getProfile().getNickname();
 
 		User user = userRepository.findByProviderId(kakaoId)
-			.orElseGet(() -> userRepository.save(User.createTmpUser(kakaoId, nickname)));
+				.orElseGet(() -> userRepository.save(User.createTmpUser(kakaoId, nickname)));
 
 		String accessToken = jwtProvider.createAccessToken(user);
 		String refreshToken = jwtProvider.createRefreshToken(user);
 		LocalDateTime expiryTime = jwtProvider.getRefreshTokenExpiry(refreshToken);
 
 		tokenRepository.findByUser(user)
-			.ifPresentOrElse(
-				token -> token.updateRefreshToken(refreshToken, expiryTime),
-				() -> tokenRepository.save(Token.of(user, refreshToken, expiryTime))
-			);
+				.ifPresentOrElse(
+						token -> token.updateRefreshToken(refreshToken, expiryTime),
+						() -> tokenRepository.save(Token.of(user, refreshToken, expiryTime))
+				);
 
 		jwtProvider.addAccessTokenHeader(response, accessToken);
 		jwtProvider.addRefreshTokenCookie(response, refreshToken);
@@ -74,13 +74,13 @@ public class AuthService {
 		if (!jwtValidator.validateToken(refreshToken)) {
 			throw new GlobalException(AuthErrorCode.INVALID_TOKEN);
 		}
-		Long userId = jwtValidator.getUserIdFromToken(refreshToken);
+		Long userId = jwtValidator.getUserIdAndRole(refreshToken).getUserId();
 
 		User user = userRepository.findById(userId)
-			.orElseThrow(() -> new GlobalException(UserErrorCode.USER_NOT_FOUND));
+				.orElseThrow(() -> new GlobalException(UserErrorCode.USER_NOT_FOUND));
 
 		Token token = tokenRepository.findByRefreshToken(refreshToken)
-			.orElseThrow(() -> new GlobalException(AuthErrorCode.INVALID_TOKEN));
+				.orElseThrow(() -> new GlobalException(AuthErrorCode.INVALID_TOKEN));
 
 
 		String newAccessToken = jwtProvider.createAccessToken(user);
@@ -101,9 +101,9 @@ public class AuthService {
 			throw new GlobalException(AuthErrorCode.INVALID_TOKEN);
 		}
 
-		Long userId = jwtValidator.getUserIdFromToken(refreshToken);
+		Long userId = jwtValidator.getUserIdAndRole(refreshToken).getUserId();
 		User user = userRepository.findById(userId)
-			.orElseThrow(() -> new GlobalException(UserErrorCode.USER_NOT_FOUND));
+				.orElseThrow(() -> new GlobalException(UserErrorCode.USER_NOT_FOUND));
 
 		tokenRepository.deleteByUser(user);
 
@@ -133,6 +133,6 @@ public class AuthService {
 
 	private User findUser(Long userId){
 		return userRepository.findById(userId)
-			.orElseThrow(() -> new GlobalException(UserErrorCode.USER_NOT_FOUND));
+				.orElseThrow(() -> new GlobalException(UserErrorCode.USER_NOT_FOUND));
 	}
 }

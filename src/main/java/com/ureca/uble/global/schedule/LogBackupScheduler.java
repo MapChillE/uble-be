@@ -1,6 +1,5 @@
 package com.ureca.uble.global.schedule;
 
-import com.ureca.uble.global.schedule.util.RedisLockUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +16,6 @@ import java.time.format.DateTimeFormatter;
 @RequiredArgsConstructor
 public class LogBackupScheduler {
 
-    private final RedisLockUtil redisLockUtil;
     private final WebClient elasticWebClient;
 
     @Value("${spring.elasticsearch.username}")
@@ -31,25 +29,22 @@ public class LogBackupScheduler {
 
     @Scheduled(cron = "0 0 3 * * *")
     public void backupSearchLog() {
-        redisLockUtil.executeWithLockWithRetry("backup-log-lock", 1, 300, () -> {
-            log.info("[Elasticsearch] 로그 백업 시작: {}", LocalDateTime.now());
+        log.info("[Elasticsearch] 로그 백업 시작: {}", LocalDateTime.now());
 
-            String[] indexList = {
-                "search-log",
-                "brand-click-log",
-                "store-click-log",
-                "usage-history-log"
-            };
+        String[] indexList = {
+            "search-log",
+            "brand-click-log",
+            "store-click-log",
+            "usage-history-log"
+        };
 
-            for (String index : indexList) {
-                try {
-                    backUpIndex(index);
-                } catch (Exception e) {
-                    log.error("[Elasticsearch] 인덱스 {} 백업 실패: {}", index, e.getMessage(), e);
-                }
+        for (String index : indexList) {
+            try {
+                backUpIndex(index);
+            } catch (Exception e) {
+                log.error("[Elasticsearch] 인덱스 {} 백업 실패: {}", index, e.getMessage(), e);
             }
-            return null;
-        });
+        }
     }
 
     private void backUpIndex(String index) {

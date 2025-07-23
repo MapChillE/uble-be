@@ -12,9 +12,7 @@ import com.ureca.uble.entity.User;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -43,6 +41,7 @@ public class JwtProvider {
 	public String createAccessToken(User user) {
 		return Jwts.builder()
 			.subject(String.valueOf(user.getId()))
+			.claim("role", user.getRole().name())
 			.issuedAt(new Date())
 			.expiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY_MILLIS))
 			.signWith(Keys.hmacShaKeyFor(secret.getBytes()))
@@ -52,6 +51,7 @@ public class JwtProvider {
 	public String createRefreshToken(User user) {
 		return Jwts.builder()
 			.subject(String.valueOf(user.getId()))
+			.claim("role", user.getRole().name())
 			.issuedAt(new Date())
 			.expiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY_MILLIS))
 			.signWith(Keys.hmacShaKeyFor(secret.getBytes()))

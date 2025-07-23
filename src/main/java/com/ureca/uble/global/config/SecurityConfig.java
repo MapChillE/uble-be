@@ -2,7 +2,6 @@ package com.ureca.uble.global.config;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -43,9 +42,6 @@ public class SecurityConfig {
 				.requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
 				.requestMatchers("/health").permitAll()
 				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-				.requestMatchers(HttpMethod.POST, "/user/extra-info").hasRole("TMP_USER")
-				.requestMatchers(HttpMethod.GET, "/api/users/userInfo").hasRole("USER")
-				.requestMatchers(HttpMethod.PUT, "/api/users/userInfo").hasAnyRole("TMP_USER", "USER")
 				.requestMatchers("/api/admin/**").hasRole("ADMIN")
 				.anyRequest().authenticated()
 			)
