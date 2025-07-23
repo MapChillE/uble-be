@@ -1,7 +1,9 @@
 package com.ureca.uble.domain.store.service;
 
+import com.ureca.uble.domain.bookmark.repository.BookmarkRepository;
 import com.ureca.uble.domain.store.dto.response.GetStoreDetailRes;
 import com.ureca.uble.domain.store.dto.response.GetStoreListRes;
+import com.ureca.uble.domain.store.dto.response.GetStoreSummaryRes;
 import com.ureca.uble.domain.store.repository.StoreClickLogDocumentRepository;
 import com.ureca.uble.domain.store.repository.StoreRepository;
 import com.ureca.uble.domain.users.repository.UsageCountRepository;
@@ -48,6 +50,9 @@ class StoreServiceTest {
     @Mock
     private StoreClickLogDocumentRepository storeClickLogDocumentRepository;
 
+    @Mock
+    private BookmarkRepository bookmarkRepository;
+
     @Test
     @DisplayName("반경 500m 내의 매장 중 필터링 조건에 맞는 매장 리스트를 조회한다.")
     void getStores_get_check() {
@@ -85,6 +90,55 @@ class StoreServiceTest {
         assertNotNull(result);
         assertEquals(1, result.getStoreList().size());
         assertEquals("테스트 선릉점", result.getStoreList().get(0).getStoreName());
+    }
+
+    @Test
+    @DisplayName("매장 소모달 정보를 조회한다.")
+    void getStoreSummarySuccess() {
+        // given
+        Double latitude = 37.5;
+        Double longitude = 127.0;
+        Long userId = 1L;
+        Long storeId = 10L;
+
+        User mockUser = mock(User.class);
+        Brand mockBrand = mock(Brand.class);
+        Category mockCategory = mock(Category.class);
+        Store mockStore = mock(Store.class);
+        Point mockLocation = mock(Point.class);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
+        when(storeRepository.findByIdWithBrandAndCategoryAndBenefits(storeId)).thenReturn(Optional.of(mockStore));
+
+        when(mockStore.getBrand()).thenReturn(mockBrand);
+        when(mockStore.getId()).thenReturn(storeId);
+        when(mockStore.getName()).thenReturn("스타벅스 선릉점");
+        when(mockStore.getAddress()).thenReturn("서울 강남구 테헤란로64길 18");
+        when(mockStore.getPhoneNumber()).thenReturn("02-1234-5678");
+        when(mockStore.getLocation()).thenReturn(mockLocation);
+        when(mockLocation.getY()).thenReturn(37.0);
+        when(mockLocation.getX()).thenReturn(127.0);
+        when(mockBrand.getId()).thenReturn(123L);
+        when(mockBrand.getDescription()).thenReturn("커피가 맛있는 스타벅스");
+        when(mockBrand.getImageUrl()).thenReturn("https://example.com");
+        when(mockBrand.getCategory()).thenReturn(mockCategory);
+        when(mockCategory.getName()).thenReturn("음식점");
+
+        when(bookmarkRepository.existsByBrand_IdAndUser_Id(userId, mockBrand.getId())).thenReturn(true);
+
+        // when
+        GetStoreSummaryRes result = storeService.getStoreSummary(latitude, longitude, userId, storeId);
+
+        // then
+        assertThat(result.getBrandId()).isEqualTo(123L);
+        assertThat(result.getStoreId()).isEqualTo(storeId);
+        assertThat(result.getStoreName()).isEqualTo("스타벅스 선릉점");
+        assertThat(result.getDescription()).isEqualTo("커피가 맛있는 스타벅스");
+        assertThat(result.getAddress()).isEqualTo("서울 강남구 테헤란로64길 18");
+        assertThat(result.getPhoneNumber()).isEqualTo("02-1234-5678");
+        assertThat(result.getCategory()).isEqualTo("음식점");
+        assertThat(result.getImageUrl()).isEqualTo("https://example.com");
+        assertThat(result.isBookmarked()).isTrue();
     }
 
     @Test
@@ -131,6 +185,7 @@ class StoreServiceTest {
         when(mockBenefit.getManual()).thenReturn("매장 방문 시 쿠폰 제시");
         when(mockBenefit.getPeriod()).thenReturn(com.ureca.uble.entity.enums.Period.MONTHLY);
         when(mockBenefit.getNumber()).thenReturn(1);
+        when(bookmarkRepository.existsByBrand_IdAndUser_Id(userId, mockBrand.getId())).thenReturn(true);
 
         // when
         GetStoreDetailRes result = storeService.getStoreDetail(latitude, longitude, userId, storeId);
@@ -148,6 +203,8 @@ class StoreServiceTest {
         assertThat(result.getBenefitList().get(0).getBenefitId()).isEqualTo(1001L);
         assertThat(result.getBenefitList().get(0).getType()).isEqualTo("NORMAL");
         assertThat(result.getBenefitList().get(0).getContent()).isEqualTo("아메리카노 무료");
+        assertThat(result.isBookmarked()).isTrue();
+
         verify(storeClickLogDocumentRepository).save(any(StoreClickLogDocument.class));
     }
 }
