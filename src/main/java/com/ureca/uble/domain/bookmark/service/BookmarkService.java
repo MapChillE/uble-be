@@ -75,7 +75,7 @@ public class BookmarkService {
         boolean hasNext = (bookmarkList.size() > size);
         if (hasNext) bookmarkList.remove(bookmarkList.size() - 1);
 
-        long lastCursorId = bookmarkList.get(bookmarkList.size() - 1).getBookmarkId();
+        long lastCursorId = bookmarkList.isEmpty() ? 0 : bookmarkList.get(bookmarkList.size() - 1).getBookmarkId();
 
         return CursorPageRes.of(bookmarkList, hasNext, lastCursorId);
     }
