@@ -92,6 +92,7 @@ public class UsageHistoryServiceTest {
 		when(vipUser.getIsVipAvailable()).thenReturn(true);
 		when(vipUser.getGender()).thenReturn(Gender.FEMALE);
 		when(mockStore.getBrand()).thenReturn(mockBrand);
+		when(mockStore.getAddress()).thenReturn("서울 강남구");
 		when(mockBrand.getRankType()).thenReturn(RankType.VIP);
 		when(mockBrand.getCategory()).thenReturn(mockCategory);
 		when(mockCategory.getName()).thenReturn("푸드");
@@ -154,6 +155,7 @@ public class UsageHistoryServiceTest {
 		when(localUser.getIsLocalAvailable()).thenReturn(true);
 		when(localUser.getGender()).thenReturn(Gender.FEMALE);
 		when(mockStore.getBrand()).thenReturn(mockBrand);
+		when(mockStore.getAddress()).thenReturn("서울 강남구");
 		when(mockBrand.getRankType()).thenReturn(RankType.LOCAL);
 		when(mockBrand.getCategory()).thenReturn(mockCategory);
 		when(mockCategory.getName()).thenReturn("푸드");
@@ -212,6 +214,7 @@ public class UsageHistoryServiceTest {
 		Category mockCategory = mock(Category.class);
 
 		when(mockStore.getBrand()).thenReturn(mockBrand);
+		when(mockStore.getAddress()).thenReturn("서울 강남구");
 		when(mockBrand.getRankType()).thenReturn(RankType.NORMAL);
 		when(normalUser.getGender()).thenReturn(Gender.FEMALE);
 		when(normalUser.getRank()).thenReturn(Rank.VIP);
