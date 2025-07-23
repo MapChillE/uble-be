@@ -1,13 +1,20 @@
 package com.ureca.uble.domain.users.repository;
 
+import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
 import co.elastic.clients.elasticsearch._types.aggregations.CalendarInterval;
 import co.elastic.clients.elasticsearch._types.query_dsl.DateRangeQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.TermsQuery;
 import co.elastic.clients.util.NamedValue;
 import com.ureca.uble.entity.User;
 import com.ureca.uble.entity.document.UsageHistoryDocument;
+import com.ureca.uble.entity.enums.BenefitType;
+import com.ureca.uble.entity.enums.Gender;
+import com.ureca.uble.entity.enums.Rank;
+import com.ureca.uble.entity.enums.RankTarget;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchAggregations;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
@@ -16,8 +23,10 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 @Repository
 @RequiredArgsConstructor
@@ -166,6 +175,84 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
             .build();
 
         // 검색 및 반환
+        return (ElasticsearchAggregations) elasticsearchOperations.search(query, UsageHistoryDocument.class).getAggregations();
+    }
+
+    /**
+     * (Admin) 제휴처/카테고리 이용 순위
+     */
+    @Override
+    public ElasticsearchAggregations getUsageRankByFiltering(RankTarget rankTarget, Gender gender, Integer ageRange, Rank rank, BenefitType benefitType) {
+        List<Query> filters = new ArrayList<>();
+
+        // 성별 Filter
+        if(gender != null) {
+            filters.add(TermQuery.of(t -> t
+                .field("userGender")
+                .value(gender.toString())
+            )._toQuery());
+        }
+
+        // 나이 Filter
+        if(ageRange != null) {
+            int currentYear = LocalDate.now().getYear();
+            String fromBirthDate = LocalDate.of(currentYear - ageRange - 10, 12, 31).format(DateTimeFormatter.ISO_DATE);
+            String toBirthDate = LocalDate.of(currentYear - ageRange + 1, 1, 1).format(DateTimeFormatter.ISO_DATE);
+
+            filters.add(DateRangeQuery.of(r -> r
+                .field("userBirthDate")
+                .gte(fromBirthDate)
+                .lte(toBirthDate)
+            )._toRangeQuery()._toQuery());
+        }
+
+        // Rank Filter
+        if(rank != null) {
+            filters.add(TermQuery.of(t -> t
+                .field("userRank")
+                .value(rank.toString())
+            )._toQuery());
+        }
+
+        // 혜택 종류 Filter
+        if (benefitType != null) {
+            filters.add(TermsQuery.of(t -> t
+                .field("brandBenefitType")
+                .terms(v -> v.value(
+                    switch (benefitType) {
+                        case VIP -> Stream.of("VIP", "VIP_NORMAL").map(FieldValue::of).toList();
+                        case NORMAL -> Stream.of("NORMAL", "VIP_NORMAL").map(FieldValue::of).toList();
+                        case LOCAL -> Stream.of("LOCAL").map(FieldValue::of).toList();
+                    }
+                ))
+            )._toQuery());
+        }
+
+        // 통계 쿼리
+        String fieldName = switch (rankTarget) {
+            case BRAND -> "brandName";
+            case CATEGORY -> "category";
+        };
+
+        Aggregation aggregation = Aggregation.of(a -> a
+            .filter(f -> f
+                .bool(b -> b.filter(filters))
+            )
+            .aggregations("brand_rank", Aggregation.of(sub -> sub
+                .terms(t -> t
+                    .field(fieldName)
+                    .size(10)
+                    .order(List.of(NamedValue.of("_count", SortOrder.Desc)))
+                )
+            ))
+        );
+
+        // 최종 쿼리 생성
+        NativeQuery query = NativeQuery.builder()
+            .withAggregation("usage_rank", aggregation)
+            .withMaxResults(0)
+            .build();
+
         return (ElasticsearchAggregations) elasticsearchOperations.search(query, UsageHistoryDocument.class).getAggregations();
     }
 }
