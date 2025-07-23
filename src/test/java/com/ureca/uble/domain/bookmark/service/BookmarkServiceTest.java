@@ -112,14 +112,14 @@ class BookmarkServiceTest {
         Bookmark mockBookmark = mock(Bookmark.class);
         when(mockBookmark.getUser()).thenReturn(mockUser);
 
-        when(bookmarkRepository.findByUser_IdAndBrand_Id(userId, brandId)).thenReturn(Optional.of(mockBookmark));
+        when(bookmarkRepository.findByUserIdAndBrandId(userId, brandId)).thenReturn(Optional.of(mockBookmark));
 
         // when
         DeleteBookmarkRes res = bookmarkService.deleteBookmark(userId, brandId);
 
         // then
         assertNotNull(res);
-        verify(bookmarkRepository).findByUser_IdAndBrand_Id(userId, brandId);
+        verify(bookmarkRepository).findByUserIdAndBrandId(userId, brandId);
         verify(bookmarkRepository).delete(mockBookmark);
     }
 
