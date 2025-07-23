@@ -11,4 +11,6 @@ public interface CustomUsageHistoryDocumentRepository {
     ElasticsearchAggregations getUsageDateAndDiffAndCount(User user);
 
     ElasticsearchAggregations getUsageRankByFiltering(RankTarget rankTarget, Gender gender, Integer ageRange, Rank rank, BenefitType benefitType);
+
+    ElasticsearchAggregations getLocalRankByFiltering(Gender gender, Integer ageRange, Rank rank, BenefitType benefitType);
 }

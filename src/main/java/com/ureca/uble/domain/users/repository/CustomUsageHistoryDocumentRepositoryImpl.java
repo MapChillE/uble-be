@@ -209,4 +209,32 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
 
         return (ElasticsearchAggregations) elasticsearchOperations.search(query, UsageHistoryDocument.class).getAggregations();
     }
+
+    @Override
+    public ElasticsearchAggregations getLocalRankByFiltering(Gender gender, Integer ageRange, Rank rank, BenefitType benefitType) {
+        // filter 설정
+        List<Query> filters = SearchFilterUtils.getAdminStatisticFilters(gender, ageRange, rank, benefitType);
+
+        // 통계 쿼리
+        Aggregation aggregation = Aggregation.of(a -> a
+            .filter(f -> f
+                .bool(b -> b.filter(filters))
+            )
+            .aggregations("rank", Aggregation.of(sub -> sub
+                .terms(t -> t
+                    .field("storeLocal")
+                    .size(25)
+                    .order(List.of(NamedValue.of("_count", SortOrder.Desc)))
+                )
+            ))
+        );
+
+        // 최종 쿼리 생성
+        NativeQuery query = NativeQuery.builder()
+            .withAggregation("local_rank", aggregation)
+            .withMaxResults(0)
+            .build();
+
+        return (ElasticsearchAggregations) elasticsearchOperations.search(query, UsageHistoryDocument.class).getAggregations();
+    }
 }

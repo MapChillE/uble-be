@@ -1,6 +1,7 @@
 package com.ureca.uble.domain.admin.service;
 
 import com.ureca.uble.domain.admin.dto.response.GetClickRankListRes;
+import com.ureca.uble.domain.admin.dto.response.GetLocalRankListRes;
 import com.ureca.uble.domain.admin.dto.response.GetUsageRankListRes;
 import com.ureca.uble.domain.admin.dto.response.RankDetailRes;
 import com.ureca.uble.domain.brand.repository.BrandClickLogDocumentRepository;
@@ -37,6 +38,9 @@ public class AdminService {
         return GetUsageRankListRes.of(rankTarget, rankList);
     }
 
+    /**
+     * (통계) 제휴처/카테고리 클릭 순위
+     */
     public GetClickRankListRes getClickRank(RankTarget rankTarget, Gender gender, Integer ageRange, Rank rank, BenefitType benefitType) {
         ElasticsearchAggregations rankResult = brandClickLogDocumentRepository.getUsageRankByFiltering(rankTarget, gender, ageRange, rank, benefitType);
 
@@ -47,5 +51,20 @@ public class AdminService {
             .toList();
 
         return GetClickRankListRes.of(rankTarget, rankList);
+    }
+
+    /**
+     * (통계) 서울 지역구 이용 순위
+     */
+    public GetLocalRankListRes getLocalRank(Gender gender, Integer ageRange, Rank rank, BenefitType benefitType) {
+        ElasticsearchAggregations rankResult = usageHistoryDocumentRepository.getLocalRankByFiltering(gender, ageRange, rank, benefitType);
+
+        List<RankDetailRes> rankList = rankResult.aggregationsAsMap()
+            .get("local_rank").aggregation().getAggregate().filter().aggregations()
+            .get("rank").sterms().buckets().array().stream()
+            .map(b -> RankDetailRes.of(b.key().stringValue(), b.docCount()))
+            .toList();
+
+        return new GetLocalRankListRes(rankList);
     }
 }
