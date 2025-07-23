@@ -8,5 +8,4 @@ import com.ureca.uble.entity.Category;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 	List<Category> findAllByIdIn(List<Long> ids);
-	List<Category> findByOrderByIdAsc();
 }

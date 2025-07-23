@@ -69,14 +69,6 @@ public class BrandController {
 		return CommonResponse.success(brandService.getBrandListBySearch(userId, keyword, category, season, type, page, size));
 	}
 
-	@Operation(summary = "지도 초기 데이터 조회")
-	@GetMapping("/map/initial-data")
-	public CommonResponse<InitialDataRes> getInitialData(
-			@Parameter(description = "사용자정보", required = true)
-			@AuthenticationPrincipal Long userId) {
-		return CommonResponse.success(brandService.getInitialData(userId));
-	}
-
 	/**
 	 * 제휴처 검색 자동완성
 	 *
