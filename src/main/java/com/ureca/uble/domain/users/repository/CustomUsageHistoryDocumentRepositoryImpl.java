@@ -20,6 +20,7 @@ import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,6 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
     public ElasticsearchAggregations getUsageDateAndDiffAndCount(User user) {
         long userId = user.getId();
         int currentYear = LocalDate.now().getYear();
-
 
         // userId 필터
         Query userFilter = Query.of(u -> u
@@ -85,6 +85,7 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
             .field("createdAt")
             .gte(fromDate)
             .lte("now")
+            .timeZone("+09:00")
         )._toRangeQuery()._toQuery();
 
         Aggregation monthlyUsageAgg = Aggregation.of(a -> a
@@ -110,7 +111,7 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
             .aggregations("by_day", Aggregation.of(aa -> aa
                 .terms(t -> t
                     .script(s -> s
-                        .source("doc['createdAt'].value.getDayOfMonth()")
+                        .source("doc['createdAt'].value.plusHours(9).getDayOfMonth()")
                         .lang("painless")
                     )
                     .size(1)
@@ -126,7 +127,7 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
                 .terms(t -> t
                     .script(s -> s
                         .source("""
-                            int d = doc['createdAt'].value.getDayOfWeek().getValue();
+                            int d = doc['createdAt'].value.plusHours(9).getDayOfWeek().getValue();
                             if (d == 1) return '월';
                             if (d == 2) return '화';
                             if (d == 3) return '수';
@@ -150,7 +151,7 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
             .aggregations("hour", Aggregation.of(aa -> aa
                 .terms(t -> t
                     .script(s -> s
-                        .source("doc['createdAt'].value.getHour()")
+                        .source("doc['createdAt'].value.plusHours(9).getHour()")
                         .lang("painless")
                     )
                     .size(1)
