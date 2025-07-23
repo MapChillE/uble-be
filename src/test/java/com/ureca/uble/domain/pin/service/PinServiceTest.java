@@ -59,11 +59,13 @@ public class PinServiceTest {
         when(pin1.getId()).thenReturn(10L);
         when(pin1.getName()).thenReturn("집");
         when(pin1.getLocation()).thenReturn(p1);
+        when(pin1.getAddress()).thenReturn("서울시 강남구");
 
         Pin pin2 = mock(Pin.class);
         when(pin2.getId()).thenReturn(11L);
         when(pin2.getName()).thenReturn("회사");
         when(pin2.getLocation()).thenReturn(p2);
+        when(pin1.getAddress()).thenReturn("서울시 서초구");
         when(pinRepository.findByUserIdOrderByIdAsc(userId)).thenReturn(List.of(pin1, pin2));
 
         // when
