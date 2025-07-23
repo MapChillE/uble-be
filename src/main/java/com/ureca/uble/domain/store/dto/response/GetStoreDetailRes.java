@@ -1,11 +1,13 @@
 package com.ureca.uble.domain.store.dto.response;
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ureca.uble.entity.Store;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
 
 @Getter
 @Builder
@@ -47,11 +49,15 @@ public class GetStoreDetailRes {
     @Schema(description = "(사용자) 우리 동네 멤버십 혜택 사용 가능 여부", example = "false")
     private boolean isLocalAvailable;
 
+    @Schema(description = "북마크 여부", example = "true")
+    @JsonProperty("isBookmarked")
+    private boolean bookmarked;
+
     @Schema(description = "혜택 리스트", example = "혜택 리스트")
     private List<GetBenefitInfoRes> benefitList;
 
     public static GetStoreDetailRes of(Store store,Double distance, boolean isNormalAvailable, boolean isVipAvailable,
-                                       boolean isLocalAvailable, List<GetBenefitInfoRes> benefitList) {
+                                       boolean isLocalAvailable, boolean bookmarked, List<GetBenefitInfoRes> benefitList) {
         return GetStoreDetailRes.builder()
             .brandId(store.getBrand().getId())
             .storeId(store.getId())
@@ -65,6 +71,7 @@ public class GetStoreDetailRes {
             .isNormalAvailable(isNormalAvailable)
             .isVipAvailable(isVipAvailable)
             .isLocalAvailable(isLocalAvailable)
+            .bookmarked(bookmarked)
             .benefitList(benefitList)
             .build();
     }
