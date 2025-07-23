@@ -23,12 +23,6 @@ spring:
         mode: always
         encoding: UTF-8
 
-  data:
-    redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
-      ssl:
-        enabled: true
   elasticsearch:
     uris: ${ELASTIC_URIS}
     username: ${ELASTIC_USERNAME}
