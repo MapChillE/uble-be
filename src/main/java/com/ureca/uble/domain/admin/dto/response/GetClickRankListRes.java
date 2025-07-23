@@ -16,12 +16,12 @@ public class GetClickRankListRes {
     private RankTarget rankTarget;
 
     @Schema(description = "결과 List")
-    private List<RankDetailRes> usageRankList;
+    private List<RankDetailRes> clickRankList;
 
-    public static GetClickRankListRes of(RankTarget rankTarget, List<RankDetailRes> usageRankList) {
+    public static GetClickRankListRes of(RankTarget rankTarget, List<RankDetailRes> clickRankList) {
         return GetClickRankListRes.builder()
             .rankTarget(rankTarget)
-            .usageRankList(usageRankList)
+            .clickRankList(clickRankList)
             .build();
     }
 }

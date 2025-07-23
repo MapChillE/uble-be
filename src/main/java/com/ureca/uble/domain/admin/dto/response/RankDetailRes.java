@@ -6,13 +6,13 @@ import lombok.Getter;
 
 @Getter
 @Builder
-@Schema(description = "제휴처/카테고리 이용 내역 순위 반환 DTO")
+@Schema(description = "순위 반환 DTO")
 public class RankDetailRes {
 
-    @Schema(description = "카테고리/제휴처 이름", example = "푸드 or 할리스")
+    @Schema(description = "이름", example = "이름")
     private String name;
 
-    @Schema(description = "이용 횟수", example = "100")
+    @Schema(description = "횟수", example = "100")
     private Long count;
 
     public static RankDetailRes of(String name, Long count) {

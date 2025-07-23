@@ -64,7 +64,7 @@ public class CustomBrandClickLogDocumentRepositoryImpl implements CustomBrandCli
     }
 
     @Override
-    public ElasticsearchAggregations getUsageRankByFiltering(RankTarget rankTarget, Gender gender, Integer ageRange, Rank rank, BenefitType benefitType) {
+    public ElasticsearchAggregations getClickRankByFiltering(RankTarget rankTarget, Gender gender, Integer ageRange, Rank rank, BenefitType benefitType) {
         // filter 설정
         List<Query> filters = SearchFilterUtils.getAdminStatisticFilters(gender, ageRange, rank, benefitType);
 

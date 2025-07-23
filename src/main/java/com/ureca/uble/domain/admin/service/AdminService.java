@@ -42,7 +42,7 @@ public class AdminService {
      * (통계) 제휴처/카테고리 클릭 순위
      */
     public GetClickRankListRes getClickRank(RankTarget rankTarget, Gender gender, Integer ageRange, Rank rank, BenefitType benefitType) {
-        ElasticsearchAggregations rankResult = brandClickLogDocumentRepository.getUsageRankByFiltering(rankTarget, gender, ageRange, rank, benefitType);
+        ElasticsearchAggregations rankResult = brandClickLogDocumentRepository.getClickRankByFiltering(rankTarget, gender, ageRange, rank, benefitType);
 
         List<RankDetailRes> rankList = rankResult.aggregationsAsMap()
             .get("click_rank").aggregation().getAggregate().filter().aggregations()

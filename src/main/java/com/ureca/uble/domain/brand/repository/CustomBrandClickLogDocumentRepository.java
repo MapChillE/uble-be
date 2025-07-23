@@ -9,5 +9,5 @@ import org.springframework.data.elasticsearch.client.elc.ElasticsearchAggregatio
 public interface CustomBrandClickLogDocumentRepository {
     ElasticsearchAggregations getCategoryAndBrandRankByUserId(Long userId);
 
-    ElasticsearchAggregations getUsageRankByFiltering(RankTarget rankTarget, Gender gender, Integer ageRange, Rank rank, BenefitType benefitType);
+    ElasticsearchAggregations getClickRankByFiltering(RankTarget rankTarget, Gender gender, Integer ageRange, Rank rank, BenefitType benefitType);
 }
