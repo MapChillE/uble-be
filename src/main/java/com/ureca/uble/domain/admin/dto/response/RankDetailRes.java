@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @Schema(description = "제휴처/카테고리 이용 내역 순위 반환 DTO")
-public class UsageRankDetailRes {
+public class RankDetailRes {
 
     @Schema(description = "카테고리/제휴처 이름", example = "푸드 or 할리스")
     private String name;
@@ -15,8 +15,8 @@ public class UsageRankDetailRes {
     @Schema(description = "이용 횟수", example = "100")
     private Long count;
 
-    public static UsageRankDetailRes of(String name, Long count) {
-        return UsageRankDetailRes.builder()
+    public static RankDetailRes of(String name, Long count) {
+        return RankDetailRes.builder()
             .name(name)
             .count(count)
             .build();

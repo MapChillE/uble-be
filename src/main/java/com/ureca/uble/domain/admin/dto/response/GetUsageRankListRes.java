@@ -16,9 +16,9 @@ public class GetUsageRankListRes {
     private RankTarget rankTarget;
 
     @Schema(description = "결과 List")
-    private List<UsageRankDetailRes> usageRankList;
+    private List<RankDetailRes> usageRankList;
 
-    public static GetUsageRankListRes of(RankTarget rankTarget, List<UsageRankDetailRes> usageRankList) {
+    public static GetUsageRankListRes of(RankTarget rankTarget, List<RankDetailRes> usageRankList) {
         return GetUsageRankListRes.builder()
             .rankTarget(rankTarget)
             .usageRankList(usageRankList)
