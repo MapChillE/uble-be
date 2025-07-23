@@ -38,16 +38,16 @@ public class BookmarkController {
      * 즐겨찾기 삭제
      *
      * @param userId 사용자 정보
-     * @param bookmarkId 즐겨찾기 id
+     * @param brandId 제휴처 id
      */
     @Operation(summary = "즐겨찾기 삭제", description = "즐겨찾기 삭제")
-    @DeleteMapping("/{bookmarkId}")
+    @DeleteMapping("/{brandId}")
     public CommonResponse<DeleteBookmarkRes> deleteBookmark(
         @Parameter(description = "사용자정보", required = true)
         @AuthenticationPrincipal Long userId,
-        @Parameter(description = "즐겨찾기 id", required = true)
-        @PathVariable Long bookmarkId) {
-        return CommonResponse.success(bookmarkService.deleteBookmark(userId, bookmarkId));
+        @Parameter(description = "제휴처 id", required = true)
+        @PathVariable Long brandId) {
+        return CommonResponse.success(bookmarkService.deleteBookmark(userId, brandId));
     }
 
     /**
