@@ -357,8 +357,8 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
         // 기간 Filter
         filters.add(DateRangeQuery.of(r -> r
             .field("createdAt")
-            .gte(start.format(DateTimeFormatter.ISO_DATE))
-            .lte(end.format(DateTimeFormatter.ISO_DATE))
+            .gte(start.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+            .lte(end.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
         )._toRangeQuery()._toQuery());
 
         // 최종 Query
