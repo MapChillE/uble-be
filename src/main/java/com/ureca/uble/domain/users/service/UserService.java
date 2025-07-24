@@ -13,9 +13,11 @@ import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.Category;
 import com.ureca.uble.entity.User;
 import com.ureca.uble.entity.UserCategory;
+import com.ureca.uble.entity.document.UsageHistoryDocument;
 import com.ureca.uble.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchAggregations;
+import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -25,6 +27,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -129,6 +132,30 @@ public class UserService {
 		List<MonthlyBenefitUsageRes> monthlyBenefitUsageList = getMonthlyBenefitUsageList(usageResult);
 
 		return GetUserStatisticsRes.of(categoryRankList, brandRankList, benefitUsagePatternRes, benefitUsageComparisonRes, monthlyBenefitUsageList);
+	}
+
+	/**
+	 * 개인 통계 미리보기 조회
+	 */
+	@Transactional(readOnly = true)
+	public GetUserStatisticsPreviewRes getUserStatisticsPreview(Long userId) {
+		SearchHits<UsageHistoryDocument> result = usageHistoryDocumentRepository.getPreviewStatistics(userId);
+		ElasticsearchAggregations aggregations = (ElasticsearchAggregations) result.getAggregations();
+
+		// 가장 많이 사용한 카테고리
+        Optional<String> categoryNameOpt = aggregations.aggregationsAsMap().get("category_top").aggregation()
+			.getAggregate().sterms().buckets().array().stream().findFirst().map(b -> b.key().stringValue());
+		String categoryName = categoryNameOpt.orElse(null);
+
+		// 가장 많이 사용한 제휴처
+		Optional<String> brandNameOpt = aggregations.aggregationsAsMap().get("brand_top").aggregation()
+			.getAggregate().sterms().buckets().array().stream().findFirst().map(b->b.key().stringValue());
+		String brandName = brandNameOpt.orElse(null);
+
+		// 전체 사용량
+		long usageCount = result.getTotalHits();
+
+		return GetUserStatisticsPreviewRes.of(categoryName, brandName, usageCount);
 	}
 
 	/**

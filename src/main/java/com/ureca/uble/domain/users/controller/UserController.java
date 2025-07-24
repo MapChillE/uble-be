@@ -76,6 +76,19 @@ public class UserController {
 	}
 
 	/**
+	 * 사용자 통계 미리보기 정보 조회
+	 *
+	 * @param userId 사용자 정보
+	 */
+	@Operation(summary = "사용자 통계 정보 미리보기 조회", description = "사용자의 개인 통계 미리보기를 조회합니다.")
+	@GetMapping("/statistics/preview")
+	public CommonResponse<GetUserStatisticsPreviewRes> getUserStatisticsPreview(
+		@Parameter(description = "사용자정보", required = true)
+		@AuthenticationPrincipal Long userId) {
+		return CommonResponse.success(userService.getUserStatisticsPreview(userId));
+	}
+
+	/**
 	 * 사용자 통계 정보 조회
 	 *
 	 * @param userId 사용자 정보
