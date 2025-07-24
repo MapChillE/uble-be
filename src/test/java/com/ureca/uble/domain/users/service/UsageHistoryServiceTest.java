@@ -1,14 +1,12 @@
 package com.ureca.uble.domain.users.service;
 
 import com.ureca.uble.domain.brand.repository.BenefitRepository;
-import com.ureca.uble.domain.common.dto.response.CursorPageRes;
 import com.ureca.uble.domain.store.repository.StoreRepository;
 import com.ureca.uble.domain.users.dto.request.CreateUsageHistoryReq;
 import com.ureca.uble.domain.users.dto.response.CreateUsageHistoryRes;
-import com.ureca.uble.domain.users.dto.response.UsageHistoryRes;
+import com.ureca.uble.domain.users.dto.response.UsageHistoryListRes;
 import com.ureca.uble.domain.users.repository.UsageCountRepository;
 import com.ureca.uble.domain.users.repository.UsageHistoryDocumentRepository;
-import com.ureca.uble.domain.users.repository.UsageHistoryRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.*;
 import com.ureca.uble.entity.document.UsageHistoryDocument;
@@ -23,8 +21,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.elasticsearch.core.SearchHit;
+import org.springframework.data.elasticsearch.core.SearchHits;
 
 import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,8 +46,6 @@ public class UsageHistoryServiceTest {
 	@Mock
 	private StoreRepository storeRepository;
 	@Mock
-	private UsageHistoryRepository usageHistoryRepository;
-	@Mock
 	private BenefitRepository benefitRepository;
 	@Mock
 	private UsageCountRepository usageCountRepository;
@@ -54,26 +54,40 @@ public class UsageHistoryServiceTest {
 
 	@Test
 	@DisplayName("사용자 ID로 이용내역을 조회한다.")
-	void getUsageHistorySuccess(){
-		//given
+	void getUsageHistorySuccess() {
 		Long userId = 1L;
-		Long lastHistoryId = null;
+		int page = 0;
 		int size = 10;
+		int year = 2025;
+		int month = 7;
 
-		List<UsageHistoryRes> content = List.of(
-			UsageHistoryRes.of(1L, "스타벅스 선릉점", LocalDateTime.now())
-		);
-		CursorPageRes<UsageHistoryRes> expectedResult = CursorPageRes.of(content, false, null);
-		when(usageHistoryRepository.findUsagesByUserId(userId, lastHistoryId, size)).thenReturn(expectedResult);
+		LocalDateTime start = LocalDateTime.of(year, month, 1, 0, 0);
+		LocalDateTime end = LocalDateTime.of(year, month, YearMonth.of(year, month).lengthOfMonth(), 23, 59);
 
-		//when
-		CursorPageRes<UsageHistoryRes> result = usageHistoryService.getUsageHistory(userId, lastHistoryId, size);
+		UsageHistoryDocument document = UsageHistoryDocument.builder()
+			.id("1")
+			.userId(userId)
+			.storeName("스타벅스 선릉점")
+			.createdAt(ZonedDateTime.now())
+			.category("tmpCategory")
+			.brandImageUrl("example.com")
+			.build();
 
-		//then
+		SearchHit<UsageHistoryDocument> hit = mock(SearchHit.class);
+		when(hit.getContent()).thenReturn(document);
+
+		SearchHits<UsageHistoryDocument> searchHits = mock(SearchHits.class);
+		when(usageHistoryDocumentRepository.findByUserIdAndCreatedAtBetween(userId, start, end, page, size))
+			.thenReturn(searchHits);
+		when(searchHits.getTotalHits()).thenReturn(1L);
+		when(searchHits.getSearchHits()).thenReturn(List.of(hit));
+
+		UsageHistoryListRes result = usageHistoryService.getUsageHistory(userId, year, month, page, size);
+
 		assertThat(result).isNotNull();
-		assertThat(result.getContent()).hasSize(1);
-		assertThat(result.isHasNext()).isFalse();
-		verify(usageHistoryRepository).findUsagesByUserId(userId, lastHistoryId, size);
+		assertThat(result.getTotalCount()).isEqualTo(1);
+		assertThat(result.getHistoryList()).hasSize(1);
+		assertThat(result.getHistoryList().get(0).getStoreName()).isEqualTo("스타벅스 선릉점");
 	}
 
 	@Test

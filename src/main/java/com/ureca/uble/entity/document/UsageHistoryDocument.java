@@ -57,6 +57,9 @@ public class UsageHistoryDocument {
     @Field(type = FieldType.Keyword)
     private String category;
 
+    @Field(type = FieldType.Keyword)
+    private String brandImageUrl;
+
     @Field(type = FieldType.Date, pattern = "uuuu-MM-dd'T'HH:mm:ss.SSSZZ")
     private ZonedDateTime createdAt;
 
@@ -77,6 +80,7 @@ public class UsageHistoryDocument {
             .brandIsOnline(store.getBrand().getIsOnline())
             .brandBenefitType(store.getBrand().getRankList())
             .category(store.getBrand().getCategory().getName())
+            .brandImageUrl(store.getBrand().getImageUrl())
             .createdAt(ZonedDateTime.now())
             .createdHour(ZonedDateTime.now().getHour())
             .build();
