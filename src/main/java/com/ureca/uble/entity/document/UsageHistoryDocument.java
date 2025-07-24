@@ -60,6 +60,9 @@ public class UsageHistoryDocument {
     @Field(type = FieldType.Date, pattern = "uuuu-MM-dd'T'HH:mm:ss.SSSZZ")
     private ZonedDateTime createdAt;
 
+    @Field(type = FieldType.Integer)
+    private Integer createdHour;
+
     public static UsageHistoryDocument of(User user, Store store) {
         return UsageHistoryDocument.builder()
             .userId(user.getId())
@@ -75,6 +78,7 @@ public class UsageHistoryDocument {
             .brandBenefitType(store.getBrand().getRankList())
             .category(store.getBrand().getCategory().getName())
             .createdAt(ZonedDateTime.now())
+            .createdHour(ZonedDateTime.now().getHour())
             .build();
     }
 

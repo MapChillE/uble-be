@@ -2,10 +2,7 @@ package com.ureca.uble.domain.users.controller;
 
 import com.ureca.uble.domain.common.dto.response.CommonResponse;
 import com.ureca.uble.domain.users.dto.request.UpdateUserInfoReq;
-import com.ureca.uble.domain.users.dto.response.GetRecommendationListRes;
-import com.ureca.uble.domain.users.dto.response.GetUserInfoRes;
-import com.ureca.uble.domain.users.dto.response.GetUserStatisticsRes;
-import com.ureca.uble.domain.users.dto.response.UpdateUserInfoRes;
+import com.ureca.uble.domain.users.dto.response.*;
 import com.ureca.uble.domain.users.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -50,6 +47,32 @@ public class UserController {
 		@RequestParam Double longitude
 	){
 		return CommonResponse.success(userService.getRecommendations(userId, latitude, longitude));
+	}
+
+	/**
+	 * 비슷한 유저 로그 기반 추천
+	 *
+	 * @param userId 사용자 정보
+	 */
+	@Operation(summary = "비슷한 유저 로그 기반 추천", description = "비슷한 유저 로그 기반 추천")
+	@GetMapping("recommendation/similar")
+	public CommonResponse<GetSimilarUserRecommendationListRes> getSimilarUserRecommendation(
+		@Parameter(description = "사용자정보", required = true)
+		@AuthenticationPrincipal Long userId) {
+		return CommonResponse.success(userService.getSimilarUserRecommendation(userId));
+	}
+
+	/**
+	 * 시간대 기반 추천
+	 *
+	 * @param userId 사용자 정보
+	 */
+	@Operation(summary = "시간대 기반 추천", description = "시간대 기반 추천")
+	@GetMapping("recommendation/time")
+	public CommonResponse<GetTimeRecommendationListRes> getTimeRecommendation(
+		@Parameter(description = "사용자정보", required = true)
+		@AuthenticationPrincipal Long userId) {
+		return CommonResponse.success(userService.getTimeRecommendation(userId));
 	}
 
 	/**
