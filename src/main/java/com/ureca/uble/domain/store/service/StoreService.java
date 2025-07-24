@@ -1,43 +1,30 @@
 package com.ureca.uble.domain.store.service;
 
-import static com.ureca.uble.domain.store.exception.StoreErrorCode.*;
-import static com.ureca.uble.domain.users.exception.UserErrorCode.*;
-
-import java.util.List;
-import java.util.Optional;
-
+import com.ureca.uble.domain.bookmark.repository.BookmarkRepository;
+import com.ureca.uble.domain.store.dto.response.*;
+import com.ureca.uble.domain.store.repository.StoreClickLogDocumentRepository;
+import com.ureca.uble.domain.store.repository.StoreRepository;
+import com.ureca.uble.domain.users.repository.UsageCountRepository;
+import com.ureca.uble.domain.users.repository.UserRepository;
+import com.ureca.uble.entity.*;
+import com.ureca.uble.entity.document.StoreClickLogDocument;
+import com.ureca.uble.entity.enums.*;
+import com.ureca.uble.global.exception.GlobalException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.stereotype.Service;
-
-import com.ureca.uble.domain.bookmark.repository.BookmarkRepository;
-import com.ureca.uble.domain.store.dto.response.GetBenefitInfoRes;
-import com.ureca.uble.domain.store.dto.response.GetStoreDetailRes;
-import com.ureca.uble.domain.store.dto.response.GetStoreListRes;
-import com.ureca.uble.domain.store.dto.response.GetStoreRes;
-import com.ureca.uble.domain.store.dto.response.GetStoreSummaryRes;
-import com.ureca.uble.domain.store.repository.StoreClickLogDocumentRepository;
-import com.ureca.uble.domain.store.repository.StoreRepository;
-import com.ureca.uble.domain.users.repository.UsageCountRepository;
-import com.ureca.uble.domain.users.repository.UserRepository;
-import com.ureca.uble.entity.Benefit;
-import com.ureca.uble.entity.Brand;
-import com.ureca.uble.entity.Store;
-import com.ureca.uble.entity.UsageCount;
-import com.ureca.uble.entity.User;
-import com.ureca.uble.entity.document.StoreClickLogDocument;
-import com.ureca.uble.entity.enums.BenefitType;
-import com.ureca.uble.entity.enums.Period;
-import com.ureca.uble.entity.enums.Rank;
-import com.ureca.uble.entity.enums.RankType;
-import com.ureca.uble.entity.enums.Season;
-import com.ureca.uble.global.exception.GlobalException;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
+
+import static com.ureca.uble.domain.store.exception.StoreErrorCode.OUT_OF_RANGE_INPUT;
+import static com.ureca.uble.domain.store.exception.StoreErrorCode.STORE_NOT_FOUND;
+import static com.ureca.uble.domain.users.exception.UserErrorCode.USER_NOT_FOUND;
 
 @Slf4j
 @Service
