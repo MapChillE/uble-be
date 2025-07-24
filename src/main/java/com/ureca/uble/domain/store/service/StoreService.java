@@ -37,6 +37,7 @@ import com.ureca.uble.global.exception.GlobalException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -53,6 +54,7 @@ public class StoreService {
     /**
      * 근처 매장 정보 조회
      */
+    @Transactional(readOnly = true)
     public GetStoreListRes getStores(double latitude, double longitude, int distance, Long categoryId, Long brandId, Season season, BenefitType type) {
         validateRange(latitude, longitude, distance);
 
@@ -66,6 +68,7 @@ public class StoreService {
     /**
      * 매장 소모달 정보 조회
      */
+    @Transactional(readOnly = true)
     public GetStoreSummaryRes getStoreSummary(double latitude, double longitude, Long userId, Long storeId) {
         User user = findUser(userId);
         Store store = findByIdWithBrandAndCategoryAndBenefits(storeId);
@@ -74,14 +77,14 @@ public class StoreService {
         Double distance = calculateDistance(store.getLocation().getY(), store.getLocation().getX(), latitude, longitude);
 
         // 북마크 여부
-        boolean isBookmarked = bookmarkRepository.existsByBrand_IdAndUser_Id(userId, store.getBrand().getId());
-
+        boolean isBookmarked = bookmarkRepository.existsByBrand_IdAndUser_Id(store.getBrand().getId(), userId);
         return GetStoreSummaryRes.of(store, distance, isBookmarked);
     }
 
     /**
      * 매장 상세 정보 조회
      */
+    @Transactional(readOnly = true)
     public GetStoreDetailRes getStoreDetail(Double latitude, Double longitude, Long userId, Long storeId) {
         User user = findUser(userId);
         Store store = findByIdWithBrandAndCategoryAndBenefits(storeId);
@@ -96,7 +99,7 @@ public class StoreService {
         boolean isLocalAvailable = (type == RankType.LOCAL) && handleLocalBenefit(user);
 
         // 북마크 여부
-        boolean isBookmarked = bookmarkRepository.existsByBrand_IdAndUser_Id(userId, store.getBrand().getId());
+        boolean isBookmarked = bookmarkRepository.existsByBrand_IdAndUser_Id(store.getBrand().getId(), userId);
 
         // 혜택 List 계산
         List<GetBenefitInfoRes> benefitList = store.getBrand().getBenefits().stream()
