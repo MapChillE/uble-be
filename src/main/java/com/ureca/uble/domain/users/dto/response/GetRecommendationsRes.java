@@ -17,6 +17,12 @@ public class GetRecommendationsRes {
     @Schema(description = "매장 이름", example = "CGV 강남")
     private String storeName;
 
+    @Schema(description = "위도", example = "37.5017831")
+    private Double latitude;
+
+    @Schema(description = "경도", example = "127.0262445")
+    private Double longitude;
+
     @Schema(description = "카테고리", example = "문화/여가")
     private String category;
 
