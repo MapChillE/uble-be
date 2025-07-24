@@ -272,18 +272,7 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
         )._toRangeQuery()._toQuery());
 
         // 사용자 등급 Filter
-        filters.add(TermsQuery.of(t -> t
-            .field("userRank")
-            .terms(v -> v.value(
-                switch (user.getRank()) {
-                    case VVIP -> Stream.of("VVIP", "VIP", "PREMIUM", "NORMAL").map(FieldValue::of).toList();
-                    case VIP -> Stream.of("VIP", "PREMIUM", "NORMAL").map(FieldValue::of).toList();
-                    case PREMIUM -> Stream.of("PREMIUM", "NORMAL").map(FieldValue::of).toList();
-                    case NORMAL -> Stream.of("NORMAL").map(FieldValue::of).toList();
-                    case NONE -> throw new GlobalException(RANK_NOT_AVAILABLE);
-                }
-            ))
-        )._toQuery());
+        filters.add(getUserRankFilter(user));
 
         Aggregation aggregation = Aggregation.of(a -> a
             .filter(f -> f
@@ -329,18 +318,7 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
         );
 
         // 사용자 등급 Filter
-        filters.add(TermsQuery.of(t -> t
-            .field("userRank")
-            .terms(v -> v.value(
-                switch (user.getRank()) {
-                    case VVIP -> Stream.of("VVIP", "VIP", "PREMIUM", "NORMAL").map(FieldValue::of).toList();
-                    case VIP -> Stream.of("VIP", "PREMIUM", "NORMAL").map(FieldValue::of).toList();
-                    case PREMIUM -> Stream.of("PREMIUM", "NORMAL").map(FieldValue::of).toList();
-                    case NORMAL -> Stream.of("NORMAL").map(FieldValue::of).toList();
-                    case NONE -> throw new GlobalException(RANK_NOT_AVAILABLE);
-                }
-            ))
-        )._toQuery());
+        filters.add(getUserRankFilter(user));
 
         // 통계 쿼리
         Aggregation aggregation = Aggregation.of(a -> a
@@ -362,5 +340,20 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
             .build();
 
         return (ElasticsearchAggregations) elasticsearchOperations.search(query, UsageHistoryDocument.class).getAggregations();
+    }
+    
+    private Query getUserRankFilter(User user) {
+        return TermsQuery.of(t -> t
+            .field("userRank")
+            .terms(v -> v.value(
+                switch (user.getRank()) {
+                    case VVIP -> Stream.of("VVIP", "VIP", "PREMIUM", "NORMAL").map(FieldValue::of).toList();
+                    case VIP -> Stream.of("VIP", "PREMIUM", "NORMAL").map(FieldValue::of).toList();
+                    case PREMIUM -> Stream.of("PREMIUM", "NORMAL").map(FieldValue::of).toList();
+                    case NORMAL -> Stream.of("NORMAL").map(FieldValue::of).toList();
+                    case NONE -> throw new GlobalException(RANK_NOT_AVAILABLE);
+                }
+            ))
+        )._toQuery();
     }
 }
