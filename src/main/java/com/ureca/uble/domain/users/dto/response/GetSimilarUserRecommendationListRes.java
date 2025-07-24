@@ -18,9 +18,9 @@ public class GetSimilarUserRecommendationListRes {
     private Gender gender;
 
     @Schema(description = "추천 리스트")
-    private List<GetSimilarUserRecommendationRes> recommendationsList;
+    private List<GetRecommendationRes> recommendationsList;
 
-    public static GetSimilarUserRecommendationListRes of(int ageRange, Gender gender, List<GetSimilarUserRecommendationRes> recommendationsList) {
+    public static GetSimilarUserRecommendationListRes of(int ageRange, Gender gender, List<GetRecommendationRes> recommendationsList) {
         return GetSimilarUserRecommendationListRes.builder()
             .ageRange(ageRange)
             .gender(gender)

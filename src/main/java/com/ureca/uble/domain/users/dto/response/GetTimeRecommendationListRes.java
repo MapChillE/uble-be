@@ -12,5 +12,5 @@ import java.util.List;
 public class GetTimeRecommendationListRes {
 
     @Schema(description = "추천 리스트")
-    private List<GetTimeRecommendationRes> recommendationsList;
+    private List<GetRecommendationRes> recommendationsList;
 }
