@@ -68,6 +68,24 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
             .term(t -> t.field("userGender").value(user.getGender().toString()))
         );
 
+        // 카테고리 순위
+        Aggregation categoryAggregation = Aggregation.of(a -> a
+            .terms(t -> t
+                .field("category")
+                .order(List.of(NamedValue.of("_count", SortOrder.Desc)))
+            )
+        );
+
+        // 제휴처 순위
+        Aggregation brandAggregation = Aggregation.of(a -> a
+            .terms(t -> t
+                .field("brandName")
+                .size(10)
+                .order(List.of(NamedValue.of("_count", SortOrder.Desc)))
+            )
+        );
+
+        // 사용자 전체 평균 사용량
         Aggregation targetGroupAgg = Aggregation.of(a -> a
             .filter(f -> f.bool(b -> b
                 .filter(List.of(ageRangeFilter, genderFilter))
@@ -170,6 +188,8 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
 
         // 최종 쿼리 생성
         NativeQuery query = NativeQuery.builder()
+            .withAggregation("category_rank", categoryAggregation)
+            .withAggregation("brand_rank", brandAggregation)
             .withAggregation("target_group", targetGroupAgg)
             .withAggregation("my_usage_count", myUsageCountAgg)
             .withAggregation("monthly_usage", monthlyUsageAgg)
