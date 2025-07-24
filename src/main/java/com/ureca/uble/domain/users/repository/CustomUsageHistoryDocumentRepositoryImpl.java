@@ -1,10 +1,13 @@
 package com.ureca.uble.domain.users.repository;
 
+import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
 import co.elastic.clients.elasticsearch._types.aggregations.CalendarInterval;
 import co.elastic.clients.elasticsearch._types.query_dsl.DateRangeQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch._types.query_dsl.TermQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.TermsQuery;
 import co.elastic.clients.util.NamedValue;
 import com.ureca.uble.domain.common.util.SearchFilterUtils;
 import com.ureca.uble.entity.User;
@@ -13,6 +16,7 @@ import com.ureca.uble.entity.enums.BenefitType;
 import com.ureca.uble.entity.enums.Gender;
 import com.ureca.uble.entity.enums.Rank;
 import com.ureca.uble.entity.enums.RankTarget;
+import com.ureca.uble.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchAggregations;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
@@ -20,10 +24,13 @@ import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
+
+import static com.ureca.uble.domain.users.exception.UserErrorCode.RANK_NOT_AVAILABLE;
 
 @Repository
 @RequiredArgsConstructor
@@ -85,7 +92,6 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
             .field("createdAt")
             .gte(fromDate)
             .lte("now")
-            .timeZone("+09:00")
         )._toRangeQuery()._toQuery();
 
         Aggregation monthlyUsageAgg = Aggregation.of(a -> a
@@ -111,7 +117,7 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
             .aggregations("by_day", Aggregation.of(aa -> aa
                 .terms(t -> t
                     .script(s -> s
-                        .source("doc['createdAt'].value.plusHours(9).getDayOfMonth()")
+                        .source("doc['createdAt'].value.getDayOfMonth()")
                         .lang("painless")
                     )
                     .size(1)
@@ -127,7 +133,7 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
                 .terms(t -> t
                     .script(s -> s
                         .source("""
-                            int d = doc['createdAt'].value.plusHours(9).getDayOfWeek().getValue();
+                            int d = doc['createdAt'].value.getDayOfWeek().getValue();
                             if (d == 1) return '월';
                             if (d == 2) return '화';
                             if (d == 3) return '수';
@@ -151,7 +157,7 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
             .aggregations("hour", Aggregation.of(aa -> aa
                 .terms(t -> t
                     .script(s -> s
-                        .source("doc['createdAt'].value.plusHours(9).getHour()")
+                        .source("doc['createdAt'].value.getHour()")
                         .lang("painless")
                     )
                     .size(1)
@@ -233,6 +239,66 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
         // 최종 쿼리 생성
         NativeQuery query = NativeQuery.builder()
             .withAggregation("local_rank", aggregation)
+            .withMaxResults(0)
+            .build();
+
+        return (ElasticsearchAggregations) elasticsearchOperations.search(query, UsageHistoryDocument.class).getAggregations();
+    }
+
+    @Override
+    public ElasticsearchAggregations getRecommendationBySimilarUser(User user, int ageRange) {
+        List<Query> filters = new ArrayList<>();
+
+        // 성별 Filter
+        filters.add(TermQuery.of(t -> t.field("userGender").value(user.getGender().toString()))._toQuery());
+
+        // 연령대 Filter
+        int currentYear = LocalDate.now().getYear();
+        String fromBirthDate = LocalDate.of(currentYear - ageRange - 9, 1, 1).format(DateTimeFormatter.ISO_DATE);
+        String toBirthDate = LocalDate.of(currentYear - ageRange, 12, 31).format(DateTimeFormatter.ISO_DATE);
+
+        filters.add(DateRangeQuery.of(r -> r
+            .field("userBirthDate")
+            .gte(fromBirthDate)
+            .lte(toBirthDate)
+        )._toRangeQuery()._toQuery());
+
+        // 기간 Filter
+        filters.add(DateRangeQuery.of(r -> r
+            .field("createdAt")
+            .gte("now-3M")
+            .lte("now")
+        )._toRangeQuery()._toQuery());
+
+        // 사용자 등급 Filter
+        filters.add(TermsQuery.of(t -> t
+            .field("userRank")
+            .terms(v -> v.value(
+                switch (user.getRank()) {
+                    case VVIP -> Stream.of("VVIP", "VIP", "PREMIUM", "NORMAL").map(FieldValue::of).toList();
+                    case VIP -> Stream.of("VIP", "PREMIUM", "NORMAL").map(FieldValue::of).toList();
+                    case PREMIUM -> Stream.of("PREMIUM", "NORMAL").map(FieldValue::of).toList();
+                    case NORMAL -> Stream.of("NORMAL").map(FieldValue::of).toList();
+                    case NONE -> throw new GlobalException(RANK_NOT_AVAILABLE);
+                }
+            ))
+        )._toQuery());
+
+        Aggregation aggregation = Aggregation.of(a -> a
+            .filter(f -> f
+                .bool(b -> b.filter(filters))
+            )
+            .aggregations("rank", Aggregation.of(sub -> sub
+                .terms(t -> t
+                    .field("brandId")
+                    .size(5)
+                    .order(List.of(NamedValue.of("_count", SortOrder.Desc)))
+                )
+            ))
+        );
+
+        NativeQuery query = NativeQuery.builder()
+            .withAggregation("similar_reco_rank", aggregation)
             .withMaxResults(0)
             .build();
 
