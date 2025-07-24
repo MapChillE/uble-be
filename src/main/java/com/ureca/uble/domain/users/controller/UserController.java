@@ -55,7 +55,7 @@ public class UserController {
 	 * @param userId 사용자 정보
 	 */
 	@Operation(summary = "비슷한 유저 로그 기반 추천", description = "비슷한 유저 로그 기반 추천")
-	@GetMapping("/api/users/recommendation/similar")
+	@GetMapping("recommendation/similar")
 	public CommonResponse<GetSimilarUserRecommendationListRes> getSimilarUserRecommendation(
 		@Parameter(description = "사용자정보", required = true)
 		@AuthenticationPrincipal Long userId) {
@@ -68,7 +68,7 @@ public class UserController {
 	 * @param userId 사용자 정보
 	 */
 	@Operation(summary = "시간대 기반 추천", description = "시간대 기반 추천")
-	@GetMapping("/api/users/recommendation/time")
+	@GetMapping("recommendation/time")
 	public CommonResponse<GetTimeRecommendationListRes> getTimeRecommendation(
 		@Parameter(description = "사용자정보", required = true)
 		@AuthenticationPrincipal Long userId) {
