@@ -109,15 +109,13 @@ public class UserService {
 	@Transactional(readOnly = true)
 	public GetUserStatisticsRes getUserStatistics(Long userId) {
 		User user = findUser(userId);
-
-		ElasticsearchAggregations rankResult = brandClickLogDocumentRepository.getCategoryAndBrandRankByUserId(userId);
 		ElasticsearchAggregations usageResult = usageHistoryDocumentRepository.getUsageDateAndDiffAndCount(user);
 
 		// 카테고리 순위
-		List<CategoryRankRes> categoryRankList = getCategoryRankList(rankResult);
+		List<CategoryRankRes> categoryRankList = getCategoryRankList(usageResult);
 
 		// 제휴처 순위
-		List<BrandRankRes> brandRankList = getBrandRankList(rankResult);
+		List<BrandRankRes> brandRankList = getBrandRankList(usageResult);
 
 		// 가장 많이 사용한 날(일)
 		BenefitUsagePatternRes benefitUsagePatternRes = getBenefitPattern(usageResult);
