@@ -4,23 +4,30 @@ import com.ureca.uble.domain.brand.repository.BenefitRepository;
 import com.ureca.uble.domain.store.repository.StoreRepository;
 import com.ureca.uble.domain.users.dto.request.CreateUsageHistoryReq;
 import com.ureca.uble.domain.users.dto.response.CreateUsageHistoryRes;
+import com.ureca.uble.domain.users.dto.response.UsageHistoryListRes;
 import com.ureca.uble.domain.users.dto.response.UsageHistoryRes;
 import com.ureca.uble.domain.users.repository.UsageCountRepository;
 import com.ureca.uble.domain.users.repository.UsageHistoryDocumentRepository;
 import com.ureca.uble.domain.users.repository.UsageHistoryRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
-import com.ureca.uble.entity.*;
+import com.ureca.uble.entity.Benefit;
+import com.ureca.uble.entity.Store;
+import com.ureca.uble.entity.UsageCount;
+import com.ureca.uble.entity.User;
 import com.ureca.uble.entity.document.UsageHistoryDocument;
 import com.ureca.uble.entity.enums.BenefitType;
 import com.ureca.uble.entity.enums.Period;
 import com.ureca.uble.entity.enums.Rank;
 import com.ureca.uble.entity.enums.RankType;
 import com.ureca.uble.global.exception.GlobalException;
-import com.ureca.uble.domain.common.dto.response.CursorPageRes;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.util.List;
 import java.util.Optional;
 
 import static com.ureca.uble.domain.brand.exception.BrandErrorCode.BENEFIT_NOT_FOUND;
@@ -43,8 +50,20 @@ public class UsageHistoryService {
 	 * 매장 이용 내역 전체 조회
 	 */
 	@Transactional(readOnly = true)
-	public CursorPageRes<UsageHistoryRes> getUsageHistory(Long userId, Long lastHistoryId, int size) {
-		return usageRepository.findUsagesByUserId(userId, lastHistoryId, size);
+	public UsageHistoryListRes getUsageHistory(Long userId, int year, int month, int page, int size) {
+		LocalDateTime start = LocalDateTime.of(year, month, 1, 0, 0);
+		LocalDateTime end = LocalDateTime.of(year, month, YearMonth.of(year, month).lengthOfMonth(), 23, 59);
+
+		SearchHits<UsageHistoryDocument> searchHits = usageHistoryDocumentRepository.findByUserIdAndCreatedAtBetween(userId, start, end, page, size);
+
+		long totalCount = searchHits.getTotalHits();
+		List<UsageHistoryRes> historyList = searchHits.getSearchHits().stream()
+			.map(hit -> {
+				UsageHistoryDocument uhd = hit.getContent();
+				return UsageHistoryRes.of(uhd.getId(), uhd.getStoreName(), uhd.getCreatedAt().toLocalDateTime(), uhd.getCategory(), uhd.getBrandImageUrl());
+			}).toList();
+
+		return UsageHistoryListRes.of(totalCount, historyList);
 	}
 
 	/**

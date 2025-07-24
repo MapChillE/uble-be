@@ -18,9 +18,12 @@ import com.ureca.uble.entity.enums.Rank;
 import com.ureca.uble.entity.enums.RankTarget;
 import com.ureca.uble.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchAggregations;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -341,7 +344,36 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
 
         return (ElasticsearchAggregations) elasticsearchOperations.search(query, UsageHistoryDocument.class).getAggregations();
     }
-    
+
+    @Override
+    public SearchHits<UsageHistoryDocument> findByUserIdAndCreatedAtBetween(Long userId, LocalDateTime start, LocalDateTime end, int page, int size) {
+        List<Query> filters = new ArrayList<>();
+
+        // user Filter
+        filters.add(Query.of(u -> u
+            .term(t -> t.field("userId").value(userId))
+        ));
+
+        // 기간 Filter
+        filters.add(DateRangeQuery.of(r -> r
+            .field("createdAt")
+            .gte(start.format(DateTimeFormatter.ISO_DATE))
+            .lte(end.format(DateTimeFormatter.ISO_DATE))
+        )._toRangeQuery()._toQuery());
+
+        // 최종 Query
+        NativeQuery query = NativeQuery.builder()
+            .withQuery(q -> q
+                .bool(b -> b
+                    .filter(filters)
+                )
+            )
+            .withPageable(PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt")))
+            .build();
+
+        return elasticsearchOperations.search(query, UsageHistoryDocument.class);
+    }
+
     private Query getUserRankFilter(User user) {
         return TermsQuery.of(t -> t
             .field("userRank")
