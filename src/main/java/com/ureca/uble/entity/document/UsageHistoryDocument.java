@@ -5,7 +5,9 @@ import com.ureca.uble.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.*;
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -37,11 +39,8 @@ public class UsageHistoryDocument {
     @Field(type = FieldType.Keyword)
     private String storeName;
 
-    @MultiField(
-        mainField = @Field(type = FieldType.Text, analyzer = "standard"),
-        otherFields = { @InnerField(suffix = "raw", type = FieldType.Keyword) }
-    )
-    private String storeAddress;
+    @Field(type = FieldType.Keyword)
+    private String storeLocal;
 
     @Field(type = FieldType.Long)
     private Long brandId;
@@ -58,8 +57,14 @@ public class UsageHistoryDocument {
     @Field(type = FieldType.Keyword)
     private String category;
 
+    @Field(type = FieldType.Keyword)
+    private String brandImageUrl;
+
     @Field(type = FieldType.Date, pattern = "uuuu-MM-dd'T'HH:mm:ss.SSSZZ")
     private ZonedDateTime createdAt;
+
+    @Field(type = FieldType.Integer)
+    private Integer createdHour;
 
     public static UsageHistoryDocument of(User user, Store store) {
         return UsageHistoryDocument.builder()
@@ -69,13 +74,20 @@ public class UsageHistoryDocument {
             .userGender(user.getGender().toString())
             .storeId(store.getId())
             .storeName(store.getName())
-            .storeAddress(store.getAddress())
+            .storeLocal(getLocal(store.getAddress()))
             .brandId(store.getBrand().getId())
             .brandName(store.getBrand().getName())
             .brandIsOnline(store.getBrand().getIsOnline())
             .brandBenefitType(store.getBrand().getRankList())
             .category(store.getBrand().getCategory().getName())
+            .brandImageUrl(store.getBrand().getImageUrl())
             .createdAt(ZonedDateTime.now())
+            .createdHour(ZonedDateTime.now().getHour())
             .build();
+    }
+
+    private static String getLocal(String address) {
+        if(address == null || !address.startsWith("서울")) return null;
+        return address.split(" ")[1];
     }
 }

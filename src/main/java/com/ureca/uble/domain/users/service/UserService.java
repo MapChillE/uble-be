@@ -1,6 +1,8 @@
 package com.ureca.uble.domain.users.service;
 
+import co.elastic.clients.elasticsearch._types.aggregations.LongTermsBucket;
 import com.ureca.uble.domain.brand.repository.BrandClickLogDocumentRepository;
+import com.ureca.uble.domain.brand.repository.BrandRepository;
 import com.ureca.uble.domain.category.repository.CategoryRepository;
 import com.ureca.uble.domain.users.dto.request.UpdateUserInfoReq;
 import com.ureca.uble.domain.users.dto.response.*;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -33,6 +36,7 @@ public class UserService {
 	private final WebClient fastapiWebClient;
 	private final BrandClickLogDocumentRepository brandClickLogDocumentRepository;
 	private final UsageHistoryDocumentRepository usageHistoryDocumentRepository;
+	private final BrandRepository brandRepository;
 
 	/**
 	 * 사용자 정보 조회
@@ -125,6 +129,48 @@ public class UserService {
 		List<MonthlyBenefitUsageRes> monthlyBenefitUsageList = getMonthlyBenefitUsageList(usageResult);
 
 		return GetUserStatisticsRes.of(categoryRankList, brandRankList, benefitUsagePatternRes, benefitUsageComparisonRes, monthlyBenefitUsageList);
+	}
+
+	/**
+	 * 비슷한 사용자 기반 추천 조회
+	 */
+	public GetSimilarUserRecommendationListRes getSimilarUserRecommendation(Long userId) {
+		User user = findUser(userId);
+		int ageRange = ((LocalDate.now().getYear() - user.getBirthDate().getYear() + 1) / 10) * 10;
+
+		ElasticsearchAggregations recoList = usageHistoryDocumentRepository.getRecommendationBySimilarUser(user, ageRange);
+
+		// Id 뽑기
+		List<Long> brandIdList = recoList.aggregationsAsMap()
+			.get("similar_reco_rank").aggregation().getAggregate().filter().aggregations()
+			.get("rank").lterms().buckets().array().stream()
+			.map(LongTermsBucket::key).toList();
+
+		// DB에서 가져오기
+		List<GetRecommendationRes> similarRecoList = brandRepository.findWithCategoryByIdsIn(brandIdList).stream()
+			.map(GetRecommendationRes::from).toList();
+
+		return GetSimilarUserRecommendationListRes.of(ageRange, user.getGender(), similarRecoList);
+	}
+
+	/**
+	 * 시간대 기반 추천 조회
+	 */
+	public GetTimeRecommendationListRes getTimeRecommendation(Long userId) {
+		User user = findUser(userId);
+		ElasticsearchAggregations recoList = usageHistoryDocumentRepository.getRecommendationByTime(user);
+
+		// Id 뽑기
+		List<Long> brandIdList = recoList.aggregationsAsMap()
+			.get("time_reco_rank").aggregation().getAggregate().filter().aggregations()
+			.get("rank").lterms().buckets().array().stream()
+			.map(LongTermsBucket::key).toList();
+
+		// DB에서 가져오기
+		List<GetRecommendationRes> timeRecoList = brandRepository.findWithCategoryByIdsIn(brandIdList).stream()
+			.map(GetRecommendationRes::from).toList();
+
+		return new GetTimeRecommendationListRes(timeRecoList);
 	}
 
 	private List<CategoryRankRes> getCategoryRankList(ElasticsearchAggregations rankResult) {

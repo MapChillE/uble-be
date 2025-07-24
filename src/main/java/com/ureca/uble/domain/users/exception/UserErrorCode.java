@@ -14,7 +14,9 @@ public enum UserErrorCode implements ResultCode {
 	USER_ALREADY_DELETED(HttpStatus.BAD_REQUEST, 2002, "이미 삭제된 사용자입니다."),
     INVALID_PARAMETER(HttpStatus.BAD_REQUEST, 2003, "요청 파라미터가 유효하지 않습니다."),
     EXTERNAL_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 2004, "외부 API 호출에 실패했습니다."),
-    RECOMMENDATION_NOT_FOUND(HttpStatus.NOT_FOUND, 2005, "추천 결과를 찾을 수 없습니다.");
+    RECOMMENDATION_NOT_FOUND(HttpStatus.NOT_FOUND, 2005, "추천 결과를 찾을 수 없습니다."),
+    RANK_NOT_AVAILABLE(HttpStatus.BAD_REQUEST, 2006, "유효하지 않은 등급입니다."),
+    ;
 
     private final HttpStatus status;
     private final int code;
