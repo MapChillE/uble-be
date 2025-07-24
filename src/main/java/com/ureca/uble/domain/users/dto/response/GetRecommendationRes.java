@@ -9,7 +9,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @Schema(description = "추천 제휴처 정보 반환 DTO")
-public class GetSimilarUserRecommendationRes {
+public class GetRecommendationRes {
     @Schema(description = "제휴처 id", example = "1")
     private Long brandId;
 
@@ -32,8 +32,8 @@ public class GetSimilarUserRecommendationRes {
     @Schema(description = "제휴처 대표 이미지 url", example = "https://image.com")
     private String imgUrl;
 
-    public static GetSimilarUserRecommendationRes from(Brand brand) {
-        return GetSimilarUserRecommendationRes.builder()
+    public static GetRecommendationRes from(Brand brand) {
+        return GetRecommendationRes.builder()
             .brandId(brand.getId())
             .brandName(brand.getName())
             .category(brand.getCategory().getName())

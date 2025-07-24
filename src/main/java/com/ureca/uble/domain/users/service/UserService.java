@@ -147,8 +147,8 @@ public class UserService {
 			.map(LongTermsBucket::key).toList();
 
 		// DB에서 가져오기
-		List<GetSimilarUserRecommendationRes> similarRecoList = brandRepository.findWithCategoryByIdsIn(brandIdList).stream()
-			.map(GetSimilarUserRecommendationRes::from).toList();
+		List<GetRecommendationRes> similarRecoList = brandRepository.findWithCategoryByIdsIn(brandIdList).stream()
+			.map(GetRecommendationRes::from).toList();
 
 		return GetSimilarUserRecommendationListRes.of(ageRange, user.getGender(), similarRecoList);
 	}
@@ -167,8 +167,8 @@ public class UserService {
 			.map(LongTermsBucket::key).toList();
 
 		// DB에서 가져오기
-		List<GetTimeRecommendationRes> timeRecoList = brandRepository.findWithCategoryByIdsIn(brandIdList).stream()
-			.map(GetTimeRecommendationRes::from).toList();
+		List<GetRecommendationRes> timeRecoList = brandRepository.findWithCategoryByIdsIn(brandIdList).stream()
+			.map(GetRecommendationRes::from).toList();
 
 		return new GetTimeRecommendationListRes(timeRecoList);
 	}
