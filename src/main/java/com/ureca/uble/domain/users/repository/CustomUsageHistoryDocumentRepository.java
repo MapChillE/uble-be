@@ -13,4 +13,6 @@ public interface CustomUsageHistoryDocumentRepository {
     ElasticsearchAggregations getUsageRankByFiltering(RankTarget rankTarget, Gender gender, Integer ageRange, Rank rank, BenefitType benefitType);
 
     ElasticsearchAggregations getLocalRankByFiltering(Gender gender, Integer ageRange, Rank rank, BenefitType benefitType);
+
+    ElasticsearchAggregations getRecommendationBySimilarUser(User user, int ageRange);
 }

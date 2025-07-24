@@ -1,13 +1,12 @@
 package com.ureca.uble.domain.brand.repository;
 
-import java.util.List;
-import java.util.Optional;
-
+import com.ureca.uble.entity.Brand;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.ureca.uble.entity.Brand;
+import java.util.List;
+import java.util.Optional;
 
 public interface BrandRepository extends JpaRepository<Brand, Long>, CustomBrandRepository {
 
@@ -26,4 +25,12 @@ public interface BrandRepository extends JpaRepository<Brand, Long>, CustomBrand
     left join fetch b.benefits
     """)
 	List<Brand> findAllWithCategoryAndBenefits();
+
+	@Query("""
+	SELECT DISTINCT b FROM Brand b
+	LEFT JOIN FETCH b.category
+	LEFT JOIN FETCH b.benefits
+	WHERE b.id IN :brandIdList
+	""")
+	List<Brand> findWithCategoryByIdsIn(@Param("brandIdList") List<Long> brandIdList);
 }
