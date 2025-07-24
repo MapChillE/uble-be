@@ -140,7 +140,7 @@ public class UserService {
 
 		ElasticsearchAggregations recoList = usageHistoryDocumentRepository.getRecommendationBySimilarUser(user, ageRange);
 
-		// Id 뽑기 -> 가져오기
+		// Id 뽑기
 		List<Long> brandIdList = recoList.aggregationsAsMap()
 			.get("similar_reco_rank").aggregation().getAggregate().filter().aggregations()
 			.get("rank").lterms().buckets().array().stream()
@@ -151,6 +151,26 @@ public class UserService {
 			.map(GetSimilarUserRecommendationRes::from).toList();
 
 		return GetSimilarUserRecommendationListRes.of(ageRange, user.getGender(), similarRecoList);
+	}
+
+	/**
+	 * 시간대 기반 추천 조회
+	 */
+	public GetTimeRecommendationListRes getTimeRecommendation(Long userId) {
+		User user = findUser(userId);
+		ElasticsearchAggregations recoList = usageHistoryDocumentRepository.getRecommendationByTime(user);
+
+		// Id 뽑기
+		List<Long> brandIdList = recoList.aggregationsAsMap()
+			.get("time_reco_rank").aggregation().getAggregate().filter().aggregations()
+			.get("rank").lterms().buckets().array().stream()
+			.map(LongTermsBucket::key).toList();
+
+		// DB에서 가져오기
+		List<GetTimeRecommendationRes> timeRecoList = brandRepository.findWithCategoryByIdsIn(brandIdList).stream()
+			.map(GetTimeRecommendationRes::from).toList();
+
+		return new GetTimeRecommendationListRes(timeRecoList);
 	}
 
 	private List<CategoryRankRes> getCategoryRankList(ElasticsearchAggregations rankResult) {

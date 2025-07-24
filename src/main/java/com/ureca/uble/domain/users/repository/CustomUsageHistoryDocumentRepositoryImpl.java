@@ -24,6 +24,7 @@ import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -299,6 +300,64 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
 
         NativeQuery query = NativeQuery.builder()
             .withAggregation("similar_reco_rank", aggregation)
+            .withMaxResults(0)
+            .build();
+
+        return (ElasticsearchAggregations) elasticsearchOperations.search(query, UsageHistoryDocument.class).getAggregations();
+    }
+
+    @Override
+    public ElasticsearchAggregations getRecommendationByTime(User user) {
+        List<Query> filters = new ArrayList<>();
+
+        // 기간 Filter
+        filters.add(DateRangeQuery.of(r -> r
+            .field("createdAt")
+            .gte("now-3M")
+            .lte("now")
+        )._toRangeQuery()._toQuery());
+
+        // 시간대 Filter
+        int nowHour = LocalDateTime.now().getHour();
+        List<Integer> hours = List.of(nowHour, nowHour - 1 < 0 ? 23 : nowHour - 1);
+
+        filters.add(
+            TermsQuery.of(t -> t
+                .field("createdHour")
+                .terms(tt -> tt.value(hours.stream().map(FieldValue::of).toList()))
+            )._toQuery()
+        );
+
+        // 사용자 등급 Filter
+        filters.add(TermsQuery.of(t -> t
+            .field("userRank")
+            .terms(v -> v.value(
+                switch (user.getRank()) {
+                    case VVIP -> Stream.of("VVIP", "VIP", "PREMIUM", "NORMAL").map(FieldValue::of).toList();
+                    case VIP -> Stream.of("VIP", "PREMIUM", "NORMAL").map(FieldValue::of).toList();
+                    case PREMIUM -> Stream.of("PREMIUM", "NORMAL").map(FieldValue::of).toList();
+                    case NORMAL -> Stream.of("NORMAL").map(FieldValue::of).toList();
+                    case NONE -> throw new GlobalException(RANK_NOT_AVAILABLE);
+                }
+            ))
+        )._toQuery());
+
+        // 통계 쿼리
+        Aggregation aggregation = Aggregation.of(a -> a
+            .filter(f -> f
+                .bool(b -> b.filter(filters))
+            )
+            .aggregations("rank", Aggregation.of(sub -> sub
+                .terms(t -> t
+                    .field("brandId")
+                    .size(5)
+                    .order(List.of(NamedValue.of("_count", SortOrder.Desc)))
+                )
+            ))
+        );
+
+        NativeQuery query = NativeQuery.builder()
+            .withAggregation("time_reco_rank", aggregation)
             .withMaxResults(0)
             .build();
 

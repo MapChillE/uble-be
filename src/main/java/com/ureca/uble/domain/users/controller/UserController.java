@@ -63,6 +63,19 @@ public class UserController {
 	}
 
 	/**
+	 * 시간대 기반 추천
+	 *
+	 * @param userId 사용자 정보
+	 */
+	@Operation(summary = "시간대 기반 추천", description = "시간대 기반 추천")
+	@GetMapping("/api/users/recommendation/time")
+	public CommonResponse<GetTimeRecommendationListRes> getTimeRecommendation(
+		@Parameter(description = "사용자정보", required = true)
+		@AuthenticationPrincipal Long userId) {
+		return CommonResponse.success(userService.getTimeRecommendation(userId));
+	}
+
+	/**
 	 * 사용자 통계 정보 조회
 	 *
 	 * @param userId 사용자 정보
