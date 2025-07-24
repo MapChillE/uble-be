@@ -18,7 +18,7 @@ public class UsageHistoryController {
 	private final UsageHistoryService usageHistoryService;
 
 	@GetMapping("/history")
-	@Operation(summary = "제휴처 이용내역 조회", description = "커서 기반으로 제휴처 이용내역을 조회합니다.")
+	@Operation(summary = "제휴처 이용내역 조회", description = "연도/월 기반으로 제휴처 이용내역을 조회합니다.")
 	public CommonResponse<UsageHistoryListRes> getUsageHistory(
 		@Parameter(hidden=true)
 		@AuthenticationPrincipal Long userId,
