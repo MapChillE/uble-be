@@ -17,10 +17,6 @@ import com.ureca.uble.entity.enums.*;
 import com.ureca.uble.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,7 +37,6 @@ public class StoreService {
     private final UsageCountRepository usageCountRepository;
     private final StoreRepository storeRepository;
     private final BookmarkRepository bookmarkRepository;
-    private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
     private final StoreClickLogDocumentRepository storeClickLogDocumentRepository;
     private final LocationCoordinationDocumentRepository locationCoordinationDocumentRepository;
     private final CustomSuggestionRepository customSuggestionRepository;
@@ -132,7 +127,10 @@ public class StoreService {
         // 최종 검색 실행
         MsearchResponse<Map> response;
         try {
-            response = customSuggestionRepository.findMapSuggestionsByKeywordWithMsearch(keyword, 2, 2, size - 4, latitude, longitude);
+            int CATEGORY_SUGGESTION_SIZE = 2;
+            int BRAND_SUGGESTION_SIZE = 2;
+            response = customSuggestionRepository.findMapSuggestionsByKeywordWithMsearch(keyword, CATEGORY_SUGGESTION_SIZE, BRAND_SUGGESTION_SIZE,
+                size - (CATEGORY_SUGGESTION_SIZE + BRAND_SUGGESTION_SIZE), latitude, longitude);
         } catch (Exception e) {
             throw new GlobalException(ELASTIC_INTERNAL_ERROR);
         }
@@ -179,16 +177,6 @@ public class StoreService {
         return brand.getIsLocal() ? BenefitType.LOCAL :
             benefit.getRank() == Rank.NONE ? BenefitType.VIP :
                 BenefitType.NORMAL;
-    }
-
-    private void validateRange(double latitude, double longitude, int distance) {
-        if ((latitude < -90 || latitude > 90) || (longitude < -180 || longitude > 180) || (distance <= 0 || distance > 10000)) {
-            throw new GlobalException(OUT_OF_RANGE_INPUT);
-        }
-    }
-
-    private Point getPoint(double latitude, double longitude) {
-        return geometryFactory.createPoint(new Coordinate(longitude, latitude));
     }
 
     private static double calculateDistance(double latitude1, double longitude1, double latitude2, double longitude2) {
