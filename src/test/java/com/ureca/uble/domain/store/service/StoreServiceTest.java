@@ -54,22 +54,23 @@ class StoreServiceTest {
     private BookmarkRepository bookmarkRepository;
 
     @Test
-    @DisplayName("반경 500m 내의 매장 중 필터링 조건에 맞는 매장 리스트를 조회한다.")
-    void getStores_get_check() {
-        GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
-
+    @DisplayName("Bounding Box 내 매장 리스트 조회한다.")
+    void getStores_boxFiltering() {
         // given
-        Point testPoint = geometryFactory.createPoint(new Coordinate(127.0, 37.5));
-        Point storeLocation = geometryFactory.createPoint(new Coordinate(127.001, 37.501));
-
-        int distance = 500;
+        double swLat = 37.5;
+        double swLng = 127.0;
+        double neLat = 37.51;
+        double neLng = 127.01;
         Long categoryId = null;
         Long brandId = null;
         Season season = null;
         BenefitType type = null;
 
-        Store mockStore = mock(Store.class);
-        Brand mockBrand = mock(Brand.class);
+        GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+        Point storeLocation = geometryFactory.createPoint(new Coordinate(swLng + 0.001, swLat + 0.001));
+
+        Store mockStore    = mock(Store.class);
+        Brand mockBrand    = mock(Brand.class);
         Category mockCategory = mock(Category.class);
 
         when(mockStore.getId()).thenReturn(1L);
@@ -77,19 +78,27 @@ class StoreServiceTest {
         when(mockStore.getLocation()).thenReturn(storeLocation);
         when(mockStore.getBrand()).thenReturn(mockBrand);
         when(mockBrand.getCategory()).thenReturn(mockCategory);
-        when(mockCategory.getName()).thenReturn("푸드");
-
-        when(storeRepository.findStoresByFiltering(
-            any(Point.class), anyInt(), any(), any(), any(), any()))
-            .thenReturn(List.of(mockStore));
+        when(mockCategory.getName()).thenReturn("테스트카테고리");
+        when(storeRepository.findStoresInBox(
+                anyDouble(), anyDouble(), anyDouble(), anyDouble(),
+                any(), any(), any(), any()))
+                .thenReturn(List.of(mockStore));
 
         // when
-        GetStoreListRes result = storeService.getStores(testPoint.getY(), testPoint.getX(), distance, categoryId, brandId, season, type);
+        GetStoreListRes result = storeService.getStores(
+                swLat, swLng, neLat, neLng,
+                categoryId, brandId, season, type
+        );
 
         // then
         assertNotNull(result);
         assertEquals(1, result.getStoreList().size());
         assertEquals("테스트 선릉점", result.getStoreList().get(0).getStoreName());
+
+        verify(storeRepository).findStoresInBox(
+                eq(swLng), eq(swLat), eq(neLng), eq(neLat),
+                eq(categoryId), eq(brandId), eq(season), eq(type)
+        );
     }
 
     @Test

@@ -26,35 +26,38 @@ public class StoreController {
 
     private final StoreService storeService;
 
+
     /**
-     * 근처 매장 정보 조회
-     *
-     * @param latitude 위도
-     * @param longitude 경도
-     * @param distance 거리
-     * @param categoryId 카테고리 id
-     * @param brandId 제휴처 id
-     * @param season 계절 정보
-     * @param type 혜택 종류 정보
+     * 사각형 범위 내 매장 정보 조회
+     * @param swLat     남서쪽 위도 (south-west latitude)
+     * @param swLng     남서쪽 경도 (south-west longitude)
+     * @param neLat     북동쪽 위도 (north-east latitude)
+     * @param neLng     북동쪽 경도 (north-east longitude)
+     * @param categoryId 카테고리 id 필터링
+     * @param brandId   제휴처 id 필터링
+     * @param season    계절 필터링
+     * @param type      혜택 타입 필터링(POINT, DISCOUNT 등)
      */
-    @Operation(summary = "근처 매장 정보 조회", description = "근처 매장 정보 조회")
+    @Operation(summary = "사각형 범위 내 매장 정보 조회", description = "Bounding Box로 주변 매장 조회")
     @GetMapping
     public CommonResponse<GetStoreListRes> getStores(
-        @Parameter(description = "위도", required = true)
-        @RequestParam double latitude,
-        @Parameter(description = "경도", required = true)
-        @RequestParam double longitude,
-        @Parameter(description = "거리 반경", required = true)
-        @RequestParam(defaultValue = "500") int distance,
-        @Parameter(description = "카테고리 id 필터링")
-        @RequestParam(required = false) Long categoryId,
-        @Parameter(description = "제휴처 id 필터링")
-        @RequestParam(required = false) Long brandId,
-        @Parameter(description = "계절 필터링")
-        @RequestParam(required = false) Season season,
-        @Parameter(description = "혜택 타입 필터링(LOCAL/VIP)")
-        @RequestParam(required = false) BenefitType type) {
-        return CommonResponse.success(storeService.getStores(latitude, longitude, distance, categoryId, brandId, season, type));
+            @Parameter(description = "남서쪽 위도", required = true)
+            @RequestParam double swLat,
+            @Parameter(description = "남서쪽 경도", required = true)
+            @RequestParam double swLng,
+            @Parameter(description = "북동쪽 위도", required = true)
+            @RequestParam double neLat,
+            @Parameter(description = "북동쪽 경도", required = true)
+            @RequestParam double neLng,
+            @Parameter(description = "카테고리 id 필터링")
+            @RequestParam(required = false) Long categoryId,
+            @Parameter(description = "제휴처 id 필터링")
+            @RequestParam(required = false) Long brandId,
+            @Parameter(description = "계절 필터링")
+            @RequestParam(required = false) Season season,
+            @Parameter(description = "혜택 타입 필터링(POINT, DISCOUNT 등)")
+            @RequestParam(required = false) BenefitType type) {
+        return CommonResponse.success(storeService.getStores(swLat, swLng, neLat, neLng, categoryId, brandId, season, type));
     }
 
     /**
