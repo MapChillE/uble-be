@@ -4,6 +4,7 @@ import com.ureca.uble.entity.Bookmark;
 import com.ureca.uble.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,4 +19,7 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long>, Custo
 
     @Query("SELECT b FROM Bookmark b JOIN FETCH b.brand WHERE b.user.id = :userId AND b.brand.id IN :brandIds")
     List<Bookmark> findWithBrandByUserIdAndBrandIdIn(Long userId, List<Long> brandIds);
+
+    @Query("SELECT b.brand.id FROM Bookmark b WHERE b.user.id = :userId")
+    List<Long> findAllByUser(@Param("userId") Long userId);
 }
