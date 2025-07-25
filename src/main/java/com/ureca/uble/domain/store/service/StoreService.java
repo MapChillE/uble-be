@@ -60,7 +60,6 @@ public class StoreService {
      */
     @Transactional(readOnly = true)
     public GetStoreSummaryRes getStoreSummary(double latitude, double longitude, Long userId, Long storeId) {
-        User user = findUser(userId);
         Store store = findByIdWithBrandAndCategoryAndBenefits(storeId);
 
         // 좌표 기준 거리 계산
