@@ -1,23 +1,18 @@
 package com.ureca.uble.domain.store.controller;
 
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.ureca.uble.domain.common.dto.response.CommonResponse;
+import com.ureca.uble.domain.store.dto.response.GetGlobalSuggestionListRes;
 import com.ureca.uble.domain.store.dto.response.GetStoreDetailRes;
 import com.ureca.uble.domain.store.dto.response.GetStoreListRes;
 import com.ureca.uble.domain.store.dto.response.GetStoreSummaryRes;
 import com.ureca.uble.domain.store.service.StoreService;
 import com.ureca.uble.entity.enums.BenefitType;
 import com.ureca.uble.entity.enums.Season;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/stores")
@@ -102,5 +97,26 @@ public class StoreController {
         @Parameter(description = "매장 id", required = true)
         @PathVariable Long storeId) {
         return CommonResponse.success(storeService.getStoreDetail(latitude, longitude, userId, storeId));
+    }
+
+    /**
+     * (자동완성) 지도 전체 검색 자동완성
+     *
+     * @param latitude 위도
+     * @param longitude 경도
+     * @param size 사용자 정보
+     */
+    @Operation(summary = "(자동완성) 지도 전체 검색 자동완성", description = "(자동완성) 지도 전체 검색 자동완성")
+    @GetMapping("/suggestions")
+    public CommonResponse<GetGlobalSuggestionListRes> getGlobalSuggestionList(
+        @Parameter(description = "검색어", required = true)
+        @RequestParam String keyword,
+        @Parameter(description = "위도", required = true)
+        @RequestParam double latitude,
+        @Parameter(description = "경도", required = true)
+        @RequestParam double longitude,
+        @Parameter(description = "한번에 가져올 크기")
+        @RequestParam(defaultValue = "10") int size) {
+        return CommonResponse.success(storeService.getGlobalSuggestionList(keyword, latitude, longitude, size));
     }
 }
