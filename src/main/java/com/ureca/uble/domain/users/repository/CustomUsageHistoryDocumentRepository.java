@@ -23,4 +23,6 @@ public interface CustomUsageHistoryDocumentRepository {
     ElasticsearchAggregations getRecommendationByTime(User user);
 
     SearchHits<UsageHistoryDocument> findByUserIdAndCreatedAtBetween(Long userId, LocalDateTime start, LocalDateTime end, int page, int size);
+
+    SearchHits<UsageHistoryDocument> getPreviewStatistics(Long userId);
 }

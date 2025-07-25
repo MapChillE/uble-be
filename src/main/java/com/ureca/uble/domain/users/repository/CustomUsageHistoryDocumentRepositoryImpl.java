@@ -48,9 +48,7 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
         int currentYear = LocalDate.now().getYear();
 
         // userId 필터
-        Query userFilter = Query.of(u -> u
-            .term(t -> t.field("userId").value(userId))
-        );
+        Query userFilter = getUserFilter(userId);
 
         // 사용자 성별, 연령대의 평균 사용량 정보
         int userAgeRange = ((currentYear - user.getBirthDate().getYear() + 1) / 10) * 10;
@@ -70,6 +68,24 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
             .term(t -> t.field("userGender").value(user.getGender().toString()))
         );
 
+        // 카테고리 순위
+        Aggregation categoryAggregation = Aggregation.of(a -> a
+            .terms(t -> t
+                .field("category")
+                .order(List.of(NamedValue.of("_count", SortOrder.Desc)))
+            )
+        );
+
+        // 제휴처 순위
+        Aggregation brandAggregation = Aggregation.of(a -> a
+            .terms(t -> t
+                .field("brandName")
+                .size(10)
+                .order(List.of(NamedValue.of("_count", SortOrder.Desc)))
+            )
+        );
+
+        // 사용자 전체 평균 사용량
         Aggregation targetGroupAgg = Aggregation.of(a -> a
             .filter(f -> f.bool(b -> b
                 .filter(List.of(ageRangeFilter, genderFilter))
@@ -172,6 +188,8 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
 
         // 최종 쿼리 생성
         NativeQuery query = NativeQuery.builder()
+            .withAggregation("category_rank", categoryAggregation)
+            .withAggregation("brand_rank", brandAggregation)
             .withAggregation("target_group", targetGroupAgg)
             .withAggregation("my_usage_count", myUsageCountAgg)
             .withAggregation("monthly_usage", monthlyUsageAgg)
@@ -350,9 +368,7 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
         List<Query> filters = new ArrayList<>();
 
         // user Filter
-        filters.add(Query.of(u -> u
-            .term(t -> t.field("userId").value(userId))
-        ));
+        filters.add(getUserFilter(userId));
 
         // 기간 Filter
         filters.add(DateRangeQuery.of(r -> r
@@ -372,6 +388,61 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
             .build();
 
         return elasticsearchOperations.search(query, UsageHistoryDocument.class);
+    }
+
+    @Override
+    public SearchHits<UsageHistoryDocument> getPreviewStatistics(Long userId) {
+        // Filter 설정
+        List<Query> filters = new ArrayList<>();
+        LocalDate now = LocalDate.now();
+        String fromDate = LocalDate.of(now.getYear(), now.getMonth(), 1).format(DateTimeFormatter.ISO_DATE);
+        String toDate = now.withDayOfMonth(now.lengthOfMonth()).format(DateTimeFormatter.ISO_DATE);
+
+        filters.add(getUserFilter(userId));
+        filters.add(DateRangeQuery.of(r -> r
+            .field("createdAt")
+            .gte(fromDate)
+            .lte(toDate)
+        )._toRangeQuery()._toQuery());
+
+        Query boolQuery = Query.of(q -> q
+            .bool(b -> b
+                .filter(filters)
+            )
+        );
+
+        // 가장 많이 사용한 카테고리
+        Aggregation categoryAgg = Aggregation.of(a -> a
+            .terms(t -> t
+                .field("category")
+                .size(1)
+                .order(List.of(NamedValue.of("_count", SortOrder.Desc)))
+            )
+        );
+
+        // 가장 많이 사용한 제휴처
+        Aggregation brandAgg = Aggregation.of(a -> a
+            .terms(t -> t
+                .field("brandName")
+                .size(1)
+                .order(List.of(NamedValue.of("_count", SortOrder.Desc)))
+            )
+        );
+
+        NativeQuery query = NativeQuery.builder()
+            .withQuery(boolQuery)
+            .withAggregation("category_top", categoryAgg)
+            .withAggregation("brand_top", brandAgg)
+            .withMaxResults(0)
+            .build();
+
+        return elasticsearchOperations.search(query, UsageHistoryDocument.class);
+    }
+
+    private Query getUserFilter(Long userId) {
+        return Query.of(u -> u
+            .term(t -> t.field("userId").value(userId))
+        );
     }
 
     private Query getUserRankFilter(User user) {

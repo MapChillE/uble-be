@@ -124,7 +124,7 @@ class StoreServiceTest {
         when(mockBrand.getCategory()).thenReturn(mockCategory);
         when(mockCategory.getName()).thenReturn("음식점");
 
-        when(bookmarkRepository.existsByBrand_IdAndUser_Id(userId, mockBrand.getId())).thenReturn(true);
+        when(bookmarkRepository.existsByBrand_IdAndUser_Id(mockBrand.getId(), userId)).thenReturn(true);
 
         // when
         GetStoreSummaryRes result = storeService.getStoreSummary(latitude, longitude, userId, storeId);
@@ -185,7 +185,7 @@ class StoreServiceTest {
         when(mockBenefit.getManual()).thenReturn("매장 방문 시 쿠폰 제시");
         when(mockBenefit.getPeriod()).thenReturn(com.ureca.uble.entity.enums.Period.MONTHLY);
         when(mockBenefit.getNumber()).thenReturn(1);
-        when(bookmarkRepository.existsByBrand_IdAndUser_Id(userId, mockBrand.getId())).thenReturn(true);
+        when(bookmarkRepository.existsByBrand_IdAndUser_Id(mockBrand.getId(), userId)).thenReturn(true);
 
         // when
         GetStoreDetailRes result = storeService.getStoreDetail(latitude, longitude, userId, storeId);
