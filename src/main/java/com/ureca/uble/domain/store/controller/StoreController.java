@@ -21,7 +21,6 @@ public class StoreController {
 
     private final StoreService storeService;
 
-
     /**
      * 사각형 범위 내 매장 정보 조회
      * @param swLat     남서쪽 위도 (south-west latitude)
@@ -104,7 +103,7 @@ public class StoreController {
      *
      * @param latitude 위도
      * @param longitude 경도
-     * @param size 사용자 정보
+     * @param size 결과 크기
      */
     @Operation(summary = "(자동완성) 지도 전체 검색 자동완성", description = "(자동완성) 지도 전체 검색 자동완성")
     @GetMapping("/suggestions")

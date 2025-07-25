@@ -16,10 +16,10 @@ public class GetGlobalSuggestionRes {
     @Schema(description = "자동완성", example = "할리스")
     private String suggestion;
 
-    @Schema(description = "카테고리", example = "BRAND")
+    @Schema(description = "카테고리", example = "카페")
     private String category;
 
-    @Schema(description = "주소", example = "BRAND")
+    @Schema(description = "주소", example = "서울시 강남구 123")
     private String address;
 
     @Schema(description = "자동완성 타입", example = "BRAND")
