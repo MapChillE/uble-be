@@ -1,6 +1,7 @@
 package com.ureca.uble.domain.users.service;
 
 import co.elastic.clients.elasticsearch._types.aggregations.LongTermsBucket;
+import com.ureca.uble.domain.bookmark.repository.BookmarkRepository;
 import com.ureca.uble.domain.brand.repository.BrandClickLogDocumentRepository;
 import com.ureca.uble.domain.brand.repository.BrandRepository;
 import com.ureca.uble.domain.category.repository.CategoryRepository;
@@ -40,6 +41,7 @@ public class UserService {
 	private final BrandClickLogDocumentRepository brandClickLogDocumentRepository;
 	private final UsageHistoryDocumentRepository usageHistoryDocumentRepository;
 	private final BrandRepository brandRepository;
+	private final BookmarkRepository bookmarkRepository;
 
 	/**
 	 * 사용자 정보 조회
@@ -171,9 +173,12 @@ public class UserService {
 			.get("rank").lterms().buckets().array().stream()
 			.map(LongTermsBucket::key).toList();
 
+		// 북마크 리스트 조회
+		List<Long> bookmarkedBrandIdList = bookmarkRepository.findAllByUser(userId);
+
 		// DB에서 가져오기
 		List<GetRecommendationRes> similarRecoList = brandRepository.findWithCategoryByIdsIn(brandIdList).stream()
-			.map(GetRecommendationRes::from).toList();
+			.map(b -> GetRecommendationRes.from(b, bookmarkedBrandIdList.contains(b.getId()))).toList();
 
 		return GetSimilarUserRecommendationListRes.of(ageRange, user.getGender(), similarRecoList);
 	}
@@ -191,9 +196,12 @@ public class UserService {
 			.get("rank").lterms().buckets().array().stream()
 			.map(LongTermsBucket::key).toList();
 
+		// 북마크 리스트 조회
+		List<Long> bookmarkedBrandIdList = bookmarkRepository.findAllByUser(userId);
+
 		// DB에서 가져오기
 		List<GetRecommendationRes> timeRecoList = brandRepository.findWithCategoryByIdsIn(brandIdList).stream()
-			.map(GetRecommendationRes::from).toList();
+			.map(b -> GetRecommendationRes.from(b, bookmarkedBrandIdList.contains(b.getId()))).toList();
 
 		return new GetTimeRecommendationListRes(timeRecoList);
 	}

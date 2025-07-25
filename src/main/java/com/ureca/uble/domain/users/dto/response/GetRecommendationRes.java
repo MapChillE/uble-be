@@ -14,7 +14,7 @@ public class GetRecommendationRes {
     private Long brandId;
 
     @Schema(description = "제휴처 이름", example = "CGV 강남")
-    private String brandName;
+    private String name;
 
     @Schema(description = "카테고리", example = "문화/여가")
     private String category;
@@ -32,15 +32,20 @@ public class GetRecommendationRes {
     @Schema(description = "제휴처 대표 이미지 url", example = "https://image.com")
     private String imgUrl;
 
-    public static GetRecommendationRes from(Brand brand) {
+    @Schema(description = "즐겨찾기 여부", example = "true")
+    @JsonProperty("isBookmarked")
+    private boolean bookmarked;
+
+    public static GetRecommendationRes from(Brand brand, boolean isBookmarked) {
         return GetRecommendationRes.builder()
             .brandId(brand.getId())
-            .brandName(brand.getName())
+            .name(brand.getName())
             .category(brand.getCategory().getName())
             .description(brand.getDescription())
             .vipcock(brand.isVIPcock())
             .minRank(brand.getMinRank().toString())
             .imgUrl(brand.getImageUrl())
+            .bookmarked(isBookmarked)
             .build();
     }
 }

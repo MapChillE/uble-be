@@ -10,6 +10,7 @@ import com.ureca.uble.entity.*;
 import com.ureca.uble.entity.document.StoreClickLogDocument;
 import com.ureca.uble.entity.enums.*;
 import com.ureca.uble.global.exception.GlobalException;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
@@ -42,13 +43,15 @@ public class StoreService {
      * 근처 매장 정보 조회
      */
     @Transactional(readOnly = true)
-    public GetStoreListRes getStores(double latitude, double longitude, int distance, Long categoryId, Long brandId, Season season, BenefitType type) {
-        validateRange(latitude, longitude, distance);
+    public GetStoreListRes getStores(double swLat, double swLng, double neLat, double neLng,
+                                     Long categoryId, Long brandId, Season season, BenefitType type) {
+        // 입력 범위 검증: 남서 좌표가 북동 좌표보다 작아야 함
+        if (swLat >= neLat || swLng >= neLng){
+            throw new GlobalException(OUT_OF_RANGE_INPUT);
+        }
 
-        Point curPoint = getPoint(latitude, longitude);
-        List<GetStoreRes> storeList = storeRepository.findStoresByFiltering(curPoint, distance, categoryId, brandId, season, type)
-            .stream().map(GetStoreRes::from).toList();
-
+        List<GetStoreRes> storeList = storeRepository.findStoresInBox(swLng, swLat, neLng, neLat, categoryId, brandId, season, type)
+                .stream().map(GetStoreRes::from).toList();
         return new GetStoreListRes(storeList);
     }
 
@@ -57,7 +60,6 @@ public class StoreService {
      */
     @Transactional(readOnly = true)
     public GetStoreSummaryRes getStoreSummary(double latitude, double longitude, Long userId, Long storeId) {
-        User user = findUser(userId);
         Store store = findByIdWithBrandAndCategoryAndBenefits(storeId);
 
         // 좌표 기준 거리 계산
