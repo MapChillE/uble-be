@@ -14,8 +14,11 @@ public class GetRecommendationsRes {
     @Schema(description = "매장 id", example = "1")
     private Long storeId;
 
+    @Schema(description = "브랜드 id", example = "1")
+    private Long brandId;
+
     @Schema(description = "매장 이름", example = "CGV 강남")
-    private String storeName;
+    private String name;
 
     @Schema(description = "위도", example = "37.5017831")
     private Double latitude;
