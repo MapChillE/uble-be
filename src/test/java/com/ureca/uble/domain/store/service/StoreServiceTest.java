@@ -110,13 +110,11 @@ class StoreServiceTest {
         Long userId = 1L;
         Long storeId = 10L;
 
-        User mockUser = mock(User.class);
         Brand mockBrand = mock(Brand.class);
         Category mockCategory = mock(Category.class);
         Store mockStore = mock(Store.class);
         Point mockLocation = mock(Point.class);
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
         when(storeRepository.findByIdWithBrandAndCategoryAndBenefits(storeId)).thenReturn(Optional.of(mockStore));
 
         when(mockStore.getBrand()).thenReturn(mockBrand);
