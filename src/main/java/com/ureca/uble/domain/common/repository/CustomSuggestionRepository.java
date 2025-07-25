@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -81,7 +82,7 @@ public class CustomSuggestionRepository {
         )._toQuery();
     }
 
-    private Query getBrandQuery(String keyword, boolean isOnlineOnly) {
+    private Query getBrandQuery(String keyword, boolean isOfflineOnly) {
         Query multiMatchQuery = MultiMatchQuery.of(m -> m
             .query(keyword)
             .fields(
@@ -97,7 +98,7 @@ public class CustomSuggestionRepository {
             .type(TextQueryType.BestFields)
         )._toQuery();
 
-        if (isOnlineOnly) {
+        if (isOfflineOnly) {
             return BoolQuery.of(b -> b
                 .must(multiMatchQuery)
                 .filter(f -> f
@@ -112,7 +113,9 @@ public class CustomSuggestionRepository {
     }
 
     private Query getStoreQuery(String keyword, double latitude, double longitude) {
-        List<String> tokens = List.of(keyword.split(" "));
+        List<String> tokens = Arrays.stream(keyword.trim().split("\\s+"))
+            .filter(token -> !token.isEmpty())
+            .toList();
 
         // 각 토큰을 should 쿼리로 변환
         List<Query> shouldQueries = tokens.stream()
