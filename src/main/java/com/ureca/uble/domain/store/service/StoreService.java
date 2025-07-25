@@ -116,6 +116,10 @@ public class StoreService {
      * (자동완성) 지도 전체 검색 자동완성
      */
     public GetGlobalSuggestionListRes getGlobalSuggestionList(String keyword, double latitude, double longitude, int size) {
+        if(keyword == null || keyword.trim().isEmpty()) {
+            return new GetGlobalSuggestionListRes(List.of());
+        }
+
         // 위경도 설정
         List<String> keywordList = List.of(keyword.split(" "));
         SearchHits<LocationCoordinationDocument> locationHits = locationCoordinationDocumentRepository.findCoordinationByLocation(keywordList);
