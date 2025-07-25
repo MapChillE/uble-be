@@ -9,7 +9,7 @@ import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 @Getter
 @Builder
 @Document(indexName = "location-coordination")
-@Setting(settingPath = "/elasticsearch/search-log-settings.json")
+@Setting(settingPath = "/elasticsearch/location-coordination-settings.json")
 public class LocationCoordinationDocument {
     @Id
     private String id;
