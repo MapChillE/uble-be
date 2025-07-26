@@ -92,4 +92,18 @@ public class AdminService {
 
         return new GetDailySearchRankListRes(rankList);
     }
+
+    /**
+     * (통계) 결과 미포함 검색어 순위
+     */
+    public GetEmptySearchRankListRes getEmptySearchRank(Gender gender, Integer ageRange, Rank rank, BenefitType benefitType) {
+        ElasticsearchAggregations rankResult = searchLogDocumentRepository.getEmptySearchRankByFiltering(gender, ageRange, rank, benefitType);
+
+        List<RankDetailRes> rankList = rankResult.aggregationsAsMap()
+            .get("empty_top_keywords").aggregation().getAggregate().sterms().buckets().array().stream()
+            .map(b -> RankDetailRes.of(b.key().stringValue(), b.docCount()))
+            .toList();
+
+        return new GetEmptySearchRankListRes(rankList);
+    }
 }

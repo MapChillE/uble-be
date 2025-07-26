@@ -1,9 +1,6 @@
 package com.ureca.uble.domain.admin.controller;
 
-import com.ureca.uble.domain.admin.dto.response.GetClickRankListRes;
-import com.ureca.uble.domain.admin.dto.response.GetDailySearchRankListRes;
-import com.ureca.uble.domain.admin.dto.response.GetLocalRankListRes;
-import com.ureca.uble.domain.admin.dto.response.GetUsageRankListRes;
+import com.ureca.uble.domain.admin.dto.response.*;
 import com.ureca.uble.domain.admin.service.AdminService;
 import com.ureca.uble.domain.common.dto.response.CommonResponse;
 import com.ureca.uble.entity.enums.BenefitType;
@@ -117,5 +114,27 @@ public class AdminController {
         @Parameter(description = "혜택 타입 ")
         @RequestParam(required = false) BenefitType benefitType) {
         return CommonResponse.success(adminService.getDailySearchRank(gender, ageRange, rank, benefitType));
+    }
+
+    /**
+     * (통계) 결과 미포함 검색어 순위
+     *
+     * @param gender 성별
+     * @param ageRange 나이대
+     * @param rank 사용자 등급
+     * @param benefitType 혜택 타입
+     */
+    @Operation(summary = "(통계) 결과 미포함 검색어 순위", description = "성별/나이/유저등급/혜택타입에 따른 결과 미포함 검색어 순위")
+    @GetMapping("/statistics/rank/keywords/empty-top")
+    public CommonResponse<GetEmptySearchRankListRes> getEmptySearchRank (
+        @Parameter(description = "성별")
+        @RequestParam(required = false) Gender gender,
+        @Parameter(description = "나이대 (10 단위)")
+        @RequestParam(required = false) Integer ageRange,
+        @Parameter(description = "사용자 등급 (NONE 제외)")
+        @RequestParam(required = false) Rank rank,
+        @Parameter(description = "혜택 타입 ")
+        @RequestParam(required = false) BenefitType benefitType) {
+        return CommonResponse.success(adminService.getEmptySearchRank(gender, ageRange, rank, benefitType));
     }
 }

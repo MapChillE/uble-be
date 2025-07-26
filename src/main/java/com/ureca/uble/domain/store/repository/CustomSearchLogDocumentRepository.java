@@ -7,4 +7,6 @@ import org.springframework.data.elasticsearch.client.elc.ElasticsearchAggregatio
 
 public interface CustomSearchLogDocumentRepository {
     ElasticsearchAggregations getPopularSearchRankByFiltering(Gender gender, Integer ageRange, Rank rank, BenefitType benefitType);
+
+    ElasticsearchAggregations getEmptySearchRankByFiltering(Gender gender, Integer ageRange, Rank rank, BenefitType benefitType);
 }
