@@ -1,31 +1,32 @@
 package com.ureca.uble.domain.store.service;
 
+import co.elastic.clients.elasticsearch.core.MsearchResponse;
+import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.ureca.uble.domain.bookmark.repository.BookmarkRepository;
+import com.ureca.uble.domain.common.repository.CustomSuggestionRepository;
 import com.ureca.uble.domain.store.dto.response.*;
+import com.ureca.uble.domain.store.repository.LocationCoordinationDocumentRepository;
 import com.ureca.uble.domain.store.repository.StoreClickLogDocumentRepository;
 import com.ureca.uble.domain.store.repository.StoreRepository;
 import com.ureca.uble.domain.users.repository.UsageCountRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.*;
+import com.ureca.uble.entity.document.LocationCoordinationDocument;
 import com.ureca.uble.entity.document.StoreClickLogDocument;
 import com.ureca.uble.entity.enums.*;
 import com.ureca.uble.global.exception.GlobalException;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.geom.PrecisionModel;
+import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.ureca.uble.domain.store.exception.StoreErrorCode.OUT_OF_RANGE_INPUT;
 import static com.ureca.uble.domain.store.exception.StoreErrorCode.STORE_NOT_FOUND;
 import static com.ureca.uble.domain.users.exception.UserErrorCode.USER_NOT_FOUND;
+import static com.ureca.uble.global.exception.GlobalErrorCode.ELASTIC_INTERNAL_ERROR;
 
 @Slf4j
 @Service
@@ -36,8 +37,9 @@ public class StoreService {
     private final UsageCountRepository usageCountRepository;
     private final StoreRepository storeRepository;
     private final BookmarkRepository bookmarkRepository;
-    private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
     private final StoreClickLogDocumentRepository storeClickLogDocumentRepository;
+    private final LocationCoordinationDocumentRepository locationCoordinationDocumentRepository;
+    private final CustomSuggestionRepository customSuggestionRepository;
 
     /**
      * 근처 매장 정보 조회
@@ -105,20 +107,76 @@ public class StoreService {
         return GetStoreDetailRes.of(store, distance, isNormalAvailable, isVipAvailable, isLocalAvailable, isBookmarked, benefitList);
     }
 
+    /**
+     * (자동완성) 지도 전체 검색 자동완성
+     */
+    public GetGlobalSuggestionListRes getGlobalSuggestionList(String keyword, double latitude, double longitude, int size) {
+        if(keyword == null || keyword.trim().isEmpty()) {
+            return new GetGlobalSuggestionListRes(List.of());
+        }
+
+        // 위경도 설정
+        List<String> keywordList = List.of(keyword.split(" "));
+        SearchHits<LocationCoordinationDocument> locationHits = locationCoordinationDocumentRepository.findCoordinationByLocation(keywordList);
+
+        if(locationHits.getTotalHits() > 0) {
+            latitude = locationHits.getSearchHit(0).getContent().getLocation().getLat();
+            longitude = locationHits.getSearchHit(0).getContent().getLocation().getLon();
+        }
+
+        // 최종 검색 실행
+        MsearchResponse<Map> response;
+        try {
+            int CATEGORY_SUGGESTION_SIZE = 2;
+            int BRAND_SUGGESTION_SIZE = 2;
+            response = customSuggestionRepository.findMapSuggestionsByKeywordWithMsearch(keyword, CATEGORY_SUGGESTION_SIZE, BRAND_SUGGESTION_SIZE,
+                size - (CATEGORY_SUGGESTION_SIZE + BRAND_SUGGESTION_SIZE), latitude, longitude);
+        } catch (Exception e) {
+            throw new GlobalException(ELASTIC_INTERNAL_ERROR);
+        }
+
+        List<GetGlobalSuggestionRes> res = new ArrayList<>();
+
+        // 카테고리 매핑
+        res.addAll(response.responses().get(0).result().hits().hits().stream()
+            .map(Hit::source).filter(Objects::nonNull)
+            .map(source -> GetGlobalSuggestionRes.of(
+                (String) source.get("categoryName"),
+                null,
+                null,
+                SuggestionType.CATEGORY
+            ))
+            .toList());
+
+        // brand 조회
+        res.addAll(response.responses().get(1).result().hits().hits().stream()
+            .map(Hit::source).filter(Objects::nonNull)
+            .map(source -> GetGlobalSuggestionRes.of(
+                (String) source.get("brandName"),
+                (String) source.get("category"),
+                null,
+                SuggestionType.BRAND
+            ))
+            .toList());
+
+        // store조회
+        res.addAll(response.responses().get(2).result().hits().hits().stream()
+            .map(Hit::source).filter(Objects::nonNull)
+            .map(source -> GetGlobalSuggestionRes.of(
+                (String) source.get("storeName"),
+                (String) source.get("category"),
+                (String) source.get("address"),
+                SuggestionType.STORE
+            ))
+            .toList());
+
+        return new GetGlobalSuggestionListRes(res);
+    }
+
     private BenefitType getBenefitType(Brand brand, Benefit benefit) {
         return brand.getIsLocal() ? BenefitType.LOCAL :
             benefit.getRank() == Rank.NONE ? BenefitType.VIP :
                 BenefitType.NORMAL;
-    }
-
-    private void validateRange(double latitude, double longitude, int distance) {
-        if ((latitude < -90 || latitude > 90) || (longitude < -180 || longitude > 180) || (distance <= 0 || distance > 10000)) {
-            throw new GlobalException(OUT_OF_RANGE_INPUT);
-        }
-    }
-
-    private Point getPoint(double latitude, double longitude) {
-        return geometryFactory.createPoint(new Coordinate(longitude, latitude));
     }
 
     private static double calculateDistance(double latitude1, double longitude1, double latitude2, double longitude2) {
@@ -163,6 +221,4 @@ public class StoreService {
     private User findUser(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new GlobalException(USER_NOT_FOUND));
     }
-
-
 }
