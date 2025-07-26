@@ -1,20 +1,26 @@
 package com.ureca.uble.domain.feedback.controller;
 
-import com.ureca.uble.domain.feedback.dto.request.CreateFeedbackReq;
-import com.ureca.uble.domain.feedback.dto.response.AdminFeedbackRes;
-import com.ureca.uble.domain.feedback.dto.response.CreateFeedbackRes;
-import com.ureca.uble.domain.feedback.service.FeedbackService;
-import com.ureca.uble.domain.common.dto.response.CommonResponse;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.ureca.uble.domain.common.dto.response.CommonResponse;
+import com.ureca.uble.domain.feedback.dto.request.CreateFeedbackReq;
+import com.ureca.uble.domain.feedback.dto.response.AdminFeedbackRes;
+import com.ureca.uble.domain.feedback.dto.response.CreateFeedbackRes;
+import com.ureca.uble.domain.feedback.service.FeedbackService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 
 @RestController
@@ -37,7 +43,7 @@ public class FeedbackController {
             @Parameter(description = "사용자정보", required = true)
             @AuthenticationPrincipal Long userId,
             @Parameter(description = "제목(title), 내용(content), 별점1~5(score)을 담은 요청 객체", required = true)
-            @Validated @RequestBody CreateFeedbackReq req
+            @Valid @RequestBody CreateFeedbackReq req
     ) {
         CreateFeedbackRes res = feedbackService.createFeedback(userId, req);
         return CommonResponse.success(res);
