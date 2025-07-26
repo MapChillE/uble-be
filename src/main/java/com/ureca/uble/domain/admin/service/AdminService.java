@@ -1,10 +1,8 @@
 package com.ureca.uble.domain.admin.service;
 
-import com.ureca.uble.domain.admin.dto.response.GetClickRankListRes;
-import com.ureca.uble.domain.admin.dto.response.GetLocalRankListRes;
-import com.ureca.uble.domain.admin.dto.response.GetUsageRankListRes;
-import com.ureca.uble.domain.admin.dto.response.RankDetailRes;
+import com.ureca.uble.domain.admin.dto.response.*;
 import com.ureca.uble.domain.brand.repository.BrandClickLogDocumentRepository;
+import com.ureca.uble.domain.store.repository.SearchLogDocumentRepository;
 import com.ureca.uble.domain.users.repository.UsageHistoryDocumentRepository;
 import com.ureca.uble.entity.enums.BenefitType;
 import com.ureca.uble.entity.enums.Gender;
@@ -14,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchAggregations;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -22,6 +21,7 @@ public class AdminService {
 
     private final UsageHistoryDocumentRepository usageHistoryDocumentRepository;
     private final BrandClickLogDocumentRepository brandClickLogDocumentRepository;
+    private final SearchLogDocumentRepository searchLogDocumentRepository;
 
     /**
      * (통계) 제휴처/카테고리 이용 순위
@@ -66,5 +66,30 @@ public class AdminService {
             .toList();
 
         return new GetLocalRankListRes(rankList);
+    }
+
+    /**
+     * (통계) 일별 인기 검색어 순위
+     */
+    public GetDailySearchRankListRes getDailySearchRank(Gender gender, Integer ageRange, Rank rank, BenefitType benefitType) {
+        ElasticsearchAggregations rankResult = searchLogDocumentRepository.getPopularSearchRankByFiltering(gender, ageRange, rank, benefitType);
+
+        List<GetRankListRes> rankList = rankResult.aggregationsAsMap()
+            .get("daily_top_keywords").aggregation().getAggregate().filter().aggregations()
+            .get("daily_top10").dateHistogram().buckets().array().stream()
+                .map(bucket -> GetRankListRes.of(
+                    LocalDate.parse(bucket.keyAsString()),
+                    bucket.aggregations()
+                        .get("rank").sterms()
+                        .buckets().array().stream()
+                        .map(b -> RankDetailRes.of(
+                            b.key().stringValue(),
+                            b.docCount()
+                        ))
+                        .toList()
+                ))
+            .toList();
+
+        return new GetDailySearchRankListRes(rankList);
     }
 }
