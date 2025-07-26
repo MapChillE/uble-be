@@ -8,6 +8,7 @@ import com.ureca.uble.domain.pin.dto.response.GetPinRes;
 import com.ureca.uble.domain.pin.service.PinService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +34,7 @@ public class PinController {
             @Parameter(description = "사용자 ID", required = true)
             @AuthenticationPrincipal Long userId,
             @Parameter(description = "자주 가는 곳 정보", required = true)
-            @RequestBody CreatePinReq req) {
+            @Valid @RequestBody CreatePinReq req) {
         CreatePinRes res = pinService.createPin(userId, req);
         return CommonResponse.success(res);
     }
