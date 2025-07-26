@@ -6,6 +6,7 @@ import com.ureca.uble.domain.common.dto.response.CreateSearchLogRes;
 import com.ureca.uble.domain.common.service.CommonService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,7 +46,7 @@ public class CommonController {
 		@Parameter(description = "사용자정보", required = true)
 		@AuthenticationPrincipal Long userId,
 		@Parameter(description = "검색 종류", required = true)
-		@RequestBody CreateSearchLogReq req) {
+		@Valid @RequestBody CreateSearchLogReq req) {
 		return CommonResponse.success(commonService.createSearchLog(userId, req));
 	}
 }

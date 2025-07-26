@@ -30,8 +30,8 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.ureca.uble.domain.common.exception.CommonErrorCode.ELASTIC_INTERNAL_ERROR;
 import static com.ureca.uble.domain.users.exception.UserErrorCode.USER_NOT_FOUND;
-import static com.ureca.uble.global.exception.GlobalErrorCode.ELASTIC_INTERNAL_ERROR;
 
 @Slf4j
 @Service

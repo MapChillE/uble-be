@@ -6,6 +6,7 @@ import com.ureca.uble.domain.users.dto.response.*;
 import com.ureca.uble.domain.users.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +32,7 @@ public class UserController {
 	public CommonResponse<UpdateUserInfoRes>updateUserInfo(
 		@Parameter(description = "사용자정보", required = true)
 		@AuthenticationPrincipal Long userId,
-		@RequestBody UpdateUserInfoReq request
+		@Valid @RequestBody UpdateUserInfoReq request
 	){
 		return CommonResponse.success(userService.updateUserInfo(userId, request));
 	}

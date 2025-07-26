@@ -12,7 +12,7 @@ import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Repository;
 
-import static com.ureca.uble.global.exception.GlobalErrorCode.ELASTIC_INTERNAL_ERROR;
+import static com.ureca.uble.domain.common.exception.CommonErrorCode.ELASTIC_INTERNAL_ERROR;
 
 @Repository
 @RequiredArgsConstructor

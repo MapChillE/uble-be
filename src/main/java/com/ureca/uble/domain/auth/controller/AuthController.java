@@ -22,6 +22,7 @@ import com.ureca.uble.domain.common.dto.response.CommonResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -33,7 +34,7 @@ public class AuthController {
 
 	@PostMapping("/login")
 	@Operation(summary = "카카오 로그인", description = "카카오 인가코드를 받아 로그인합니다.")
-	public CommonResponse<KakaoLoginRes> login(@RequestBody KakaoLoginReq request, HttpServletResponse response){
+	public CommonResponse<KakaoLoginRes> login(@Valid @RequestBody KakaoLoginReq request, HttpServletResponse response){
 		User user = authService.login(request.getCode(), response);
 		KakaoLoginRes result = new KakaoLoginRes(user.getRole().name());
 		return CommonResponse.success(result);

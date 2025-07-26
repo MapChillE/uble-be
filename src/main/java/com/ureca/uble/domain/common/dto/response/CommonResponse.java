@@ -23,6 +23,13 @@ public class CommonResponse<T> {
         this.message = resultCode.getMessage();
     }
 
+    // Validation 오류 메시지용 생성자
+    public CommonResponse(Integer statusCode, String message) {
+        this.statusCode = statusCode;
+        this.message = message;
+        this.data = null;
+    }
+
     // 성공 시 일반적인 생성자
     public CommonResponse(ResultCode resultCode, T data) {
         this.statusCode = resultCode.getCode();
