@@ -31,7 +31,7 @@ public class CreatePinReq {
     private double latitude;
 
     @Schema(description = "장소의 도로명 주소", example = "서울시 강남구 테헤란로 12")
-    @NotBlank(message = "장소 별칭은 필수입니다.")
+    @NotBlank(message = "주소는 필수입니다.")
     @Size(max = 100, message = "도로명 주소는 100자 이하로 입력해주세요.")
     private String address;
 }
