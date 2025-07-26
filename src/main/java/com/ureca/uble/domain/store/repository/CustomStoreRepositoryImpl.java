@@ -29,18 +29,19 @@ public class CustomStoreRepositoryImpl implements CustomStoreRepository {
     public List<Store> findStoresInBox(double swLng, double swLat, double neLng, double neLat,
                                        Long categoryId, Long brandId, Season season, BenefitType type) {
         return jpaQueryFactory
-                .select(store).from(store)
-                .innerJoin(store.brand, brand).fetchJoin()
-                .innerJoin(brand.category, category).fetchJoin()
-                .where(
-                        Expressions.booleanTemplate(
-                                "function('ST_Intersects', {0}, function('ST_MakeEnvelope', {1}, {2}, {3}, {4}, 4326)) = TRUE",
-                                store.location,
-                                swLng, swLat, neLng, neLat
-                        ),
-                        categoryIdEq(categoryId), brandIdEq(brandId), seasonEq(season), typeEq(type)
-                )
-                .fetch();
+            .select(store).from(store)
+            .innerJoin(store.brand, brand).fetchJoin()
+            .innerJoin(brand.category, category).fetchJoin()
+            .where(
+                Expressions.booleanTemplate(
+                    "function('ST_Intersects', {0}, function('ST_MakeEnvelope', {1}, {2}, {3}, {4}, 4326)) = TRUE",
+                    store.location,
+                    swLng, swLat, neLng, neLat
+                ),
+                categoryIdEq(categoryId), brandIdEq(brandId), seasonEq(season), typeEq(type)
+            )
+            .limit(50)
+            .fetch();
     }
 
     public BooleanExpression getCondition(BenefitType type) {
