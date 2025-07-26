@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 public enum CommonErrorCode implements ResultCode {
 	// COMMON 9000번대
 	ELASTIC_INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 9000, "검색 서버 내부 오류가 발생했습니다."),
+	VALIDATION_ERROR(HttpStatus.BAD_REQUEST, 9001, "요청 값이 유효하지 않습니다.")
 	;
 
 	private final HttpStatus status;
