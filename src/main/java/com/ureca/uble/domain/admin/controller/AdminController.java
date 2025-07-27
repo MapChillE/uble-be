@@ -137,4 +137,26 @@ public class AdminController {
         @RequestParam(required = false) BenefitType benefitType) {
         return CommonResponse.success(adminService.getEmptySearchRank(gender, ageRange, rank, benefitType));
     }
+
+    /**
+     * (통계) 관심사 변화 추이 (top 10)
+     *
+     * @param gender 성별
+     * @param ageRange 나이대
+     * @param rank 사용자 등급
+     * @param benefitType 혜택 타입
+     */
+    @Operation(summary = "(통계) 상위 10개 제휴처 대상 관심사 변화 추이", description = "성별/나이/유저등급/혜택타입에 따른 관심사 변화 추이 (상위 10개 제휴처 대상)")
+    @GetMapping("/statistics/rank/asdfasdf") // TODO: 이름바꾸기
+    public CommonResponse<GetInterestChangeRes> getInterestChange (
+        @Parameter(description = "성별")
+        @RequestParam(required = false) Gender gender,
+        @Parameter(description = "나이대 (10 단위)")
+        @RequestParam(required = false) Integer ageRange,
+        @Parameter(description = "사용자 등급 (NONE 제외)")
+        @RequestParam(required = false) Rank rank,
+        @Parameter(description = "혜택 타입 ")
+        @RequestParam(required = false) BenefitType benefitType) {
+        return CommonResponse.success(adminService.getInterestChange(gender, ageRange, rank, benefitType));
+    }
 }
