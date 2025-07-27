@@ -144,7 +144,8 @@ public class StoreService {
                 (String) source.get("categoryName"),
                 null, null,
                 SuggestionType.CATEGORY,
-                null, null, null
+                ((Number) source.get("categoryId")).longValue(),
+                null, null
             ))
             .toList());
 
@@ -156,7 +157,8 @@ public class StoreService {
                 (String) source.get("category"),
                 null,
                 SuggestionType.BRAND,
-                null, null, null
+                ((Number) source.get("brandId")).longValue(),
+                null, null
             ))
             .toList());
 

@@ -19,8 +19,8 @@ public class GetGlobalSuggestionRes {
     @Schema(description = "카테고리", example = "카페")
     private String category;
 
-    @Schema(description = "매장 id", example = "12")
-    private Long storeId;
+    @Schema(description = "결과 id", example = "12")
+    private Long id;
 
     @Schema(description = "위도", example = "37.123")
     private Double latitude;
@@ -35,13 +35,13 @@ public class GetGlobalSuggestionRes {
     private SuggestionType type;
 
 
-    public static GetGlobalSuggestionRes of(String suggestion, String category, String address, SuggestionType type, Long storeId, Double latitude, Double longitude) {
+    public static GetGlobalSuggestionRes of(String suggestion, String category, String address, SuggestionType type, Long id, Double latitude, Double longitude) {
         return GetGlobalSuggestionRes.builder()
             .suggestion(suggestion)
             .category(category)
             .address(address)
             .type(type)
-            .storeId(storeId)
+            .id(id)
             .latitude(latitude)
             .longitude(longitude)
             .build();
