@@ -124,16 +124,15 @@ public class AdminService {
             .map(b -> b.key().stringValue()).toList();
 
         // 제휴처 별 각 기준 count 조회
-        GetInterestChangeRes result;
+        ElasticsearchAggregations brandResult, storeResult, usageResult;
         try {
-            ElasticsearchAggregations brandResult = customSuggestionRepository.getCountsByFiltering(BRAND_CLICK, brandNameList, gender, ageRange, rank, benefitType);
-            ElasticsearchAggregations storeResult = customSuggestionRepository.getCountsByFiltering(STORE_CLICK, brandNameList, gender, ageRange, rank, benefitType);
-            ElasticsearchAggregations usageResult = customSuggestionRepository.getCountsByFiltering(USAGE, brandNameList, gender, ageRange, rank, benefitType);
-            result = parseInterestChangeRes(brandResult, storeResult, usageResult);
+            brandResult = customSuggestionRepository.getCountsByFiltering(BRAND_CLICK, brandNameList, gender, ageRange, rank, benefitType);
+            storeResult = customSuggestionRepository.getCountsByFiltering(STORE_CLICK, brandNameList, gender, ageRange, rank, benefitType);
+            usageResult = customSuggestionRepository.getCountsByFiltering(USAGE, brandNameList, gender, ageRange, rank, benefitType);
         } catch (Exception e) {
             throw new GlobalException(ELASTIC_INTERNAL_ERROR);
         }
-        return result;
+        return parseInterestChangeRes(brandResult, storeResult, usageResult);
     }
 
     public GetInterestChangeRes parseInterestChangeRes(ElasticsearchAggregations brandResult, ElasticsearchAggregations storeResult, ElasticsearchAggregations usageResult) {
