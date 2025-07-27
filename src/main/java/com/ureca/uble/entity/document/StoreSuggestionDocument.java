@@ -21,8 +21,14 @@ public class StoreSuggestionDocument {
     @Field(type = FieldType.Search_As_You_Type, analyzer = "address_synonym_analyzer")
     private String storeName;
 
+    @Field(type = FieldType.Long)
+    private Long brandId;
+
     @Field(type = FieldType.Search_As_You_Type, analyzer = "brand_synonym_analyzer")
     private String brandName;
+
+    @Field(type = FieldType.Long)
+    private Long categoryId;
 
     @Field(type = FieldType.Search_As_You_Type, analyzer = "category_synonym_analyzer")
     private String category;
@@ -40,7 +46,9 @@ public class StoreSuggestionDocument {
         return StoreSuggestionDocument.builder()
             .storeId(store.getId())
             .storeName(store.getName())
+            .brandId(store.getBrand().getId())
             .brandName(store.getBrand().getName())
+            .categoryId(store.getBrand().getCategory().getId())
             .category(store.getBrand().getCategory().getName())
             .season(store.getBrand().getSeason().toString())
             .address(store.getAddress())
