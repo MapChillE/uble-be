@@ -1,0 +1,19 @@
+{
+  "analysis": {
+    "filter": {
+      "address_synonym_filter": {
+        "type": "synonym",
+        "synonyms_path": "analysis/address-synonyms.txt"
+      }
+    },
+    "analyzer": {
+      "address_synonym_analyzer": {
+        "tokenizer": "standard",
+        "filter": [
+          "lowercase",
+          "address_synonym_filter"
+        ]
+      }
+    }
+  }
+}

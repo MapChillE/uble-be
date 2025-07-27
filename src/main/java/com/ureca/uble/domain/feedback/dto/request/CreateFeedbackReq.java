@@ -14,12 +14,12 @@ import lombok.NoArgsConstructor;
 public class CreateFeedbackReq {
 
     @Schema(description = "피드백 제목 (100자 이내)", example = "앱 사용성이 좋습니다.")
-    @NotBlank
+    @NotBlank(message = "제목은 필수입니다.")
     @Size(max = 100)
     private String title;
 
     @Schema(description = "피드백 내용 (200자 이내)", example = "지도 기능이 직관적이라 너무 편리해요!")
-    @NotBlank
+    @NotBlank(message = "내용은 필수입니다.")
     @Size(max = 200)
     private String content;
 
