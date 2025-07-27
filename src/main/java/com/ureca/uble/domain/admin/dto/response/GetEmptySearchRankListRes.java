@@ -11,5 +11,5 @@ import java.util.List;
 @Schema(description = "결과 미포함 검색어 순위 반환 DTO")
 public class GetEmptySearchRankListRes {
     @Schema(description = "순위 List")
-    List<RankDetailRes> rankList;
+    private List<RankDetailRes> rankList;
 }

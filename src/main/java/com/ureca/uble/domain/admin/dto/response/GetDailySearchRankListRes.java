@@ -11,5 +11,5 @@ import java.util.List;
 @Schema(description = "일별 검색어 인기 순위 반환 DTO")
 public class GetDailySearchRankListRes {
     @Schema(description = "전체 인기 순위 리스트")
-    List<GetRankListRes> rankList;
+    private List<GetRankListRes> rankList;
 }
