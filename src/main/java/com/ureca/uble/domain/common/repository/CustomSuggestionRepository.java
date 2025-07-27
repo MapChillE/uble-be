@@ -127,7 +127,6 @@ public class CustomSuggestionRepository {
             .withAggregation("top_brands", aggregation)
             .withIndicesBoost(boosts)
             .withMaxResults(0)
-            .withIndicesBoost()
             .build();
 
         return (ElasticsearchAggregations) elasticsearchOperations
