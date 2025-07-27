@@ -142,9 +142,10 @@ public class StoreService {
             .map(Hit::source).filter(Objects::nonNull)
             .map(source -> GetGlobalSuggestionRes.of(
                 (String) source.get("categoryName"),
-                null,
-                null,
-                SuggestionType.CATEGORY
+                null, null,
+                SuggestionType.CATEGORY,
+                ((Number) source.get("categoryId")).longValue(),
+                null, null
             ))
             .toList());
 
@@ -155,19 +156,33 @@ public class StoreService {
                 (String) source.get("brandName"),
                 (String) source.get("category"),
                 null,
-                SuggestionType.BRAND
+                SuggestionType.BRAND,
+                ((Number) source.get("brandId")).longValue(),
+                null, null
             ))
             .toList());
 
         // store조회
         res.addAll(response.responses().get(2).result().hits().hits().stream()
             .map(Hit::source).filter(Objects::nonNull)
-            .map(source -> GetGlobalSuggestionRes.of(
-                (String) source.get("storeName"),
-                (String) source.get("category"),
-                (String) source.get("address"),
-                SuggestionType.STORE
-            ))
+            .map(source -> {
+                Map<String, Object> locMap = (Map<String, Object>) source.get("location");
+                Double lat = null, lon = null;
+                if (locMap != null) {
+                    lat = ((Number) locMap.get("lat")).doubleValue();
+                    lon = ((Number) locMap.get("lon")).doubleValue();
+                }
+
+                return GetGlobalSuggestionRes.of(
+                    (String) source.get("storeName"),
+                    (String) source.get("category"),
+                    (String) source.get("address"),
+                    SuggestionType.STORE,
+                    ((Number) source.get("storeId")).longValue(),
+                    lat,
+                    lon
+                );
+            })
             .toList());
 
         return new GetGlobalSuggestionListRes(res);
