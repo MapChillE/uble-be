@@ -28,7 +28,18 @@ jobs:
       run: |
         mkdir -p src/main/resources
         echo "${{ secrets.APPLICATION_YML_RELEASE }}" > ./src/main/resources/application.yml
+        
+    # logback 설정
+    - name: logback-spring.xml 파일 설정
+      run: |
+        mkdir -p src/main/resources
+        echo "${{ secrets.LOGBACK_SPRING_XML }}" > ./src/main/resources/logback-spring.xml
 
+    # filebeat 설정
+    - name: filebeat.yml 파일 설정
+      run: |
+        echo "${{ secrets.FILEBEAT_YML }}" > ./filebeat.yml
+        
     # Gradle 환경 설치
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
@@ -58,9 +69,9 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script_stop: true
         script: |
-          # 모든 컨테이너 중지 및 제거 (컨테이너가 있는 경우)
-          sudo docker stop $(docker ps -a -q) || true
-          sudo docker rm -fv $(docker ps -aq) || true
+          # Spring 컨테이너 중지 및 제거 (컨테이너가 있는 경우)
+          sudo docker stop uble-main || true
+          sudo docker rm -fv uble-main || true
 
           # 이전 이미지 삭제
           sudo docker image rm ${{ secrets.DOCKER_USERNAME }}/uble-main:latest || true
@@ -69,8 +80,7 @@ jobs:
           sudo docker pull ${{ secrets.DOCKER_USERNAME }}/uble-main:latest
         
           # Docker 컨테이너 실행
-          sudo docker run -d -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/uble-main:latest
+          sudo docker run -d -p 8080:8080 --name uble-main ${{ secrets.DOCKER_USERNAME }}/uble-main:latest
         
           # 불필요한 Docker 이미지 정리
           sudo docker image prune -f
-      
