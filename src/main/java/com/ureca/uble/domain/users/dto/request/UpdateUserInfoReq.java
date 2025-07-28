@@ -30,7 +30,6 @@ public class UpdateUserInfoReq {
 	private LocalDate birthDate;
 
 	@Schema(description = "바코드 번호", example = "123456787654321")
-	@NotBlank(message = "바코드 번호는 필수입니다.")
 	@Size(min = 16, max = 16, message = "바코드는 16자로 입력해주세요.")
 	private String barcode;
 

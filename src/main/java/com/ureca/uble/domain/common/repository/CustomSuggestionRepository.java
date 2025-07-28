@@ -1,9 +1,7 @@
 package com.ureca.uble.domain.common.repository;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.FieldValue;
-import co.elastic.clients.elasticsearch._types.GeoLocation;
-import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.*;
 import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
 import co.elastic.clients.elasticsearch._types.aggregations.CalendarInterval;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
@@ -11,13 +9,12 @@ import co.elastic.clients.elasticsearch.core.MsearchRequest;
 import co.elastic.clients.elasticsearch.core.MsearchResponse;
 import co.elastic.clients.util.NamedValue;
 import com.ureca.uble.domain.common.util.SearchFilterUtils;
+import com.ureca.uble.domain.store.dto.response.GetGlobalSuggestionRes;
 import com.ureca.uble.entity.document.BrandClickLogDocument;
 import com.ureca.uble.entity.document.StoreClickLogDocument;
 import com.ureca.uble.entity.document.UsageHistoryDocument;
-import com.ureca.uble.entity.enums.BenefitType;
-import com.ureca.uble.entity.enums.Gender;
-import com.ureca.uble.entity.enums.InterestType;
 import com.ureca.uble.entity.enums.Rank;
+import com.ureca.uble.entity.enums.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchAggregations;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
@@ -27,6 +24,7 @@ import org.springframework.data.elasticsearch.core.query.IndexBoost;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -62,9 +60,52 @@ public class CustomSuggestionRepository {
     }
 
     /**
-     * 카테고리, 재휴처, 매장 자동완성
+     * 매장 자동완성 + 카테고리/제휴처 대표 매장 위경도 조회
      */
-    public MsearchResponse<Map> findMapSuggestionsByKeywordWithMsearch(String keyword, int categorySize, int brandSize, int storeSize, double latitude, double longitude) throws IOException {
+    public MsearchResponse<Map> findMapSuggestionsByKeywordWithMsearch(String keyword, int storeSize, double latitude, double longitude, List<GetGlobalSuggestionRes> find) throws IOException {
+        MsearchRequest.Builder builder = new MsearchRequest.Builder();
+
+        // 매장 자동완성
+        builder.searches(s -> s
+                .header(h -> h.index("store-suggestion"))
+                .body(b -> b
+                    .size(storeSize)
+                    .minScore(5.0)
+                    .query(getStoreQuery(keyword, latitude, longitude))
+                )
+        );
+
+        // CATEGORY / BRAND 동적 추가
+        for (GetGlobalSuggestionRes res : find) {
+            builder.searches(s -> s
+                .header(h -> h.index("store-suggestion"))
+                .body(b -> b
+                    .size(1)
+                    .query(getNearestStoreQuery(res.getType(), res.getSuggestion()))
+                    .sort(sb -> sb
+                        .geoDistance(g -> g
+                            .field("location")
+                            .location(l -> l.latlon(
+                                new LatLonGeoLocation.Builder()
+                                    .lat(latitude)
+                                    .lon(longitude)
+                                    .build()
+                            ))
+                            .order(SortOrder.Asc)
+                            .unit(DistanceUnit.Meters)
+                        )
+                    )
+                )
+            );
+        }
+        return elasticsearchClient.msearch(builder.build(), Map.class);
+    }
+
+    /**
+     * 위경도 계산 + 제휴처, 카테고리 검색
+     */
+    public MsearchResponse<Map> findCoordinationAndBrandAndCategoryWithMSearch(String keyword, int categorySize, int brandSize) throws IOException {
+        List<String> keywordList = List.of(keyword.split(" "));
         MsearchRequest request = new MsearchRequest.Builder()
             .searches(s -> s
                 .header(h -> h.index("category-suggestion"))
@@ -81,11 +122,10 @@ public class CustomSuggestionRepository {
                 )
             )
             .searches(s -> s
-                .header(h -> h.index("store-suggestion"))
+                .header(h -> h.index("location-coordination"))
                 .body(b -> b
-                    .size(storeSize)
-                    .minScore(5.0)
-                    .query(getStoreQuery(keyword, latitude, longitude))
+                    .size(1)
+                    .query(findCoordinationByLocation(keywordList))
                 )
             )
             .build();
@@ -198,6 +238,62 @@ public class CustomSuggestionRepository {
         return (ElasticsearchAggregations) elasticsearchOperations
             .search(query, classType)
             .getAggregations();
+    }
+
+    private Query getNearestStoreQuery(SuggestionType type, String name) {
+        String fieldName = switch (type) {
+            case BRAND -> "brandName.raw";
+            case CATEGORY -> "category.raw";
+            default -> "";
+        };
+
+        return MatchQuery.of(m -> m
+            .field(fieldName)
+            .query(name)
+        )._toQuery();
+    }
+
+    private Query findCoordinationByLocation(List<String> keywordList) {
+        // should 쿼리 생성 : 유연한 검색
+        List<Query> shouldQueries = new ArrayList<>();
+        keywordList.forEach(keyword -> {
+            shouldQueries.add(MatchQuery.of(m -> m
+                .field("name")
+                .query(keyword)
+            )._toQuery());
+        });
+
+        Query boolQuery = Query.of(q -> q
+            .bool(b -> b
+                .should(shouldQueries)
+                .minimumShouldMatch("1")
+            )
+        );
+
+        // keyword 일치 시 가중치 부여
+        List<FieldValue> fieldValues = keywordList.stream()
+            .map(FieldValue::of)
+            .toList();
+
+        List<FunctionScore> functions = new ArrayList<>();
+        functions.add(FunctionScore.of(fs -> fs
+            .filter(Query.of(q -> q
+                .terms(t -> t
+                    .field("name.raw")
+                    .terms(tt -> tt.value(fieldValues))
+                )
+            ))
+            .weight(10.0)
+        ));
+
+        // 최종 쿼리 빌드
+        FunctionScoreQuery functionScoreQuery = FunctionScoreQuery.of(f -> f
+            .query(boolQuery)
+            .functions(functions)
+        );
+
+        // 검색 실행 및 결과 반환
+        return functionScoreQuery._toQuery();
     }
 
     private Query getCategoryQuery(String keyword) {

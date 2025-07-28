@@ -11,13 +11,11 @@ import com.ureca.uble.domain.store.repository.StoreRepository;
 import com.ureca.uble.domain.users.repository.UsageCountRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.*;
-import com.ureca.uble.entity.document.LocationCoordinationDocument;
 import com.ureca.uble.entity.document.StoreClickLogDocument;
 import com.ureca.uble.entity.enums.*;
 import com.ureca.uble.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,21 +38,47 @@ public class StoreService {
     private final StoreClickLogDocumentRepository storeClickLogDocumentRepository;
     private final LocationCoordinationDocumentRepository locationCoordinationDocumentRepository;
     private final CustomSuggestionRepository customSuggestionRepository;
+    private static final int CLUSTERING_THRESHOLD_ZOOM = 16;
+    private static final int GRID_SIZE_THRESHOLD_ZOOM = 12;
+    private static final double FINE_GRID_SIZE = 0.01;
+    private static final double COARSE_GRID_SIZE = 0.05;
+    private static final int MIN_ZOOM_LEVEL = 0;
+    private static final int MAX_ZOOM_LEVEL = 22;
 
     /**
      * 근처 매장 정보 조회
      */
     @Transactional(readOnly = true)
-    public GetStoreListRes getStores(double swLat, double swLng, double neLat, double neLng,
+    public GetStoreListRes getStores(int zoomLevel, double swLat, double swLng, double neLat, double neLng,
                                      Long categoryId, Long brandId, Season season, BenefitType type) {
+
+        if (zoomLevel < MIN_ZOOM_LEVEL || zoomLevel > MAX_ZOOM_LEVEL){
+            throw new GlobalException(OUT_OF_RANGE_INPUT);
+        }
         // 입력 범위 검증: 남서 좌표가 북동 좌표보다 작아야 함
         if (swLat >= neLat || swLng >= neLng){
             throw new GlobalException(OUT_OF_RANGE_INPUT);
         }
 
-        List<GetStoreRes> storeList = storeRepository.findStoresInBox(swLng, swLat, neLng, neLat, categoryId, brandId, season, type)
-                .stream().map(GetStoreRes::from).toList();
-        return new GetStoreListRes(storeList);
+        List<Store> stores;
+        if (zoomLevel >= CLUSTERING_THRESHOLD_ZOOM) {
+            stores = storeRepository.findStoresInBox(
+                    swLng, swLat, neLng, neLat,
+                    categoryId, brandId, season, type
+            );
+        } else {
+            //클러스터링: grid 크기 선택
+            double gridSize = (zoomLevel >= GRID_SIZE_THRESHOLD_ZOOM) ? FINE_GRID_SIZE : COARSE_GRID_SIZE;
+            stores = storeRepository.findClusterRepresentatives(
+                    swLng, swLat, neLng, neLat,
+                    categoryId, brandId, season, type,
+                    gridSize
+            );
+        }
+        List<GetStoreRes> dtoList = stores.stream()
+                .map(GetStoreRes::from)
+                .toList();
+        return new GetStoreListRes(zoomLevel, dtoList);
     }
 
     /**
@@ -115,30 +139,19 @@ public class StoreService {
             return new GetGlobalSuggestionListRes(List.of());
         }
 
-        // 위경도 설정
-        List<String> keywordList = List.of(keyword.split(" "));
-        SearchHits<LocationCoordinationDocument> locationHits = locationCoordinationDocumentRepository.findCoordinationByLocation(keywordList);
-
-        if(locationHits.getTotalHits() > 0) {
-            latitude = locationHits.getSearchHit(0).getContent().getLocation().getLat();
-            longitude = locationHits.getSearchHit(0).getContent().getLocation().getLon();
-        }
-
-        // 최종 검색 실행
-        MsearchResponse<Map> response;
+        // 위경도 설정 + 브랜드, 카테고리 결과 받기
+        int CATEGORY_SUGGESTION_SIZE = 2;
+        int BRAND_SUGGESTION_SIZE = 2;
+        MsearchResponse<Map> firstResponse;
         try {
-            int CATEGORY_SUGGESTION_SIZE = 2;
-            int BRAND_SUGGESTION_SIZE = 2;
-            response = customSuggestionRepository.findMapSuggestionsByKeywordWithMsearch(keyword, CATEGORY_SUGGESTION_SIZE, BRAND_SUGGESTION_SIZE,
-                size - (CATEGORY_SUGGESTION_SIZE + BRAND_SUGGESTION_SIZE), latitude, longitude);
+            firstResponse = customSuggestionRepository.findCoordinationAndBrandAndCategoryWithMSearch(keyword, CATEGORY_SUGGESTION_SIZE, BRAND_SUGGESTION_SIZE);
         } catch (Exception e) {
             throw new GlobalException(ELASTIC_INTERNAL_ERROR);
         }
 
-        List<GetGlobalSuggestionRes> res = new ArrayList<>();
-
         // 카테고리 매핑
-        res.addAll(response.responses().get(0).result().hits().hits().stream()
+        List<GetGlobalSuggestionRes> res = new ArrayList<>();
+        res.addAll(firstResponse.responses().get(0).result().hits().hits().stream()
             .map(Hit::source).filter(Objects::nonNull)
             .map(source -> GetGlobalSuggestionRes.of(
                 (String) source.get("categoryName"),
@@ -150,7 +163,7 @@ public class StoreService {
             .toList());
 
         // brand 조회
-        res.addAll(response.responses().get(1).result().hits().hits().stream()
+        res.addAll(firstResponse.responses().get(1).result().hits().hits().stream()
             .map(Hit::source).filter(Objects::nonNull)
             .map(source -> GetGlobalSuggestionRes.of(
                 (String) source.get("brandName"),
@@ -162,8 +175,42 @@ public class StoreService {
             ))
             .toList());
 
+        // 위경도 재설정
+        Map<String, Object> locationMap = firstResponse.responses().get(2).result().hits().hits().stream()
+            .map(Hit::source)
+            .filter(Objects::nonNull)
+            .map(src -> (Map<String, Object>) src.get("location"))
+            .findFirst()
+            .orElse(null);
+
+        if(locationMap != null) {
+            latitude = (Double) locationMap.get("lat");
+            longitude = (Double) locationMap.get("lon");
+        }
+
+        // 최종 검색 실행
+        MsearchResponse<Map> secondResponse;
+        try {
+            secondResponse = customSuggestionRepository.findMapSuggestionsByKeywordWithMsearch(keyword, size - (res.size()), latitude, longitude, res);
+        } catch (Exception e) {
+            throw new GlobalException(ELASTIC_INTERNAL_ERROR);
+        }
+
+        // brand/category 위경도 추가
+        for (int i = 1; i < secondResponse.responses().size(); i++) {
+            Map<String, Object> locRes = secondResponse.responses().get(i).result().hits().hits().stream()
+                .map(Hit::source).filter(Objects::nonNull)
+                .map(src -> (Map<String, Object>) src.get("location"))
+                .findFirst()
+                .orElse(null);
+
+            if(locRes != null) {
+                res.get(i - 1).update((Double) locRes.get("lat"), (Double) locRes.get("lon"));
+            }
+        }
+
         // store조회
-        res.addAll(response.responses().get(2).result().hits().hits().stream()
+        res.addAll(secondResponse.responses().get(0).result().hits().hits().stream()
             .map(Hit::source).filter(Objects::nonNull)
             .map(source -> {
                 Map<String, Object> locMap = (Map<String, Object>) source.get("location");

@@ -31,12 +31,16 @@ public class Store extends BaseEntity {
     @Column(columnDefinition = "geography(Point,4326)")
     private Point location;
 
+    @Column(name = "visit_count", nullable = false)
+    private int visitCount;
+
     @Builder(access = PRIVATE)
-    private Store(Brand brand, String name, String address, String phoneNumber, Point location) {
+    private Store(Brand brand, String name, String address, String phoneNumber, Point location, int visitCount) {
         this.brand = brand;
         this.name = name;
         this.address = address;
         this.phoneNumber = phoneNumber;
         this.location = location;
+        this.visitCount = visitCount;
     }
 }
