@@ -68,7 +68,7 @@ public class LogBackupScheduler {
               "indices": "%s",
               "include_global_state": false
             }
-            """.formatted(index);
+            """.formatted(originalIndex);
 
         try {
             elasticWebClient.put()
