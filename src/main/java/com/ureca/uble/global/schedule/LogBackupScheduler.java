@@ -35,7 +35,10 @@ public class LogBackupScheduler {
             "search-log",
             "brand-click-log",
             "store-click-log",
-            "usage-history-log"
+            "usage-history-log",
+            "business-logs-*",
+            "slow-logs-*",
+            "error-logs-*"
         };
 
         for (String index : indexList) {
@@ -47,7 +50,8 @@ public class LogBackupScheduler {
         }
     }
 
-    private void backUpIndex(String index) {
+    private void backUpIndex(String originalIndex) {
+        String index = originalIndex.replace("-*", "");
         String repoName = "s3_repo_" + index;
         String basePath = "elasticsearch-snapshots/" + index;
 
@@ -110,7 +114,7 @@ public class LogBackupScheduler {
 
             log.info("[Elasticsearch] 레포지토리 {} 등록 성공", repoName);
         } catch (Exception e) {
-            log.warn("[Elasticsearch] 레포지토리 {} 등록 실패: {}", repoName, e.getMessage());
+            log.error("[Elasticsearch] 레포지토리 {} 등록 실패: {}", repoName, e.getMessage());
             return false;
         }
         return true;
