@@ -38,21 +38,47 @@ public class StoreService {
     private final StoreClickLogDocumentRepository storeClickLogDocumentRepository;
     private final LocationCoordinationDocumentRepository locationCoordinationDocumentRepository;
     private final CustomSuggestionRepository customSuggestionRepository;
+    private static final int CLUSTERING_THRESHOLD_ZOOM = 16;
+    private static final int GRID_SIZE_THRESHOLD_ZOOM = 12;
+    private static final double FINE_GRID_SIZE = 0.01;
+    private static final double COARSE_GRID_SIZE = 0.05;
+    private static final int MIN_ZOOM_LEVEL = 0;
+    private static final int MAX_ZOOM_LEVEL = 22;
 
     /**
      * 근처 매장 정보 조회
      */
     @Transactional(readOnly = true)
-    public GetStoreListRes getStores(double swLat, double swLng, double neLat, double neLng,
+    public GetStoreListRes getStores(int zoomLevel, double swLat, double swLng, double neLat, double neLng,
                                      Long categoryId, Long brandId, Season season, BenefitType type) {
+
+        if (zoomLevel < MIN_ZOOM_LEVEL || zoomLevel > MAX_ZOOM_LEVEL){
+            throw new GlobalException(OUT_OF_RANGE_INPUT);
+        }
         // 입력 범위 검증: 남서 좌표가 북동 좌표보다 작아야 함
         if (swLat >= neLat || swLng >= neLng){
             throw new GlobalException(OUT_OF_RANGE_INPUT);
         }
 
-        List<GetStoreRes> storeList = storeRepository.findStoresInBox(swLng, swLat, neLng, neLat, categoryId, brandId, season, type)
-                .stream().map(GetStoreRes::from).toList();
-        return new GetStoreListRes(storeList);
+        List<Store> stores;
+        if (zoomLevel >= CLUSTERING_THRESHOLD_ZOOM) {
+            stores = storeRepository.findStoresInBox(
+                    swLng, swLat, neLng, neLat,
+                    categoryId, brandId, season, type
+            );
+        } else {
+            //클러스터링: grid 크기 선택
+            double gridSize = (zoomLevel >= GRID_SIZE_THRESHOLD_ZOOM) ? FINE_GRID_SIZE : COARSE_GRID_SIZE;
+            stores = storeRepository.findClusterRepresentatives(
+                    swLng, swLat, neLng, neLat,
+                    categoryId, brandId, season, type,
+                    gridSize
+            );
+        }
+        List<GetStoreRes> dtoList = stores.stream()
+                .map(GetStoreRes::from)
+                .toList();
+        return new GetStoreListRes(zoomLevel, dtoList);
     }
 
     /**

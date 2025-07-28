@@ -10,6 +10,9 @@ import java.util.List;
 @AllArgsConstructor
 @Schema(description = "매장 리스트 반환 DTO")
 public class GetStoreListRes {
+    @Schema(description = "요청한 줌 레벨", example = "12")
+    private int zoomLevel;
+
     @Schema(description = "매장 리스트", example = "매장 정보 리스트")
     private List<GetStoreRes> storeList;
 }

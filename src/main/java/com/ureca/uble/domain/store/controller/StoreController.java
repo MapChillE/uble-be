@@ -23,6 +23,7 @@ public class StoreController {
 
     /**
      * 사각형 범위 내 매장 정보 조회
+     * @param zoomLevel 요청한 줌 레벨
      * @param swLat     남서쪽 위도 (south-west latitude)
      * @param swLng     남서쪽 경도 (south-west longitude)
      * @param neLat     북동쪽 위도 (north-east latitude)
@@ -35,6 +36,8 @@ public class StoreController {
     @Operation(summary = "사각형 범위 내 매장 정보 조회", description = "Bounding Box로 주변 매장 조회")
     @GetMapping
     public CommonResponse<GetStoreListRes> getStores(
+            @Parameter(description = "요청한 줌 레벨", required = true)
+            @RequestParam int zoomLevel,
             @Parameter(description = "남서쪽 위도", required = true)
             @RequestParam double swLat,
             @Parameter(description = "남서쪽 경도", required = true)
@@ -51,7 +54,7 @@ public class StoreController {
             @RequestParam(required = false) Season season,
             @Parameter(description = "혜택 타입 필터링(POINT, DISCOUNT 등)")
             @RequestParam(required = false) BenefitType type) {
-        return CommonResponse.success(storeService.getStores(swLat, swLng, neLat, neLng, categoryId, brandId, season, type));
+        return CommonResponse.success(storeService.getStores(zoomLevel, swLat, swLng, neLat, neLng, categoryId, brandId, season, type));
     }
 
     /**

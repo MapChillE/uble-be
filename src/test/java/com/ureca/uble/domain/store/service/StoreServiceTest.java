@@ -69,8 +69,8 @@ class StoreServiceTest {
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
         Point storeLocation = geometryFactory.createPoint(new Coordinate(swLng + 0.001, swLat + 0.001));
 
-        Store mockStore    = mock(Store.class);
-        Brand mockBrand    = mock(Brand.class);
+        Store mockStore = mock(Store.class);
+        Brand mockBrand = mock(Brand.class);
         Category mockCategory = mock(Category.class);
 
         when(mockStore.getId()).thenReturn(1L);
@@ -86,7 +86,7 @@ class StoreServiceTest {
 
         // when
         GetStoreListRes result = storeService.getStores(
-                swLat, swLng, neLat, neLng,
+                18, swLat, swLng, neLat, neLng,
                 categoryId, brandId, season, type
         );
 
@@ -98,6 +98,46 @@ class StoreServiceTest {
         verify(storeRepository).findStoresInBox(
                 eq(swLng), eq(swLat), eq(neLng), eq(neLat),
                 eq(categoryId), eq(brandId), eq(season), eq(type)
+        );
+    }
+
+    @Test
+    @DisplayName("줌 레벨이 낮을 때 클러스터 대표 매장을 조회한다.")
+    void getStores_clustering() {
+        // given
+        double swLat = 37.5;
+        double swLng = 127.0;
+        double neLat = 37.51;
+        double neLng = 127.01;
+        int zoomLevel = 13;
+
+        Store mockStore = mock(Store.class);
+        Brand mockBrand = mock(Brand.class);
+        Category mockCategory = mock(Category.class);
+
+        GeometryFactory geometryFactory = new GeometryFactory();
+        Point point = geometryFactory.createPoint(new Coordinate(127.001, 37.501));
+
+        when(mockStore.getBrand()).thenReturn(mockBrand);
+        when(mockBrand.getCategory()).thenReturn(mockCategory);
+        when(mockStore.getLocation()).thenReturn(point);
+        when(mockStore.getName()).thenReturn("테스트 매장");
+
+        when(storeRepository.findClusterRepresentatives(
+                anyDouble(), anyDouble(), anyDouble(), anyDouble(),
+                any(), any(), any(), any(), anyDouble()))
+                .thenReturn(List.of(mockStore));
+
+        // when
+        GetStoreListRes result = storeService.getStores(
+                zoomLevel, swLat, swLng, neLat, neLng,
+                null, null, null, null
+        );
+
+        // then
+        verify(storeRepository).findClusterRepresentatives(
+                eq(swLng), eq(swLat), eq(neLng), eq(neLat),
+                eq(null), eq(null), eq(null), eq(null), anyDouble()
         );
     }
 
