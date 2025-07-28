@@ -101,16 +101,16 @@ public class BrandService {
 			brands.remove(size);
 		}
 
-		List<BrandListRes> brandList = brands.stream().map(brand -> {
-			Optional<Bookmark> optionalBookmark = bookmarkRepository.findByUserIdAndBrandId(userId, brand.getId());
-			boolean isBookmarked = optionalBookmark.isPresent();
-			Long bookmarkId = optionalBookmark.map(Bookmark::getId).orElse(null);
+		List<Long> bookmarkedBrandIdList = bookmarkRepository.findAllByUser(userId);
+		Set<Long> bookmarkedBrandIdSet = new HashSet<>(bookmarkedBrandIdList);
 
-			boolean isVIPcock = brand.isVIPcock();
-			Rank minRank = brand.getMinRank();
-
-			return BrandListRes.of(brand, isBookmarked, bookmarkId, isVIPcock, minRank);
-		}).toList();
+		List<BrandListRes> brandList = brands.stream()
+			.map(brand -> BrandListRes.of(
+				brand, bookmarkedBrandIdSet.contains(brand.getId()),
+				brand.isVIPcock(),
+				brand.getMinRank()
+			))
+			.toList();
 
 		Long lastCursorId = brandList.isEmpty() ? null : brandList.get(brandList.size() - 1).getBrandId();
 
@@ -147,9 +147,8 @@ public class BrandService {
 
 				Bookmark bookmark = bookmarkMap.get(document.getBrandId());
 				boolean isBookmarked = (bookmark != null);
-				Long bookmarkId = (bookmark != null) ? bookmark.getId() : null;
 
-				return BrandListRes.of(document, isBookmarked, bookmarkId);
+				return BrandListRes.of(document, isBookmarked);
 			})
 			.toList();
 
