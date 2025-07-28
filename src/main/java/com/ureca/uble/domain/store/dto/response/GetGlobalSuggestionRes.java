@@ -5,8 +5,10 @@ import com.ureca.uble.entity.enums.SuggestionType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Schema(description="지도 내 자동완성 조회 응답 DTO")
