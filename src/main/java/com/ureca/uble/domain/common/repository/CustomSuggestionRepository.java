@@ -1,11 +1,29 @@
 package com.ureca.uble.domain.common.repository;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.GeoLocation;
+import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
+import co.elastic.clients.elasticsearch._types.aggregations.CalendarInterval;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.MsearchRequest;
 import co.elastic.clients.elasticsearch.core.MsearchResponse;
+import co.elastic.clients.util.NamedValue;
+import com.ureca.uble.domain.common.util.SearchFilterUtils;
+import com.ureca.uble.entity.document.BrandClickLogDocument;
+import com.ureca.uble.entity.document.StoreClickLogDocument;
+import com.ureca.uble.entity.document.UsageHistoryDocument;
+import com.ureca.uble.entity.enums.BenefitType;
+import com.ureca.uble.entity.enums.Gender;
+import com.ureca.uble.entity.enums.InterestType;
+import com.ureca.uble.entity.enums.Rank;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.elasticsearch.client.elc.ElasticsearchAggregations;
+import org.springframework.data.elasticsearch.client.elc.NativeQuery;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+import org.springframework.data.elasticsearch.core.query.IndexBoost;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -17,6 +35,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CustomSuggestionRepository {
 
+    private final ElasticsearchOperations elasticsearchOperations;
     private final ElasticsearchClient elasticsearchClient;
 
     /**
@@ -71,6 +90,114 @@ public class CustomSuggestionRepository {
             )
             .build();
         return elasticsearchClient.msearch(request, Map.class);
+    }
+
+    /**
+     * 관심도 상위 10개 제휴처 조회
+     */
+    public ElasticsearchAggregations getTopInterestBrandByFiltering(Gender gender, Integer ageRange, Rank rank, BenefitType benefitType) {
+        // filter 설정
+        List<Query> filters = SearchFilterUtils.getAdminStatisticFilters(gender, ageRange, rank, benefitType);
+
+        filters.add(DateRangeQuery.of(r -> r
+            .field("createdAt")
+            .gte("now/M")
+            .lte("now")
+        )._toRangeQuery()._toQuery());
+
+        // 통계 쿼리 작성
+        Aggregation aggregation = Aggregation.of(a -> a
+            .terms(t -> t
+                .field("brandName")
+                .size(10)
+                .order(List.of(NamedValue.of("_count", SortOrder.Desc)))
+            )
+        );
+
+        // Index 가중치 설정
+        List<IndexBoost> boosts = List.of(
+            new IndexBoost("usage-history-log", 2.0f),
+            new IndexBoost("brand-click-log", 1.0f),
+            new IndexBoost("store-click-log", 1.0f)
+        );
+
+        // 최종 쿼리 작성
+        NativeQuery query = NativeQuery.builder()
+            .withQuery(q -> q.bool(b -> b.filter(filters)))
+            .withAggregation("top_brands", aggregation)
+            .withIndicesBoost(boosts)
+            .withMaxResults(0)
+            .build();
+
+        return (ElasticsearchAggregations) elasticsearchOperations
+            .search(query, Map.class, IndexCoordinates.of("brand-click-log", "store-click-log", "usage-history-log"))
+            .getAggregations();
+    }
+
+    /**
+     * 제휴처 별 클릭 및 사용량 조회
+     */
+    public ElasticsearchAggregations getCountsByFiltering(InterestType type, List<String> brandNameList, Gender gender, Integer ageRange, Rank rank, BenefitType benefitType) {
+        List<Query> filters = SearchFilterUtils.getAdminStatisticFilters(gender, ageRange, rank, benefitType);
+
+        filters.add(DateRangeQuery.of(r -> r
+            .field("createdAt")
+            .gte("now-6M/M")
+            .lte("now/M")
+        )._toRangeQuery()._toQuery());
+
+        filters.add(TermsQuery.of(t -> t
+            .field("brandName")
+            .terms(v -> v.value(
+                brandNameList.stream().map(FieldValue::of).toList()
+            ))
+        )._toQuery());
+
+        // 통계 쿼리 작성
+        Aggregation aggregation = Aggregation.of(a -> a
+            .filter(f -> f
+                .bool(b -> b.filter(filters))
+            )
+            .aggregations("count_info", da -> da
+                .dateHistogram(dh -> dh
+                    .field("createdAt")
+                    .calendarInterval(CalendarInterval.Month)
+                    .format("yyyy-MM")
+                    .order(List.of(NamedValue.of("_key", SortOrder.Asc)))
+                )
+                .aggregations("rank", b -> b
+                    .terms(t -> t
+                        .field("brandName")
+                        .order(List.of(NamedValue.of("_count", SortOrder.Desc)))
+                    )
+                )
+            )
+        );
+
+        // Index 가중치 설정
+        List<IndexBoost> boosts = List.of(
+            new IndexBoost("usage-history-log", 2.0f),
+            new IndexBoost("brand-click-log", 1.0f),
+            new IndexBoost("store-click-log", 1.0f)
+        );
+
+        // 최종 쿼리 생성
+        NativeQuery query = NativeQuery.builder()
+            .withIndicesBoost(boosts)
+            .withQuery(q -> q.bool(b -> b.filter(filters)))
+            .withAggregation("monthly_count", aggregation)
+            .withMaxResults(0)
+            .build();
+
+        Class<?> classType = switch (type) {
+            case BRAND_CLICK -> BrandClickLogDocument.class;
+            case STORE_CLICK -> StoreClickLogDocument.class;
+            case USAGE -> UsageHistoryDocument.class;
+        };
+
+        return (ElasticsearchAggregations) elasticsearchOperations
+            .search(query, classType)
+            .getAggregations();
     }
 
     private Query getCategoryQuery(String keyword) {
