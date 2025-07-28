@@ -11,13 +11,11 @@ import com.ureca.uble.domain.store.repository.StoreRepository;
 import com.ureca.uble.domain.users.repository.UsageCountRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.*;
-import com.ureca.uble.entity.document.LocationCoordinationDocument;
 import com.ureca.uble.entity.document.StoreClickLogDocument;
 import com.ureca.uble.entity.enums.*;
 import com.ureca.uble.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -115,30 +113,19 @@ public class StoreService {
             return new GetGlobalSuggestionListRes(List.of());
         }
 
-        // 위경도 설정
-        List<String> keywordList = List.of(keyword.split(" "));
-        SearchHits<LocationCoordinationDocument> locationHits = locationCoordinationDocumentRepository.findCoordinationByLocation(keywordList);
-
-        if(locationHits.getTotalHits() > 0) {
-            latitude = locationHits.getSearchHit(0).getContent().getLocation().getLat();
-            longitude = locationHits.getSearchHit(0).getContent().getLocation().getLon();
-        }
-
-        // 최종 검색 실행
-        MsearchResponse<Map> response;
+        // 위경도 설정 + 브랜드, 카테고리 결과 받기
+        int CATEGORY_SUGGESTION_SIZE = 2;
+        int BRAND_SUGGESTION_SIZE = 2;
+        MsearchResponse<Map> firstResponse;
         try {
-            int CATEGORY_SUGGESTION_SIZE = 2;
-            int BRAND_SUGGESTION_SIZE = 2;
-            response = customSuggestionRepository.findMapSuggestionsByKeywordWithMsearch(keyword, CATEGORY_SUGGESTION_SIZE, BRAND_SUGGESTION_SIZE,
-                size - (CATEGORY_SUGGESTION_SIZE + BRAND_SUGGESTION_SIZE), latitude, longitude);
+            firstResponse = customSuggestionRepository.findCoordinationAndBrandAndCategoryWithMSearch(keyword, CATEGORY_SUGGESTION_SIZE, BRAND_SUGGESTION_SIZE);
         } catch (Exception e) {
             throw new GlobalException(ELASTIC_INTERNAL_ERROR);
         }
 
-        List<GetGlobalSuggestionRes> res = new ArrayList<>();
-
         // 카테고리 매핑
-        res.addAll(response.responses().get(0).result().hits().hits().stream()
+        List<GetGlobalSuggestionRes> res = new ArrayList<>();
+        res.addAll(firstResponse.responses().get(0).result().hits().hits().stream()
             .map(Hit::source).filter(Objects::nonNull)
             .map(source -> GetGlobalSuggestionRes.of(
                 (String) source.get("categoryName"),
@@ -150,7 +137,7 @@ public class StoreService {
             .toList());
 
         // brand 조회
-        res.addAll(response.responses().get(1).result().hits().hits().stream()
+        res.addAll(firstResponse.responses().get(1).result().hits().hits().stream()
             .map(Hit::source).filter(Objects::nonNull)
             .map(source -> GetGlobalSuggestionRes.of(
                 (String) source.get("brandName"),
@@ -162,8 +149,42 @@ public class StoreService {
             ))
             .toList());
 
+        // 위경도 재설정
+        Map<String, Object> locationMap = firstResponse.responses().get(2).result().hits().hits().stream()
+            .map(Hit::source)
+            .filter(Objects::nonNull)
+            .map(src -> (Map<String, Object>) src.get("location"))
+            .findFirst()
+            .orElse(null);
+
+        if(locationMap != null) {
+            latitude = (Double) locationMap.get("lat");
+            longitude = (Double) locationMap.get("lon");
+        }
+
+        // 최종 검색 실행
+        MsearchResponse<Map> secondResponse;
+        try {
+            secondResponse = customSuggestionRepository.findMapSuggestionsByKeywordWithMsearch(keyword, size - (res.size()), latitude, longitude, res);
+        } catch (Exception e) {
+            throw new GlobalException(ELASTIC_INTERNAL_ERROR);
+        }
+
+        // brand/category 위경도 추가
+        for (int i = 1; i < secondResponse.responses().size(); i++) {
+            Map<String, Object> locRes = secondResponse.responses().get(i).result().hits().hits().stream()
+                .map(Hit::source).filter(Objects::nonNull)
+                .map(src -> (Map<String, Object>) src.get("location"))
+                .findFirst()
+                .orElse(null);
+
+            if(locRes != null) {
+                res.get(i - 1).update((Double) locRes.get("lat"), (Double) locRes.get("lon"));
+            }
+        }
+
         // store조회
-        res.addAll(response.responses().get(2).result().hits().hits().stream()
+        res.addAll(secondResponse.responses().get(0).result().hits().hits().stream()
             .map(Hit::source).filter(Objects::nonNull)
             .map(source -> {
                 Map<String, Object> locMap = (Map<String, Object>) source.get("location");

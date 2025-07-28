@@ -24,13 +24,19 @@ public class StoreSuggestionDocument {
     @Field(type = FieldType.Long)
     private Long brandId;
 
-    @Field(type = FieldType.Search_As_You_Type, analyzer = "brand_synonym_analyzer")
+    @MultiField(
+        mainField = @Field(type = FieldType.Search_As_You_Type, analyzer = "brand_synonym_analyzer"),
+        otherFields = { @InnerField(suffix = "raw", type = FieldType.Keyword) }
+    )
     private String brandName;
 
     @Field(type = FieldType.Long)
     private Long categoryId;
 
-    @Field(type = FieldType.Search_As_You_Type, analyzer = "category_synonym_analyzer")
+    @MultiField(
+        mainField = @Field(type = FieldType.Search_As_You_Type, analyzer = "category_synonym_analyzer"),
+        otherFields = { @InnerField(suffix = "raw", type = FieldType.Keyword) }
+    )
     private String category;
 
     @Field(type = FieldType.Search_As_You_Type, analyzer = "season_synonym_analyzer")

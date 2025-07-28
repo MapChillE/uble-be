@@ -34,7 +34,6 @@ public class GetGlobalSuggestionRes {
     @Schema(description = "자동완성 타입", example = "BRAND")
     private SuggestionType type;
 
-
     public static GetGlobalSuggestionRes of(String suggestion, String category, String address, SuggestionType type, Long id, Double latitude, Double longitude) {
         return GetGlobalSuggestionRes.builder()
             .suggestion(suggestion)
@@ -45,5 +44,10 @@ public class GetGlobalSuggestionRes {
             .latitude(latitude)
             .longitude(longitude)
             .build();
+    }
+
+    public void update(Double latitude, Double longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 }
