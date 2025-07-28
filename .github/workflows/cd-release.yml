@@ -29,12 +29,6 @@ jobs:
           mkdir -p src/main/resources
           echo "${{ secrets.APPLICATION_YML_RELEASE }}" > ./src/main/resources/application.yml
 
-      # logback 설정
-      - name: logback-spring.xml 파일 설정
-        run: |
-          mkdir -p src/main/resources
-          echo "${{ secrets.LOGBACK_SPRING_XML }}" > ./src/main/resources/logback-spring.xml
-
       # Gradle 환경 설치
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
