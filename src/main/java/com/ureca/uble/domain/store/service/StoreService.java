@@ -179,8 +179,7 @@ public class StoreService {
                 .orElse(null);
 
             if(locRes != null) {
-                res.get(i - 1).setLatitude((Double) locRes.get("lat"));
-                res.get(i - 1).setLongitude((Double) locRes.get("lon"));
+                res.get(i - 1).update((Double) locRes.get("lat"), (Double) locRes.get("lon"));
             }
         }
 
