@@ -27,8 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static com.ureca.uble.domain.common.exception.CommonErrorCode.ELASTIC_INTERNAL_ERROR;
 import static com.ureca.uble.domain.users.exception.UserErrorCode.USER_NOT_FOUND;
@@ -106,7 +104,8 @@ public class BrandService {
 
 		List<BrandListRes> brandList = brands.stream()
 			.map(brand -> BrandListRes.of(
-				brand, bookmarkedBrandIdSet.contains(brand.getId()),
+				brand,
+				bookmarkedBrandIdSet.contains(brand.getId()),
 				brand.isVIPcock(),
 				brand.getMinRank()
 			))
@@ -126,17 +125,8 @@ public class BrandService {
 		SearchHits<BrandNoriDocument> searchHits = brandNoriDocumentRepository.findAllByFilteringAndPage(keyword, category, season, type, page, size);
 
 		// 북마크 정보 수집
-		List<Long> brandIds = searchHits.stream()
-			.map(hit -> hit.getContent().getBrandId())
-			.toList();
-
-		List<Bookmark> bookmarks = bookmarkRepository.findWithBrandByUserIdAndBrandIdIn(userId, brandIds);
-
-		Map<Long, Bookmark> bookmarkMap = bookmarks.stream()
-			.collect(Collectors.toMap(b ->
-				b.getBrand().getId(),
-				Function.identity()
-			));
+		List<Long> bookmarkedBrandIdList = bookmarkRepository.findAllByUser(userId);
+		Set<Long> bookmarkedBrandIdSet = new HashSet<>(bookmarkedBrandIdList);
 
 		// 최종 결과 반환
 		long totalCnt = searchHits.getTotalHits();
@@ -144,10 +134,7 @@ public class BrandService {
 		List<BrandListRes> brandList = searchHits.stream()
 			.map(hit -> {
 				BrandNoriDocument document = hit.getContent();
-
-				Bookmark bookmark = bookmarkMap.get(document.getBrandId());
-				boolean isBookmarked = (bookmark != null);
-
+				boolean isBookmarked = bookmarkedBrandIdSet.contains(document.getBrandId());
 				return BrandListRes.of(document, isBookmarked);
 			})
 			.toList();
