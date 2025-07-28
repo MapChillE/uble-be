@@ -108,6 +108,7 @@ public class BrandServiceTest {
 		when(brand1.getMinRank()).thenReturn(mockMinRank);
 		when(brand1.getDescription()).thenReturn("브랜드1 설명");
 		when(brand1.getImageUrl()).thenReturn("https://image1.com");
+		when(brand1.isVIPcock()).thenReturn(false);
 
 		// 브랜드 2 mock
 		Brand brand2 = mock(Brand.class);
@@ -117,13 +118,14 @@ public class BrandServiceTest {
 		when(brand2.getMinRank()).thenReturn(mockMinRank);
 		when(brand2.getDescription()).thenReturn("브랜드2 설명");
 		when(brand2.getImageUrl()).thenReturn("https://image2.com");
+		when(brand2.isVIPcock()).thenReturn(true);
 
 		List<Brand> mockBrands = List.of(brand1, brand2);
 
 		when(brandRepository.findWithFilterAndCursor(null, null, null, lastBrandId, size + 1))
 			.thenReturn(mockBrands);
-		when(bookmarkRepository.findByUserIdAndBrandId(eq(userId), anyLong()))
-			.thenReturn(Optional.empty());
+		when(bookmarkRepository.findAllByUser(userId))
+			.thenReturn(List.of(2L));
 
 		// when
 		CursorPageRes<BrandListRes> result = brandService.getBrandList(userId, null, null, null, lastBrandId, size);
@@ -137,11 +139,13 @@ public class BrandServiceTest {
 		assertThat(res1.getBrandId()).isEqualTo(1L);
 		assertThat(res1.getImgUrl()).isEqualTo("https://image1.com");
 		assertThat(res1.isBookmarked()).isFalse();
+		assertThat(res1.isVipcock()).isFalse();
 
 		BrandListRes res2 = result.getContent().get(1);
 		assertThat(res2.getBrandId()).isEqualTo(2L);
 		assertThat(res2.getImgUrl()).isEqualTo("https://image2.com");
-		assertThat(res2.isBookmarked()).isFalse();
+		assertThat(res2.isBookmarked()).isTrue();
+		assertThat(res2.isVipcock()).isTrue();
 	}
 
 	@Test

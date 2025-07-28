@@ -1,10 +1,10 @@
 package com.ureca.uble.domain.brand.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ureca.uble.entity.Brand;
 import com.ureca.uble.entity.document.BrandNoriDocument;
 import com.ureca.uble.entity.enums.Rank;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
@@ -39,11 +39,7 @@ public class BrandListRes {
 	@JsonProperty("isBookmarked")
 	private boolean bookmarked;
 
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	@Schema(description = "북마크 ID", example = "36")
-	private Long bookmarkId;
-
-	public static BrandListRes of(Brand brand, boolean isBookmarked, Long bookmarkId, boolean isVIPcock, Rank minRank) {
+	public static BrandListRes of(Brand brand, boolean isBookmarked, boolean isVIPcock, Rank minRank) {
 		return BrandListRes.builder()
 			.brandId(brand.getId())
 			.name(brand.getName())
@@ -53,11 +49,10 @@ public class BrandListRes {
 			.minRank(minRank.toString())
 			.imgUrl(brand.getImageUrl())
 			.bookmarked(isBookmarked)
-			.bookmarkId(bookmarkId)
 			.build();
 	}
 
-	public static BrandListRes of(BrandNoriDocument brand, boolean isBookmarked, Long bookmarkId) {
+	public static BrandListRes of(BrandNoriDocument brand, boolean isBookmarked) {
 		return BrandListRes.builder()
 			.brandId(brand.getBrandId())
 			.name(brand.getBrandName())
@@ -67,7 +62,6 @@ public class BrandListRes {
 			.minRank(brand.getMinRank())
 			.imgUrl(brand.getImageUrl())
 			.bookmarked(isBookmarked)
-			.bookmarkId(bookmarkId)
 			.build();
 	}
 }
