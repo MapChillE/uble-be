@@ -2,7 +2,6 @@ package com.ureca.uble.global.exception;
 
 import com.ureca.uble.domain.common.dto.response.CommonResponse;
 import com.ureca.uble.domain.common.exception.CommonErrorCode;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -16,9 +15,17 @@ public class GlobalExceptionHandler {
     // GlobalException 발생 시 반환 형태
     @ExceptionHandler(GlobalException.class)
     public ResponseEntity<CommonResponse<Void>> handleException(GlobalException e) {
+        log.error("GlobalException occurred: code={}, status={}, message={}",
+            e.getResultCode().getCode(),
+            e.getResultCode().getStatus(),
+            e.getResultCode().getMessage(),
+            e
+        );
+
         return ResponseEntity.status(e.getResultCode().getStatus())
             .body(new CommonResponse<>(e.getResultCode()));
     }
+
     // Validation 실패 처리
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<CommonResponse<Void>> handleValidation(MethodArgumentNotValidException e) {

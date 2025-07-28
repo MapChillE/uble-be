@@ -2,6 +2,7 @@ package com.ureca.uble.global.config;
 
 import java.util.List;
 
+import com.ureca.uble.global.logging.LoggingFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -32,7 +33,7 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http, UserRepository userRepository,
-		CorsConfigurationSource corsConfigurationSource, JwtValidator jwtValidator) throws Exception{
+		CorsConfigurationSource corsConfigurationSource, JwtValidator jwtValidator, LoggingFilter loggingFilter) throws Exception{
 		return http
 			.csrf(csrf -> csrf.disable())
 			.cors(cors -> cors.configurationSource(corsConfigurationSource))
@@ -46,6 +47,7 @@ public class SecurityConfig {
 				.anyRequest().authenticated()
 			)
 			.addFilterBefore(new JwtAuthenticationFilter(jwtValidator, userRepository), UsernamePasswordAuthenticationFilter.class)
+			.addFilterAfter(loggingFilter, UsernamePasswordAuthenticationFilter.class)
 			.build();
 	}
 
