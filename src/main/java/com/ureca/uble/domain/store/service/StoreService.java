@@ -45,16 +45,32 @@ public class StoreService {
      * 근처 매장 정보 조회
      */
     @Transactional(readOnly = true)
-    public GetStoreListRes getStores(double swLat, double swLng, double neLat, double neLng,
+    public GetStoreListRes getStores(int zoomLevel, double swLat, double swLng, double neLat, double neLng,
                                      Long categoryId, Long brandId, Season season, BenefitType type) {
         // 입력 범위 검증: 남서 좌표가 북동 좌표보다 작아야 함
         if (swLat >= neLat || swLng >= neLng){
             throw new GlobalException(OUT_OF_RANGE_INPUT);
         }
 
-        List<GetStoreRes> storeList = storeRepository.findStoresInBox(swLng, swLat, neLng, neLat, categoryId, brandId, season, type)
-                .stream().map(GetStoreRes::from).toList();
-        return new GetStoreListRes(storeList);
+        List<Store> stores;
+        if (zoomLevel >= 17) {
+            stores = storeRepository.findStoresInBox(
+                    swLng, swLat, neLng, neLat,
+                    categoryId, brandId, season, type
+            );
+        } else {
+            //클러스터링: grid 크기 선택
+            double gridSize = (zoomLevel >= 12) ? 0.01 : 0.05;
+            stores = storeRepository.findClusterRepresentatives(
+                    swLng, swLat, neLng, neLat,
+                    categoryId, brandId, season, type,
+                    gridSize
+            );
+        }
+        List<GetStoreRes> dtoList = stores.stream()
+                .map(GetStoreRes::from)
+                .toList();
+        return new GetStoreListRes(zoomLevel, dtoList);
     }
 
     /**

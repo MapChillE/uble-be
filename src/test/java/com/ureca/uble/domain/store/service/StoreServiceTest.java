@@ -69,8 +69,8 @@ class StoreServiceTest {
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
         Point storeLocation = geometryFactory.createPoint(new Coordinate(swLng + 0.001, swLat + 0.001));
 
-        Store mockStore    = mock(Store.class);
-        Brand mockBrand    = mock(Brand.class);
+        Store mockStore = mock(Store.class);
+        Brand mockBrand = mock(Brand.class);
         Category mockCategory = mock(Category.class);
 
         when(mockStore.getId()).thenReturn(1L);
@@ -86,7 +86,7 @@ class StoreServiceTest {
 
         // when
         GetStoreListRes result = storeService.getStores(
-                swLat, swLng, neLat, neLng,
+                18, swLat, swLng, neLat, neLng,
                 categoryId, brandId, season, type
         );
 
