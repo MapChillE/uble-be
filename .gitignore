@@ -5,6 +5,9 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+### log ###
+app.log
+
 ### QueryDSL generated Q classes
 /src/main/generated/
 
