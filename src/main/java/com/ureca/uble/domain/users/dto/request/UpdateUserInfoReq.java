@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
@@ -30,7 +31,7 @@ public class UpdateUserInfoReq {
 	private LocalDate birthDate;
 
 	@Schema(description = "바코드 번호", example = "123456787654321")
-	@Size(min = 16, max = 16, message = "바코드는 16자로 입력해주세요.")
+	@Pattern(regexp = "^$|^.{16}$", message = "바코드는 16자이거나 비워둘 수 있습니다.")
 	private String barcode;
 
 	@Schema(description = "카테고리 ID 리스트", example = "[1, 3, 5]")
