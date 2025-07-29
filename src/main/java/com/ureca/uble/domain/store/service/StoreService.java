@@ -38,8 +38,6 @@ public class StoreService {
     private final StoreClickLogDocumentRepository storeClickLogDocumentRepository;
     private final LocationCoordinationDocumentRepository locationCoordinationDocumentRepository;
     private final CustomSuggestionRepository customSuggestionRepository;
-    private static final int MIN_ZOOM_LEVEL = 0;
-    private static final int MAX_ZOOM_LEVEL = 22;
 
     /**
      * 근처 매장 정보 조회
@@ -47,10 +45,6 @@ public class StoreService {
     @Transactional(readOnly = true)
     public GetStoreListRes getStores(int zoomLevel, double swLat, double swLng, double neLat, double neLng,
                                      Long categoryId, Long brandId, Season season, BenefitType type) {
-
-        if (zoomLevel < MIN_ZOOM_LEVEL || zoomLevel > MAX_ZOOM_LEVEL) {
-            throw new GlobalException(OUT_OF_RANGE_INPUT);
-        }
 
         validateZoomAndRange(zoomLevel, swLat, swLng, neLat, neLng);
 
@@ -81,7 +75,7 @@ public class StoreService {
     }
 
     private void validateZoomAndRange(int zoomLevel, double swLat, double swLng, double neLat, double neLng) {
-        if (zoomLevel < 0 || zoomLevel > 22 || zoomLevel <= 9) {
+        if (zoomLevel > 22 || zoomLevel <= 9) {
             throw new GlobalException(OUT_OF_RANGE_INPUT);
         }
         if (swLat >= neLat || swLng >= neLng) {
