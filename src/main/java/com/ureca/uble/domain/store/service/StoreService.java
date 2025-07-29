@@ -38,10 +38,6 @@ public class StoreService {
     private final StoreClickLogDocumentRepository storeClickLogDocumentRepository;
     private final LocationCoordinationDocumentRepository locationCoordinationDocumentRepository;
     private final CustomSuggestionRepository customSuggestionRepository;
-    private static final int CLUSTERING_THRESHOLD_ZOOM = 16;
-    private static final int GRID_SIZE_THRESHOLD_ZOOM = 12;
-    private static final double FINE_GRID_SIZE = 0.01;
-    private static final double COARSE_GRID_SIZE = 0.05;
     private static final int MIN_ZOOM_LEVEL = 0;
     private static final int MAX_ZOOM_LEVEL = 22;
 
@@ -52,33 +48,57 @@ public class StoreService {
     public GetStoreListRes getStores(int zoomLevel, double swLat, double swLng, double neLat, double neLng,
                                      Long categoryId, Long brandId, Season season, BenefitType type) {
 
-        if (zoomLevel < MIN_ZOOM_LEVEL || zoomLevel > MAX_ZOOM_LEVEL){
-            throw new GlobalException(OUT_OF_RANGE_INPUT);
-        }
-        // 입력 범위 검증: 남서 좌표가 북동 좌표보다 작아야 함
-        if (swLat >= neLat || swLng >= neLng){
+        if (zoomLevel < MIN_ZOOM_LEVEL || zoomLevel > MAX_ZOOM_LEVEL) {
             throw new GlobalException(OUT_OF_RANGE_INPUT);
         }
 
-        List<Store> stores;
-        if (zoomLevel >= CLUSTERING_THRESHOLD_ZOOM) {
-            stores = storeRepository.findStoresInBox(
+        validateZoomAndRange(zoomLevel, swLat, swLng, neLat, neLng);
+
+        if (isFullReturnZoom(zoomLevel)) {
+            List<Store> stores = storeRepository.findStoresInBox(
                     swLng, swLat, neLng, neLat,
                     categoryId, brandId, season, type
             );
-        } else {
-            //클러스터링: grid 크기 선택
-            double gridSize = (zoomLevel >= GRID_SIZE_THRESHOLD_ZOOM) ? FINE_GRID_SIZE : COARSE_GRID_SIZE;
-            stores = storeRepository.findClusterRepresentatives(
-                    swLng, swLat, neLng, neLat,
-                    categoryId, brandId, season, type,
-                    gridSize
-            );
+
+            List<GetStoreRes> responseList = stores.stream()
+                    .map(GetStoreRes::from)
+                    .toList();
+            return new GetStoreListRes(zoomLevel, responseList);
         }
-        List<GetStoreRes> dtoList = stores.stream()
+
+        double gridSize = resolveGridSize(zoomLevel);
+
+        List<Store> stores = storeRepository.findClusterRepresentatives(
+                swLng, swLat, neLng, neLat,
+                categoryId, brandId, season, type,
+                gridSize
+        );
+
+        List<GetStoreRes> responseList = stores.stream()
                 .map(GetStoreRes::from)
                 .toList();
-        return new GetStoreListRes(zoomLevel, dtoList);
+        return new GetStoreListRes(zoomLevel, responseList);
+    }
+
+    private void validateZoomAndRange(int zoomLevel, double swLat, double swLng, double neLat, double neLng) {
+        if (zoomLevel < 0 || zoomLevel > 22 || zoomLevel <= 9) {
+            throw new GlobalException(OUT_OF_RANGE_INPUT);
+        }
+        if (swLat >= neLat || swLng >= neLng) {
+            throw new GlobalException(OUT_OF_RANGE_INPUT);
+        }
+    }
+
+    private boolean isFullReturnZoom(int zoomLevel) {
+        return zoomLevel >= 16;
+    }
+
+    private double resolveGridSize(int zoomLevel) {
+        if (zoomLevel == 15) return 0.004;
+        if (zoomLevel == 14) return 0.01;
+        if (zoomLevel == 13) return 0.014;
+        if (zoomLevel == 12) return 0.025;
+        return 0.05; // zoomLevel 10~11
     }
 
     /**
