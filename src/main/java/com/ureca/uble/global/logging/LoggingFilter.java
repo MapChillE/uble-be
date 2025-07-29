@@ -31,15 +31,12 @@ public class LoggingFilter extends OncePerRequestFilter {
             if (userId != null) {
                 MDC.put("userId", userId);
             }
-            LoggerFactory.getLogger("REQUEST_LOG").info("요청 시작");
 
             filterChain.doFilter(request, response);
         } finally {
             long latency = System.currentTimeMillis() - startTime;
             MDC.put("status", String.valueOf(response.getStatus()));
             MDC.put("latencyMs", String.valueOf(latency));
-
-            LoggerFactory.getLogger("REQUEST_LOG").info("요청 완료");
             MDC.clear();
         }
     }
