@@ -17,6 +17,8 @@ import com.ureca.uble.entity.UserCategory;
 import com.ureca.uble.entity.document.UsageHistoryDocument;
 import com.ureca.uble.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
+
+import org.jboss.logging.MDC;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchAggregations;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
@@ -89,6 +91,9 @@ public class UserService {
 		if (userId == null || latitude == null || longitude == null){
 			throw new GlobalException(UserErrorCode.INVALID_PARAMETER);
 		}
+
+		String traceId = (String)MDC.get("traceId");
+
 		try {
 			return fastapiWebClient.get()
 				.uri(uriBuilder -> uriBuilder
@@ -97,6 +102,7 @@ public class UserService {
 					.queryParam("lat", latitude)
 					.queryParam("lng", longitude)
 					.build())
+				.header("X-Trace-Id", traceId != null ? traceId : "-")
 				.retrieve()
 				.onStatus(status -> status.isError(), response ->
 					Mono.error(new GlobalException(UserErrorCode.EXTERNAL_API_ERROR)))
