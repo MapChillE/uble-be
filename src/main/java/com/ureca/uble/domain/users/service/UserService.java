@@ -18,7 +18,7 @@ import com.ureca.uble.entity.document.UsageHistoryDocument;
 import com.ureca.uble.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 
-import org.jboss.logging.MDC;
+import org.slf4j.MDC;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchAggregations;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
@@ -92,7 +92,7 @@ public class UserService {
 			throw new GlobalException(UserErrorCode.INVALID_PARAMETER);
 		}
 
-		String traceId = (String)MDC.get("traceId");
+		String traceId = MDC.get("traceId");
 
 		try {
 			return fastapiWebClient.get()
