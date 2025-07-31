@@ -86,6 +86,21 @@ public class User extends BaseEntity {
             .build();
     }
 
+    public static User createAdminUser(String kakaoId, String nickname){
+        return User.builder()
+            .providerId(kakaoId)
+            .nickname(nickname)
+            .rank(Rank.NORMAL)
+            .role(Role.ADMIN)
+            .isDeleted(false)
+            .isVipAvailable(true)
+            .isLocalAvailable(true)
+            .birthDate(null)
+            .gender(null)
+            .barcode(null)
+            .build();
+    }
+
     public void updateVipAvailability(boolean isVipAvailable) {
         this.isVipAvailable = isVipAvailable;
     }
