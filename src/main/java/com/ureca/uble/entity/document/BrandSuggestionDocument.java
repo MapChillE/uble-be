@@ -24,6 +24,9 @@ public class BrandSuggestionDocument {
     @Field(type = FieldType.Boolean)
     private Boolean isOnline;
 
+    @Field(type = FieldType.Boolean)
+    private Boolean isLocal;
+
     @Field(type = FieldType.Search_As_You_Type, analyzer = "brand_synonym_analyzer")
     private String brandName;
 
@@ -37,6 +40,7 @@ public class BrandSuggestionDocument {
         return BrandSuggestionDocument.builder()
             .brandId(brand.getId())
             .isOnline(brand.getIsOnline())
+            .isLocal(brand.getIsLocal())
             .brandName(brand.getName())
             .category(brand.getCategory().getName())
             .season(brand.getSeason().toString())
