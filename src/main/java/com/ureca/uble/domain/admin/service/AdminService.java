@@ -3,6 +3,7 @@ package com.ureca.uble.domain.admin.service;
 import static com.ureca.uble.domain.common.exception.CommonErrorCode.*;
 import static com.ureca.uble.entity.enums.InterestType.*;
 
+import java.security.MessageDigest;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -71,7 +72,7 @@ public class AdminService {
             throw new GlobalException(AdminErrorCode.NOT_ADMIN);
         }
 
-        if(!providedCode.equals(adminCode)){
+        if(!MessageDigest.isEqual(providedCode.getBytes(), adminCode.getBytes())){
             throw new GlobalException(AdminErrorCode.INVALID_ADMIN_CODE);
         }
 
