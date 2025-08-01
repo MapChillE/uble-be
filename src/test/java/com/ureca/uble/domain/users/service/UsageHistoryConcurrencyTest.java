@@ -62,7 +62,7 @@ public class UsageHistoryConcurrencyTest extends AbstractPostgresContainerTest {
     void checkUsageConcurrency() throws InterruptedException {
         // given
         User savedUser = userRepository.saveAndFlush(UserFixtures.createUser());
-        Category savedCategory = categoryRepository.saveAndFlush(CategoryFixtures.createTmpStore());
+        Category savedCategory = categoryRepository.saveAndFlush(CategoryFixtures.createTmpCategory());
         Brand savedBrand = brandRepository.saveAndFlush(BrandFixtures.createTmpBrand(savedCategory));
         Benefit savedBenefit = benefitRepository.saveAndFlush(BenefitFixtures.createTmpBenefit(savedBrand, 30));
         Store savedStore = storeRepository.saveAndFlush(StoreFixtures.createTmpStore(savedBrand));
