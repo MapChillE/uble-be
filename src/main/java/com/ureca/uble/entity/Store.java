@@ -43,4 +43,12 @@ public class Store extends BaseEntity {
         this.location = location;
         this.visitCount = visitCount;
     }
+
+    public static Store createTmpStore(Brand brand) {
+        return Store.builder()
+            .brand(brand)
+            .name("tmp Store")
+            .visitCount(0)
+            .build();
+    }
 }

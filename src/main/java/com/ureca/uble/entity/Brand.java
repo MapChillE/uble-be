@@ -72,6 +72,17 @@ public class Brand extends BaseEntity {
         this.rankType = rankType;
     }
 
+    public static Brand createTmpBrand(Category category) {
+        return Brand.builder()
+            .category(category)
+            .name("Tmp Brand")
+            .season(Season.SPRING)
+            .isOnline(false)
+            .isLocal(false)
+            .rankType(RankType.NORMAL)
+            .build();
+    }
+
     public boolean isVIPcock(){
         return this.rankType == RankType.VIP || this.rankType == RankType.VIP_NORMAL;
     }

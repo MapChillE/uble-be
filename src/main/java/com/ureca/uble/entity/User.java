@@ -1,22 +1,17 @@
 package com.ureca.uble.entity;
 
-import static lombok.AccessLevel.*;
-
-import java.time.LocalDate;
-
 import com.ureca.uble.entity.enums.Gender;
 import com.ureca.uble.entity.enums.Rank;
 import com.ureca.uble.entity.enums.Role;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
+
+import static lombok.AccessLevel.PRIVATE;
 
 @Entity
 @Table(name="users")
@@ -98,6 +93,19 @@ public class User extends BaseEntity {
             .birthDate(null)
             .gender(null)
             .barcode(null)
+            .build();
+    }
+
+    public static User createTmpUser(Rank rank, Role role) {
+        return User.builder()
+            .nickname("tmp User")
+            .rank(rank)
+            .role(role)
+            .gender(Gender.FEMALE)
+            .providerId("abc123")
+            .isVipAvailable(true)
+            .isLocalAvailable(true)
+            .isDeleted(false)
             .build();
     }
 

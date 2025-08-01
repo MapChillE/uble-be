@@ -24,4 +24,10 @@ public class Category extends BaseEntity {
     private Category(String name) {
         this.name = name;
     }
+
+    public static Category createTmpCategory() {
+        return Category.builder()
+            .name("Tmp Category")
+            .build();
+    }
 }
