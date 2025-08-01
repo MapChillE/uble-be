@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ureca.uble.entity.Brand;
+import com.ureca.uble.entity.enums.BenefitCategory;
 import com.ureca.uble.entity.enums.RankType;
 import com.ureca.uble.entity.enums.Season;
 
@@ -21,7 +22,7 @@ public class CustomBrandRepositoryImpl implements CustomBrandRepository {
 	private final JPAQueryFactory jpaQueryFactory;
 
 	@Override
-	public List<Brand> findWithFilterAndCursor(Long categoryId, Season season, List<RankType> rankTypes, Long lastBrandId, int size) {
+	public List<Brand> findWithFilterAndCursor(Long categoryId, Season season, List<RankType> rankTypes, BenefitCategory benefitCategory, Long lastBrandId, int size) {
 		return jpaQueryFactory
 			.selectFrom(brand)
 			.leftJoin(brand.benefits).fetchJoin()
@@ -29,7 +30,8 @@ public class CustomBrandRepositoryImpl implements CustomBrandRepository {
 				categoryIdEq(categoryId),
 				seasonEq(season),
 				rankTypeIn(rankTypes),
-				gtBrandId(lastBrandId)
+				gtBrandId(lastBrandId),
+				benefitCategoryEq(benefitCategory)
 			)
 			.orderBy(brand.id.asc())
 			.limit(size)
@@ -56,6 +58,10 @@ public class CustomBrandRepositoryImpl implements CustomBrandRepository {
 
 	private BooleanExpression rankTypeIn(List<RankType> rankTypes) {
 		return (rankTypes == null || rankTypes.isEmpty()) ? null : brand.rankType.in(rankTypes);
+	}
+
+	private BooleanExpression benefitCategoryEq(BenefitCategory benefitCategory) {
+		return benefitCategory != null ? brand.benefitCategory.eq(benefitCategory) : null;
 	}
 
 	private BooleanExpression gtBrandId(Long lastBrandId) {
