@@ -1,32 +1,89 @@
 package com.ureca.uble.domain.admin.service;
 
-import com.ureca.uble.domain.admin.dto.response.*;
-import com.ureca.uble.domain.brand.repository.BrandClickLogDocumentRepository;
-import com.ureca.uble.domain.common.repository.CustomSuggestionRepository;
-import com.ureca.uble.domain.store.repository.SearchLogDocumentRepository;
-import com.ureca.uble.domain.users.repository.UsageHistoryDocumentRepository;
-import com.ureca.uble.entity.enums.*;
-import com.ureca.uble.global.exception.GlobalException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import static com.ureca.uble.domain.common.exception.CommonErrorCode.*;
+import static com.ureca.uble.entity.enums.InterestType.*;
+
+import java.security.MessageDigest;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchAggregations;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.util.*;
+import com.ureca.uble.domain.admin.dto.response.AdminCodeRes;
+import com.ureca.uble.domain.admin.dto.response.GetClickRankListRes;
+import com.ureca.uble.domain.admin.dto.response.GetDailySearchRankListRes;
+import com.ureca.uble.domain.admin.dto.response.GetEmptySearchRankListRes;
+import com.ureca.uble.domain.admin.dto.response.GetInterestChangeRes;
+import com.ureca.uble.domain.admin.dto.response.GetInterestListRes;
+import com.ureca.uble.domain.admin.dto.response.GetLocalRankListRes;
+import com.ureca.uble.domain.admin.dto.response.GetRankListRes;
+import com.ureca.uble.domain.admin.dto.response.GetUsageRankListRes;
+import com.ureca.uble.domain.admin.dto.response.InterestDetailRes;
+import com.ureca.uble.domain.admin.dto.response.RankDetailRes;
+import com.ureca.uble.domain.admin.exception.AdminErrorCode;
+import com.ureca.uble.domain.brand.repository.BrandClickLogDocumentRepository;
+import com.ureca.uble.domain.common.repository.CustomSuggestionRepository;
+import com.ureca.uble.domain.store.repository.SearchLogDocumentRepository;
+import com.ureca.uble.domain.users.exception.UserErrorCode;
+import com.ureca.uble.domain.users.repository.UsageHistoryDocumentRepository;
+import com.ureca.uble.domain.users.repository.UserRepository;
+import com.ureca.uble.entity.User;
+import com.ureca.uble.entity.enums.BenefitType;
+import com.ureca.uble.entity.enums.Gender;
+import com.ureca.uble.entity.enums.InterestType;
+import com.ureca.uble.entity.enums.Rank;
+import com.ureca.uble.entity.enums.RankTarget;
+import com.ureca.uble.entity.enums.Role;
+import com.ureca.uble.global.exception.GlobalException;
+import com.ureca.uble.global.security.jwt.JwtProvider;
 
-import static com.ureca.uble.domain.common.exception.CommonErrorCode.ELASTIC_INTERNAL_ERROR;
-import static com.ureca.uble.entity.enums.InterestType.*;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AdminService {
 
+    @Value("${admin.code}")
+    private String adminCode;
+
     private final UsageHistoryDocumentRepository usageHistoryDocumentRepository;
     private final BrandClickLogDocumentRepository brandClickLogDocumentRepository;
     private final SearchLogDocumentRepository searchLogDocumentRepository;
     private final CustomSuggestionRepository customSuggestionRepository;
+    private final UserRepository userRepository;
+    private final JwtProvider jwtProvider;
+
+    /**
+     * Admin 인증
+     */
+    public AdminCodeRes verifyAdmin(Long userId, String providedCode, HttpServletResponse response){
+        User user = findUser(userId);
+
+        if(user.getRole() != Role.ADMIN){
+            throw new GlobalException(AdminErrorCode.NOT_ADMIN);
+        }
+
+        if(!MessageDigest.isEqual(providedCode.getBytes(), adminCode.getBytes())){
+            throw new GlobalException(AdminErrorCode.INVALID_ADMIN_CODE);
+        }
+
+        String accessToken = jwtProvider.createAccessToken(user);
+        String refreshToken = jwtProvider.createRefreshToken(user);
+
+        jwtProvider.addAccessTokenHeader(response, accessToken);
+        jwtProvider.addRefreshTokenCookie(response, refreshToken);
+
+        return new AdminCodeRes();
+    }
 
     /**
      * (통계) 제휴처/카테고리 이용 순위
@@ -188,5 +245,10 @@ public class AdminService {
         return grouped.entrySet().stream()
             .map(e -> GetInterestListRes.of(e.getKey(), new ArrayList<>(e.getValue().values())))
             .sorted(Comparator.comparing(GetInterestListRes::getDate)).toList();
+    }
+
+    private User findUser(Long userId){
+        return userRepository.findById(userId)
+            .orElseThrow(() -> new GlobalException(UserErrorCode.USER_NOT_FOUND));
     }
 }
