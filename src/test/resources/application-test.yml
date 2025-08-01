@@ -15,8 +15,7 @@ spring:
     username: test
     password: test
 logging:
-  level:
-    root: OFF
+  config: classpath:logback-test.xml
 
 dotenv:
   enabled: false
