@@ -18,6 +18,8 @@ public interface UsageCountRepository extends JpaRepository<UsageCount, Long> {
     @Query("SELECT uc FROM UsageCount uc WHERE uc.user = :user AND uc.benefit = :benefit")
     Optional<UsageCount> findByUserAndBenefitWithPessimisticLock(@Param("user") User user, @Param("benefit") Benefit benefit);
 
+    Optional<UsageCount> findByUserAndBenefit(User user, Benefit benefit);
+
     void deleteByUser(User user);
 
     @Modifying

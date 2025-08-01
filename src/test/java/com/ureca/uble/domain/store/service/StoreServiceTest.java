@@ -205,7 +205,7 @@ class StoreServiceTest {
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
         when(storeRepository.findByIdWithBrandAndCategoryAndBenefits(storeId)).thenReturn(Optional.of(mockStore));
-        when(usageCountRepository.findByUserAndBenefitWithPessimisticLock(any(), any())).thenReturn(Optional.empty());
+        when(usageCountRepository.findByUserAndBenefit(any(), any())).thenReturn(Optional.empty());
 
         when(mockUser.getRank()).thenReturn(Rank.VIP);
         when(mockUser.getGender()).thenReturn(Gender.FEMALE);
