@@ -47,4 +47,14 @@ public class Benefit extends BaseEntity {
         this.number = number;
         this.manual = manual;
     }
+
+    public static Benefit createTmpBenefit(Brand brand, Rank rank, Period period, Integer number) {
+        return Benefit.builder()
+            .brand(brand)
+            .rank(rank)
+            .content("혜택 설명")
+            .period(period)
+            .number(number)
+            .build();
+    }
 }

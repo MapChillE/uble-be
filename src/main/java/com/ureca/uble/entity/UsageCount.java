@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import static lombok.AccessLevel.PRIVATE;
 
 @Entity
-@Table(name="usage_count")
+@Table(name = "usage_count", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "benefit_id"}))
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UsageCount extends BaseEntity {
