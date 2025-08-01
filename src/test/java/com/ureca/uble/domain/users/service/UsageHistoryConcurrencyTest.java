@@ -71,8 +71,6 @@ public class UsageHistoryConcurrencyTest extends AbstractPostgresContainerTest {
         CreateUsageHistoryReq req = new CreateUsageHistoryReq(BenefitType.NORMAL);
 
         // when
-        long start = System.currentTimeMillis();
-
         int threadCount = 100;
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
         CountDownLatch latch = new CountDownLatch(threadCount);
@@ -94,7 +92,5 @@ public class UsageHistoryConcurrencyTest extends AbstractPostgresContainerTest {
         // then
         int finalCount = (int) usageHistoryDocumentRepository.count();
         assertThat(finalCount).isEqualTo(savedBenefit.getNumber());
-        long end = System.currentTimeMillis();
-        System.out.println("전체 병렬 처리 시간: " + (end - start) + " ms");
     }
 }
