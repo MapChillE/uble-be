@@ -122,13 +122,13 @@ public class BrandServiceTest {
 
 		List<Brand> mockBrands = List.of(brand1, brand2);
 
-		when(brandRepository.findWithFilterAndCursor(null, null, null, lastBrandId, size + 1))
+		when(brandRepository.findWithFilterAndCursor(null, null, null, null, lastBrandId, size + 1))
 			.thenReturn(mockBrands);
 		when(bookmarkRepository.findAllByUser(userId))
 			.thenReturn(List.of(2L));
 
 		// when
-		CursorPageRes<BrandListRes> result = brandService.getBrandList(userId, null, null, null, lastBrandId, size);
+		CursorPageRes<BrandListRes> result = brandService.getBrandList(userId, null, null, null, null, lastBrandId, size);
 
 		// then
 		assertThat(result.getContent()).hasSize(2);
