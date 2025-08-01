@@ -240,7 +240,7 @@ public class UsageHistoryServiceTest {
 		Benefit benefit = mock(Benefit.class);
 		when(benefit.getNumber()).thenReturn(3);
 		when(benefitRepository.findNormalBenefitByStoreId(storeId)).thenReturn(Optional.of(benefit));
-		when(usageCountRepository.findByUserAndBenefit(normalUser, benefit)).thenReturn(Optional.empty());
+		when(usageCountRepository.findByUserAndBenefitWithPessimisticLock(normalUser, benefit)).thenReturn(Optional.empty());
 
 		UsageHistoryDocument savedHistory = mock(UsageHistoryDocument.class);
 		when(savedHistory.getId()).thenReturn("savedId");
@@ -277,7 +277,7 @@ public class UsageHistoryServiceTest {
 
 		UsageCount usageCount = mock(UsageCount.class);
 		when(usageCount.getCount()).thenReturn(2);
-		when(usageCountRepository.findByUserAndBenefit(normalUser, benefit)).thenReturn(Optional.of(usageCount));
+		when(usageCountRepository.findByUserAndBenefitWithPessimisticLock(normalUser, benefit)).thenReturn(Optional.of(usageCount));
 
 		// when
 		GlobalException exception = assertThrows(GlobalException.class, () ->

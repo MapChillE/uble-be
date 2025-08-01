@@ -285,7 +285,7 @@ public class StoreService {
 
         if (benefit == null) return false;
 
-        Optional<UsageCount> optionalCount = usageCountRepository.findByUserAndBenefit(user, benefit);
+        Optional<UsageCount> optionalCount = usageCountRepository.findByUserAndBenefitWithPessimisticLock(user, benefit);
 
         return optionalCount.map(uc -> benefit.getPeriod() == Period.NONE || benefit.getNumber() > uc.getCount()).orElse(true);
     }

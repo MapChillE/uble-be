@@ -29,7 +29,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -206,7 +205,7 @@ class StoreServiceTest {
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
         when(storeRepository.findByIdWithBrandAndCategoryAndBenefits(storeId)).thenReturn(Optional.of(mockStore));
-        when(usageCountRepository.findByUserAndBenefit(any(), any())).thenReturn(Optional.empty());
+        when(usageCountRepository.findByUserAndBenefitWithPessimisticLock(any(), any())).thenReturn(Optional.empty());
 
         when(mockUser.getRank()).thenReturn(Rank.VIP);
         when(mockUser.getGender()).thenReturn(Gender.FEMALE);
