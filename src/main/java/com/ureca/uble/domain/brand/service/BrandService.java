@@ -80,7 +80,7 @@ public class BrandService {
 	 * 제휴처 전체 조회
 	 */
 	@Transactional(readOnly = true)
-	public CursorPageRes<BrandListRes> getBrandList(Long userId, Long categoryId, Season season, BenefitType type, Long lastBrandId, int size) {
+	public CursorPageRes<BrandListRes> getBrandList(Long userId, Long categoryId, Season season, BenefitType type, BenefitCategory benefitCategory, Long lastBrandId, int size) {
 
 		List<RankType> rankTypes = null;
 
@@ -92,7 +92,7 @@ public class BrandService {
 			}
 		}
 
-		List<Brand> brands = brandRepository.findWithFilterAndCursor(categoryId, season, rankTypes, lastBrandId, size+1);
+		List<Brand> brands = brandRepository.findWithFilterAndCursor(categoryId, season, rankTypes, benefitCategory, lastBrandId, size+1);
 
 		boolean hasNext = brands.size() > size;
 		if (hasNext) {

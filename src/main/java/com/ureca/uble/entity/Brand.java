@@ -1,5 +1,6 @@
 package com.ureca.uble.entity;
 
+import com.ureca.uble.entity.enums.BenefitCategory;
 import com.ureca.uble.entity.enums.Rank;
 import com.ureca.uble.entity.enums.RankType;
 import com.ureca.uble.entity.enums.Season;
@@ -54,12 +55,16 @@ public class Brand extends BaseEntity {
     @Column(name = "rank_type", nullable = false)
     private RankType rankType;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name="benefit_category")
+    private BenefitCategory benefitCategory;
+
     @OneToMany(mappedBy = "brand", fetch = FetchType.LAZY)
     private List<Benefit> benefits = new ArrayList<>();
 
     @Builder(access = PRIVATE)
     private Brand(Category category, String name, String csrNumber, String description, String imageUrl, Season season,
-        Boolean isOnline, Boolean isLocal, String reservationUrl, RankType rankType) {
+        Boolean isOnline, Boolean isLocal, String reservationUrl, RankType rankType, BenefitCategory benefitCategory) {
         this.category = category;
         this.name = name;
         this.csrNumber = csrNumber;
@@ -70,6 +75,7 @@ public class Brand extends BaseEntity {
         this.isLocal = isLocal;
         this.reservationUrl = reservationUrl;
         this.rankType = rankType;
+        this.benefitCategory = benefitCategory;
     }
 
     public boolean isVIPcock(){
