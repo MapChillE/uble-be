@@ -42,7 +42,7 @@ public class BrandController {
 		@RequestParam(required=false) Season season,
 		@Parameter(description = "필터링할 타입 : VIP 또는 LOCAL 또는 NORMAL", example = "VIP")
 		@RequestParam(required=false) BenefitType type,
-		@Parameter(description = "필터랑할 혜택 유형 : GIFT 또는 DISCOUNT", example = "GIFT")
+		@Parameter(description = "필터링할 혜택 유형 : GIFT 또는 DISCOUNT", example = "GIFT")
 		@RequestParam(required=false) BenefitCategory benefitCategory,
 		@Parameter(description = "마지막 제휴처 ID")
 		@RequestParam(required = false) Long lastBrandId,
