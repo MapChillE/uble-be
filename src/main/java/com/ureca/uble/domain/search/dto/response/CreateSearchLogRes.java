@@ -1,4 +1,4 @@
-package com.ureca.uble.domain.common.dto.response;
+package com.ureca.uble.domain.search.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
