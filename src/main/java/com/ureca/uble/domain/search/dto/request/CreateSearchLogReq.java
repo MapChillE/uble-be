@@ -1,4 +1,4 @@
-package com.ureca.uble.domain.common.dto.request;
+package com.ureca.uble.domain.search.dto.request;
 
 import com.ureca.uble.entity.enums.SearchType;
 import io.swagger.v3.oas.annotations.media.Schema;

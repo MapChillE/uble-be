@@ -99,4 +99,32 @@ public class CustomSearchLogDocumentRepositoryImpl implements CustomSearchLogDoc
 
         return (ElasticsearchAggregations) elasticsearchOperations.search(query, SearchLogDocument.class).getAggregations();
     }
+
+    @Override
+    public ElasticsearchAggregations getPopularKeywordList() {
+        // 최근 3시간 filter
+        Query filter = DateRangeQuery.of(r -> r
+            .field("createdAt")
+            .gte("now-3H/H")
+            .lte("now/H")
+        )._toRangeQuery()._toQuery();
+
+        Aggregation aggregation = Aggregation.of(a -> a
+            .terms(t -> t
+                .field("searchKeyword.raw")
+                .size(10)
+                .order(List.of(NamedValue.of("_count", SortOrder.Desc)))
+            )
+        );
+
+        NativeQuery query = NativeQuery.builder()
+            .withQuery(q -> q
+                .bool(b -> b.filter(List.of(filter)))
+            )
+            .withAggregation("top_keywords", aggregation)
+            .withMaxResults(0)
+            .build();
+
+        return (ElasticsearchAggregations) elasticsearchOperations.search(query, SearchLogDocument.class).getAggregations();
+    }
 }
