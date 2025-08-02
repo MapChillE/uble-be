@@ -80,8 +80,9 @@ public class JwtProvider {
 			.path("/")
 			.httpOnly(false)
 			.secure(isSecure)
-			.sameSite(cookieDomain.isBlank() ? null : cookieDomain)
 			.maxAge(REFRESH_TOKEN_VALIDITY_MILLIS / 1000)
+			.sameSite(sameSite)
+			.domain(cookieDomain.isBlank() ? null : cookieDomain)
 			.build();
 
 		response.addHeader("Set-Cookie", cookie.toString());
