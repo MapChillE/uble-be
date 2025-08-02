@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Schema(description = "인기 검색어 순위 정보 DTO")
 public class KeywordRankRes {
 
     @Schema(description = "검색어", example = "맛집")
