@@ -96,4 +96,23 @@ public class BrandController {
 			@RequestParam(defaultValue = "20") int size) {
 		return CommonResponse.success(brandService.getOfflineBrands(lastBrandId, size));
 	}
+
+	/**
+	 * 가장 가까운 제휴처 매장 위경도 조회
+	 *
+	 * @param latitude 위도
+	 * @param longitude 경도
+	 * @param brandId 제휴처 id
+	 */
+	@Operation(summary = "가장 가까운 제휴처 매장 위경도 조회", description = "가장 가까운 제휴처 매장 위경도 조회")
+	@GetMapping("/{brandId}/stores/nearest")
+	public CommonResponse<GetNearestStoreRes> getNearestStoreCoordination(
+		@Parameter(description = "위도", required = true)
+		@RequestParam double latitude,
+		@Parameter(description = "경도", required = true)
+		@RequestParam double longitude,
+		@Parameter(description = "제휴처 id", required = true)
+		@PathVariable Long brandId) {
+		return CommonResponse.success(brandService.getNearestStoreCoordination(latitude, longitude, brandId));
+	}
 }

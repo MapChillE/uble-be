@@ -1,9 +1,8 @@
 package com.ureca.uble.domain.store.repository;
 
-import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ureca.uble.entity.Store;
 import com.ureca.uble.entity.enums.BenefitType;
@@ -11,10 +10,9 @@ import com.ureca.uble.entity.enums.RankType;
 import com.ureca.uble.entity.enums.Season;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.List;
 
 import static com.ureca.uble.entity.QBrand.brand;
 import static com.ureca.uble.entity.QCategory.category;
@@ -69,6 +67,16 @@ public class CustomStoreRepositoryImpl implements CustomStoreRepository {
         return query.getResultList();
     }
 
+    @Override
+    public Store findNearestByBrandId(Long brandId, Double latitude, Double longitude) {
+        return jpaQueryFactory
+            .selectFrom(store)
+            .where(store.brand.id.eq(brandId))
+            .orderBy(distanceOrderSpec(latitude, longitude))
+            .limit(1)
+            .fetchOne();
+    }
+
     private String buildClusterQuery(Long categoryId, Long brandId, Season season, BenefitType type) {
         StringBuilder sql = new StringBuilder();
 
@@ -110,6 +118,16 @@ public class CustomStoreRepositoryImpl implements CustomStoreRepository {
                 case LOCAL -> sql.append(" AND b.is_local = true");
             }
         }
+    }
+
+    private OrderSpecifier<Double> distanceOrderSpec(Double latitude, Double longitude) {
+        return Expressions.numberTemplate(
+            Double.class,
+            "ST_Distance({0}, ST_SetSRID(ST_MakePoint({1}, {2}), 4326))",
+            store.location,
+            longitude,
+            latitude
+        ).asc();
     }
 
     public BooleanExpression getCondition(BenefitType type) {
