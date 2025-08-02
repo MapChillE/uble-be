@@ -2,7 +2,6 @@ package com.ureca.uble.global.config;
 
 import java.util.List;
 
-import com.ureca.uble.global.logging.LoggingFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -16,6 +15,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.ureca.uble.domain.users.repository.UserRepository;
+import com.ureca.uble.global.logging.LoggingFilter;
 import com.ureca.uble.global.security.jwt.JwtValidator;
 import com.ureca.uble.global.security.jwt.filter.JwtAuthenticationFilter;
 
@@ -40,6 +40,7 @@ public class SecurityConfig {
 			.formLogin(form -> form.disable())
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers("/api/auth/login", "/api/auth/reissue", "/api/auth/logout").permitAll()
+				.requestMatchers("/api/admin/verify").permitAll()
 				.requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
 				.requestMatchers("/health").permitAll()
 				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()

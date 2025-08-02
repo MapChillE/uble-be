@@ -55,7 +55,6 @@ public class AdminServiceTest {
 	@DisplayName("관리자 코드 검증에 성공하면 토큰이 헤더 및 쿠키에 설정된다.")
 	void verifyAdminSuccess() {
 		//given
-		Long userId = 1L;
 		String providedCode = "adminCode";
 		String accessToken = "access.token.value";
 		String refreshToken = "refresh.token.value";
@@ -64,14 +63,14 @@ public class AdminServiceTest {
 		User adminUser = User.createAdminUser("admin-kakao-id", "관리자");
 		Token token = mock(Token.class);
 
-		when(userRepository.findById(userId)).thenReturn(Optional.of(adminUser));
+		when(userRepository.findById(10000L)).thenReturn(Optional.of(adminUser));
 		when(tokenRepository.findByUser(adminUser)).thenReturn(Optional.of(token));
 		when(jwtProvider.createAccessToken(adminUser)).thenReturn(accessToken);
 		when(jwtProvider.createRefreshToken(adminUser)).thenReturn(refreshToken);
 		when(jwtProvider.getRefreshTokenExpiry(refreshToken)).thenReturn(expiryTime);
 
 		//when
-		AdminCodeRes res = adminService.verifyAdmin(userId, providedCode, response);
+		AdminCodeRes res = adminService.verifyAdmin(providedCode, response);
 
 		//then
 		verify(token).updateRefreshToken(refreshToken, expiryTime);
@@ -83,39 +82,14 @@ public class AdminServiceTest {
 
 
 	@Test
-	@DisplayName("유저가 ADMIN이 아닌 경우 관리자 코드 검증에 실패한다.")
-	void verifyAdminFailNotAdmin() {
-		//given
-		Long userId = 1L;
-		String providedCode = "adminCode";
-		User user = User.createTmpUser("user-id", "일반 유저");
-
-		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-
-		// when
-		GlobalException exception = catchThrowableOfType(
-			() -> adminService.verifyAdmin(userId, providedCode, response),
-			GlobalException.class
-		);
-
-		// then
-		assertThat(exception.getResultCode()).isEqualTo(AdminErrorCode.NOT_ADMIN);
-	}
-
-	@Test
 	@DisplayName("관리자 코드가 일치하지 않는 경우 관리자 코드 검증에 실패한다.")
 	void verifyAdminFailInvalidCode(){
 		//given
-		Long userId = 1L;
 		String providedCode = "Code";
-
-		User adminUser = User.createAdminUser("admin-kakao-id", "관리자");
-
-		when(userRepository.findById(userId)).thenReturn(Optional.of(adminUser));
 
 		// when
 		GlobalException exception = catchThrowableOfType(
-			() -> adminService.verifyAdmin(userId, providedCode, response),
+			() -> adminService.verifyAdmin(providedCode, response),
 			GlobalException.class
 		);
 

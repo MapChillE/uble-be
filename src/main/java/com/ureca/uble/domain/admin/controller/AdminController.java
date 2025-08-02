@@ -1,6 +1,5 @@
 package com.ureca.uble.domain.admin.controller;
 
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,13 +40,11 @@ public class AdminController {
     @Operation(summary = "Admin 인증", description = "code를 이용한 Admin 인증 수행")
     @PostMapping("/verify")
     public CommonResponse<AdminCodeRes> verifyAdmin(
-        @Parameter(description = "사용자정보", required = true)
-        @AuthenticationPrincipal Long userId,
         @Parameter(description = "관리자 인증 코드", required = true)
         @RequestBody AdminCodeReq request,
         HttpServletResponse response
         ){
-        return CommonResponse.success(adminService.verifyAdmin(userId, request.getCode(), response));
+        return CommonResponse.success(adminService.verifyAdmin(request.getCode(), response));
     }
 
     /**
