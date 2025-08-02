@@ -66,6 +66,7 @@ public class AuthService {
 
 		jwtProvider.addAccessTokenHeader(response, accessToken);
 		jwtProvider.addRefreshTokenCookie(response, refreshToken);
+		jwtProvider.addAuthCheckCookie(response);
 
 		return user;
 	}
@@ -92,6 +93,7 @@ public class AuthService {
 
 		jwtProvider.addAccessTokenHeader(response, newAccessToken);
 		jwtProvider.addRefreshTokenCookie(response, newRefreshToken);
+		jwtProvider.addAuthCheckCookie(response);
 	}
 
 	@Transactional
@@ -108,6 +110,7 @@ public class AuthService {
 		tokenRepository.deleteByUser(user);
 
 		jwtProvider.deleteRefreshTokenCookie(response);
+		jwtProvider.deleteAuthCheckCookie(response);
 	}
 
 	@Transactional
