@@ -5,6 +5,7 @@ import static com.ureca.uble.entity.enums.InterestType.*;
 
 import java.security.MessageDigest;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -27,12 +28,15 @@ import com.ureca.uble.domain.admin.dto.response.GetUsageRankListRes;
 import com.ureca.uble.domain.admin.dto.response.InterestDetailRes;
 import com.ureca.uble.domain.admin.dto.response.RankDetailRes;
 import com.ureca.uble.domain.admin.exception.AdminErrorCode;
+import com.ureca.uble.domain.auth.exception.AuthErrorCode;
 import com.ureca.uble.domain.brand.repository.BrandClickLogDocumentRepository;
 import com.ureca.uble.domain.common.repository.CustomSuggestionRepository;
 import com.ureca.uble.domain.store.repository.SearchLogDocumentRepository;
 import com.ureca.uble.domain.users.exception.UserErrorCode;
+import com.ureca.uble.domain.users.repository.TokenRepository;
 import com.ureca.uble.domain.users.repository.UsageHistoryDocumentRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
+import com.ureca.uble.entity.Token;
 import com.ureca.uble.entity.User;
 import com.ureca.uble.entity.enums.BenefitType;
 import com.ureca.uble.entity.enums.Gender;
@@ -60,6 +64,7 @@ public class AdminService {
     private final SearchLogDocumentRepository searchLogDocumentRepository;
     private final CustomSuggestionRepository customSuggestionRepository;
     private final UserRepository userRepository;
+    private final TokenRepository tokenRepository;
     private final JwtProvider jwtProvider;
 
     /**
@@ -76,11 +81,19 @@ public class AdminService {
             throw new GlobalException(AdminErrorCode.INVALID_ADMIN_CODE);
         }
 
+        Token token = tokenRepository.findByUser(user)
+            .orElseThrow(() -> new GlobalException(AuthErrorCode.INVALID_TOKEN));
+
         String accessToken = jwtProvider.createAccessToken(user);
         String refreshToken = jwtProvider.createRefreshToken(user);
+        LocalDateTime newExpiry = jwtProvider.getRefreshTokenExpiry(refreshToken);
+
+        token.updateRefreshToken(refreshToken, newExpiry);
+        tokenRepository.save(token);
 
         jwtProvider.addAccessTokenHeader(response, accessToken);
         jwtProvider.addRefreshTokenCookie(response, refreshToken);
+        jwtProvider.addAuthCheckCookie(response);
 
         return new AdminCodeRes();
     }

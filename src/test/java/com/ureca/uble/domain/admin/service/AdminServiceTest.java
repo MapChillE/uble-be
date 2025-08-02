@@ -3,7 +3,7 @@ package com.ureca.uble.domain.admin.service;
 import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.mockito.Mockito.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -17,11 +17,10 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import com.ureca.uble.domain.admin.dto.response.AdminCodeRes;
 import com.ureca.uble.domain.admin.exception.AdminErrorCode;
+import com.ureca.uble.domain.users.repository.TokenRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
+import com.ureca.uble.entity.Token;
 import com.ureca.uble.entity.User;
-import com.ureca.uble.entity.enums.Gender;
-import com.ureca.uble.entity.enums.Rank;
-import com.ureca.uble.entity.enums.Role;
 import com.ureca.uble.global.exception.GlobalException;
 import com.ureca.uble.global.security.jwt.JwtProvider;
 
@@ -35,6 +34,9 @@ public class AdminServiceTest {
 
 	@Mock
 	private UserRepository userRepository;
+
+	@Mock
+	private TokenRepository tokenRepository;
 
 	@Mock
 	private JwtProvider jwtProvider;
@@ -57,20 +59,28 @@ public class AdminServiceTest {
 		String providedCode = "adminCode";
 		String accessToken = "access.token.value";
 		String refreshToken = "refresh.token.value";
+		LocalDateTime expiryTime = LocalDateTime.now().plusDays(7);
 
 		User adminUser = User.createAdminUser("admin-kakao-id", "관리자");
+		Token token = mock(Token.class);
 
 		when(userRepository.findById(userId)).thenReturn(Optional.of(adminUser));
+		when(tokenRepository.findByUser(adminUser)).thenReturn(Optional.of(token));
 		when(jwtProvider.createAccessToken(adminUser)).thenReturn(accessToken);
 		when(jwtProvider.createRefreshToken(adminUser)).thenReturn(refreshToken);
+		when(jwtProvider.getRefreshTokenExpiry(refreshToken)).thenReturn(expiryTime);
 
 		//when
 		AdminCodeRes res = adminService.verifyAdmin(userId, providedCode, response);
 
 		//then
+		verify(token).updateRefreshToken(refreshToken, expiryTime);
+		verify(tokenRepository).save(token);
 		verify(jwtProvider).addAccessTokenHeader(response, accessToken);
 		verify(jwtProvider).addRefreshTokenCookie(response, refreshToken);
+		verify(jwtProvider).addAuthCheckCookie(response);
 	}
+
 
 	@Test
 	@DisplayName("유저가 ADMIN이 아닌 경우 관리자 코드 검증에 실패한다.")
@@ -112,5 +122,5 @@ public class AdminServiceTest {
 		// then
 		assertThat(exception.getResultCode()).isEqualTo(AdminErrorCode.INVALID_ADMIN_CODE);
 	}
-
 }
+

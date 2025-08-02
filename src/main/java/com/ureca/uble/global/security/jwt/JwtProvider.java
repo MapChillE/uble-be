@@ -75,10 +75,36 @@ public class JwtProvider {
 		response.addHeader("Set-Cookie", cookie.toString());
 	}
 
+	public void addAuthCheckCookie(HttpServletResponse response) {
+		ResponseCookie cookie = ResponseCookie.from("authCheck", "true")
+			.path("/")
+			.httpOnly(false)
+			.secure(isSecure)
+			.maxAge(REFRESH_TOKEN_VALIDITY_MILLIS / 1000)
+			.sameSite(sameSite)
+			.domain(cookieDomain.isBlank() ? null : cookieDomain)
+			.build();
+
+		response.addHeader("Set-Cookie", cookie.toString());
+	}
+
 	public void deleteRefreshTokenCookie(HttpServletResponse response){
 		ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
 			.path("/")
 			.httpOnly(true)
+			.secure(isSecure)
+			.maxAge(0)
+			.sameSite(sameSite)
+			.domain(cookieDomain.isBlank() ? null : cookieDomain)
+			.build();
+
+		response.addHeader("Set-Cookie", cookie.toString());
+	}
+
+	public void deleteAuthCheckCookie(HttpServletResponse response){
+		ResponseCookie cookie = ResponseCookie.from("authCheck", "")
+			.path("/")
+			.httpOnly(false)
 			.secure(isSecure)
 			.maxAge(0)
 			.sameSite(sameSite)
