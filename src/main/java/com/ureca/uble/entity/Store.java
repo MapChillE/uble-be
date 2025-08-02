@@ -28,7 +28,7 @@ public class Store extends BaseEntity {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(columnDefinition = "geography(Point,4326)")
+    @Column(columnDefinition = "geometry(Point,4326)")
     private Point location;
 
     @Column(name = "visit_count", nullable = false)
