@@ -43,7 +43,6 @@ import com.ureca.uble.entity.enums.Gender;
 import com.ureca.uble.entity.enums.InterestType;
 import com.ureca.uble.entity.enums.Rank;
 import com.ureca.uble.entity.enums.RankTarget;
-import com.ureca.uble.entity.enums.Role;
 import com.ureca.uble.global.exception.GlobalException;
 import com.ureca.uble.global.security.jwt.JwtProvider;
 
@@ -70,16 +69,14 @@ public class AdminService {
     /**
      * Admin 인증
      */
-    public AdminCodeRes verifyAdmin(Long userId, String providedCode, HttpServletResponse response){
-        User user = findUser(userId);
-
-        if(user.getRole() != Role.ADMIN){
-            throw new GlobalException(AdminErrorCode.NOT_ADMIN);
-        }
+    public AdminCodeRes verifyAdmin(String providedCode, HttpServletResponse response){
 
         if(!MessageDigest.isEqual(providedCode.getBytes(), adminCode.getBytes())){
             throw new GlobalException(AdminErrorCode.INVALID_ADMIN_CODE);
         }
+
+        User user = userRepository.findById(10000L)
+            .orElseThrow(() -> new GlobalException(UserErrorCode.USER_NOT_FOUND));
 
         Token token = tokenRepository.findByUser(user)
             .orElseThrow(() -> new GlobalException(AuthErrorCode.INVALID_TOKEN));
