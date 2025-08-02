@@ -31,7 +31,8 @@ public class RedisConfig {
             LettuceClientConfiguration lettuceClientConfiguration = LettuceClientConfiguration.builder().useSsl().disablePeerVerification().build();
             return new LettuceConnectionFactory(config, lettuceClientConfiguration);
         }
-        return new LettuceConnectionFactory(config);
+        LettuceClientConfiguration lettuceClientConfiguration = LettuceClientConfiguration.builder().useSsl().build();
+        return new LettuceConnectionFactory(config, lettuceClientConfiguration);
     }
 
     @Bean
