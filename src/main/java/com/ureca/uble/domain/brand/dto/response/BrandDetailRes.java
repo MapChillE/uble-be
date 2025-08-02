@@ -1,15 +1,14 @@
 package com.ureca.uble.domain.brand.dto.response;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ureca.uble.entity.Brand;
 import com.ureca.uble.entity.enums.Season;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
+
+import java.util.List;
 
 @Getter
 @Builder
@@ -36,6 +35,9 @@ public class BrandDetailRes {
 	@Schema(description = "카테고리", example = "푸드")
 	private String categoryName;
 
+	@Schema(description = "온라인 여부", example = "true")
+	private boolean isOnline;
+
 	@Schema(description = "북마크 여부", example = "true")
 	@JsonProperty("isBookmarked")
 	private boolean bookmarked;
@@ -60,11 +62,11 @@ public class BrandDetailRes {
 			.imgUrl(brand.getImageUrl())
 			.season(brand.getSeason())
 			.categoryName(brand.getCategory().getName())
+			.isOnline(brand.getIsOnline())
 			.bookmarked(isBookmarked)
 			.bookmarkId(bookmarkId)
 			.vipcock(isVIPcock)
 			.benefits(benefits)
 			.build();
 	}
-
 }
