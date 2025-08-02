@@ -4,16 +4,17 @@ import co.elastic.clients.elasticsearch.core.MsearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.ureca.uble.domain.bookmark.repository.BookmarkRepository;
 import com.ureca.uble.domain.brand.dto.response.*;
-import com.ureca.uble.domain.brand.exception.BrandErrorCode;
 import com.ureca.uble.domain.brand.repository.BrandClickLogDocumentRepository;
 import com.ureca.uble.domain.brand.repository.BrandNoriDocumentRepository;
 import com.ureca.uble.domain.brand.repository.BrandRepository;
 import com.ureca.uble.domain.common.dto.response.CursorPageRes;
 import com.ureca.uble.domain.common.repository.CustomSuggestionRepository;
 import com.ureca.uble.domain.store.repository.SearchLogDocumentRepository;
+import com.ureca.uble.domain.store.repository.StoreRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.Bookmark;
 import com.ureca.uble.entity.Brand;
+import com.ureca.uble.entity.Store;
 import com.ureca.uble.entity.User;
 import com.ureca.uble.entity.document.BrandClickLogDocument;
 import com.ureca.uble.entity.document.BrandNoriDocument;
@@ -28,6 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+import static com.ureca.uble.domain.brand.exception.BrandErrorCode.BRAND_NOT_FOUND;
+import static com.ureca.uble.domain.brand.exception.BrandErrorCode.BRAND_NOT_OFFLINE;
 import static com.ureca.uble.domain.common.exception.CommonErrorCode.ELASTIC_INTERNAL_ERROR;
 import static com.ureca.uble.domain.users.exception.UserErrorCode.USER_NOT_FOUND;
 
@@ -43,6 +46,7 @@ public class BrandService {
 	private final UserRepository userRepository;
 	private final SearchLogDocumentRepository searchLogDocumentRepository;
 	private final CustomSuggestionRepository customSuggestionRepository;
+	private final StoreRepository storeRepository;
 
 	/**
 	 * 제휴처 상세 조회
@@ -51,7 +55,7 @@ public class BrandService {
 	public BrandDetailRes getBrandDetail(Long userId, Long brandId) {
 		User user = findUser(userId);
 		Brand brand = brandRepository.findWithBenefitsById(brandId)
-			.orElseThrow(() -> new GlobalException(BrandErrorCode.BRAND_NOT_FOUND));
+			.orElseThrow(() -> new GlobalException(BRAND_NOT_FOUND));
 
 		Optional<Bookmark> optionalBookmark = bookmarkRepository.findByUserIdAndBrandId(userId, brandId);
 		boolean isBookmarked = optionalBookmark.isPresent();
@@ -183,10 +187,6 @@ public class BrandService {
 		return new BrandSuggestionListRes(res);
 	}
 
-	private User findUser(Long userId) {
-		return userRepository.findById(userId).orElseThrow(() -> new GlobalException(USER_NOT_FOUND));
-	}
-
 	/**
 	 * offline 브랜드 목록(이름+이미지) 조회
 	 */
@@ -202,5 +202,29 @@ public class BrandService {
 
 		Long newLastId = content.isEmpty() ? null : content.get(content.size() - 1).getId();
 		return CursorPageRes.of(content, hasNext, newLastId);
+	}
+
+	/**
+	 * 가장 가까운 제휴처 매장 위경도 조회
+	 */
+    public GetNearestStoreRes getNearestStoreCoordination(Double latitude, Double longitude, Long brandId) {
+		Brand brand = findBrand(brandId);
+		if(brand.getIsOnline()) {
+			throw new GlobalException(BRAND_NOT_OFFLINE);
+		}
+
+		Store store = storeRepository.findNearestByBrandId(brandId, latitude, longitude);
+		if (store.getLocation() == null || store.getLocation().isEmpty()) {
+			throw new GlobalException(BRAND_NOT_OFFLINE);
+		}
+		return GetNearestStoreRes.from(store);
+    }
+
+	private Brand findBrand(Long brandId) {
+		return brandRepository.findById(brandId).orElseThrow(() -> new GlobalException(BRAND_NOT_FOUND));
+	}
+
+	private User findUser(Long userId) {
+		return userRepository.findById(userId).orElseThrow(() -> new GlobalException(USER_NOT_FOUND));
 	}
 }
