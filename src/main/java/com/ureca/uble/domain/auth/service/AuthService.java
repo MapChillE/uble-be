@@ -72,28 +72,34 @@ public class AuthService {
 	}
 
 	public void reissue(String refreshToken, HttpServletResponse response){
-		if (!jwtValidator.validateToken(refreshToken)) {
-			throw new GlobalException(AuthErrorCode.INVALID_TOKEN);
-		}
-		Long userId = jwtValidator.getUserIdAndRole(refreshToken).getUserId();
+		try {
+			if (!jwtValidator.validateToken(refreshToken)) {
+				throw new GlobalException(AuthErrorCode.INVALID_TOKEN);
+			}
+			Long userId = jwtValidator.getUserIdAndRole(refreshToken).getUserId();
 
-		User user = userRepository.findById(userId)
+			User user = userRepository.findById(userId)
 				.orElseThrow(() -> new GlobalException(UserErrorCode.USER_NOT_FOUND));
 
-		Token token = tokenRepository.findByRefreshToken(refreshToken)
+			Token token = tokenRepository.findByRefreshToken(refreshToken)
 				.orElseThrow(() -> new GlobalException(AuthErrorCode.INVALID_TOKEN));
 
+			String newAccessToken = jwtProvider.createAccessToken(user);
+			String newRefreshToken = jwtProvider.createRefreshToken(user);
+			LocalDateTime newExpiry = jwtProvider.getRefreshTokenExpiry(newRefreshToken);
 
-		String newAccessToken = jwtProvider.createAccessToken(user);
-		String newRefreshToken = jwtProvider.createRefreshToken(user);
-		LocalDateTime newExpiry = jwtProvider.getRefreshTokenExpiry(newRefreshToken);
+			token.updateRefreshToken(newRefreshToken, newExpiry);
+			tokenRepository.save(token);
 
-		token.updateRefreshToken(newRefreshToken, newExpiry);
-		tokenRepository.save(token);
+			jwtProvider.addAccessTokenHeader(response, newAccessToken);
+			jwtProvider.addRefreshTokenCookie(response, newRefreshToken);
+			jwtProvider.addAuthCheckCookie(response);
 
-		jwtProvider.addAccessTokenHeader(response, newAccessToken);
-		jwtProvider.addRefreshTokenCookie(response, newRefreshToken);
-		jwtProvider.addAuthCheckCookie(response);
+		} catch (GlobalException e) {
+			jwtProvider.deleteRefreshTokenCookie(response);
+			jwtProvider.deleteAuthCheckCookie(response);
+			throw e;
+		}
 	}
 
 	@Transactional
