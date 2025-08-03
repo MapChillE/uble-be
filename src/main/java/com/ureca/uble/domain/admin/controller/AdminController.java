@@ -1,19 +1,31 @@
 package com.ureca.uble.domain.admin.controller;
 
-import com.ureca.uble.domain.admin.dto.response.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.ureca.uble.domain.admin.dto.request.AdminCodeReq;
+import com.ureca.uble.domain.admin.dto.response.AdminCodeRes;
+import com.ureca.uble.domain.admin.dto.response.GetClickRankListRes;
+import com.ureca.uble.domain.admin.dto.response.GetDailySearchRankListRes;
+import com.ureca.uble.domain.admin.dto.response.GetEmptySearchRankListRes;
+import com.ureca.uble.domain.admin.dto.response.GetInterestChangeRes;
+import com.ureca.uble.domain.admin.dto.response.GetLocalRankListRes;
+import com.ureca.uble.domain.admin.dto.response.GetUsageRankListRes;
 import com.ureca.uble.domain.admin.service.AdminService;
 import com.ureca.uble.domain.common.dto.response.CommonResponse;
 import com.ureca.uble.entity.enums.BenefitType;
 import com.ureca.uble.entity.enums.Gender;
 import com.ureca.uble.entity.enums.Rank;
 import com.ureca.uble.entity.enums.RankTarget;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,6 +33,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminController {
 
     private final AdminService adminService;
+
+    /**
+     * Admin 인증
+     */
+    @Operation(summary = "Admin 인증", description = "code를 이용한 Admin 인증 수행")
+    @PostMapping("/verify")
+    public CommonResponse<AdminCodeRes> verifyAdmin(
+        @Parameter(description = "관리자 인증 코드", required = true)
+        @RequestBody AdminCodeReq request,
+        HttpServletResponse response
+        ){
+        return CommonResponse.success(adminService.verifyAdmin(request.getCode(), response));
+    }
 
     /**
      * (통계) 제휴처/카테고리 이용 순위

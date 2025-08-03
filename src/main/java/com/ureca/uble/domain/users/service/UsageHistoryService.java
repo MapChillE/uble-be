@@ -8,7 +8,6 @@ import com.ureca.uble.domain.users.dto.response.UsageHistoryListRes;
 import com.ureca.uble.domain.users.dto.response.UsageHistoryRes;
 import com.ureca.uble.domain.users.repository.UsageCountRepository;
 import com.ureca.uble.domain.users.repository.UsageHistoryDocumentRepository;
-import com.ureca.uble.domain.users.repository.UsageHistoryRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.Benefit;
 import com.ureca.uble.entity.Store;
@@ -39,7 +38,6 @@ import static com.ureca.uble.domain.users.exception.UserErrorCode.USER_NOT_FOUND
 @RequiredArgsConstructor
 public class UsageHistoryService {
 
-	private final UsageHistoryRepository usageRepository;
 	private final UsageCountRepository usageCountRepository;
 	private final UserRepository userRepository;
 	private final BenefitRepository benefitRepository;
@@ -110,7 +108,7 @@ public class UsageHistoryService {
 
 	private void handleNormalBenefit(User user, Long storeId) {
 		Benefit benefit = findBenefitByStoreId(storeId);
-		Optional<UsageCount> optionalCount = usageCountRepository.findByUserAndBenefit(user, benefit);
+		Optional<UsageCount> optionalCount = usageCountRepository.findByUserAndBenefitWithPessimisticLock(user, benefit);
 
 		if (optionalCount.isEmpty()) { // 새로운 count 생성
 			UsageCount usageCount = UsageCount.of(user, benefit, benefit.getNumber() > 1, 1);

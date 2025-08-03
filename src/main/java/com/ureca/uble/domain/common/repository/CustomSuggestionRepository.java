@@ -52,7 +52,7 @@ public class CustomSuggestionRepository {
                 .header(h -> h.index("brand-suggestion"))
                 .body(b -> b
                     .size(brandSize)
-                    .query(getBrandQuery(keyword, false))
+                    .query(getBrandQuery(keyword, false, false))
                 )
             )
             .build();
@@ -118,7 +118,7 @@ public class CustomSuggestionRepository {
                 .header(h -> h.index("brand-suggestion"))
                 .body(b -> b
                     .size(brandSize)
-                    .query(getBrandQuery(keyword, true))
+                    .query(getBrandQuery(keyword, true, true))
                 )
             )
             .searches(s -> s
@@ -305,7 +305,17 @@ public class CustomSuggestionRepository {
         )._toQuery();
     }
 
-    private Query getBrandQuery(String keyword, boolean isOfflineOnly) {
+    private Query getBrandQuery(String keyword, boolean isOfflineOnly, boolean isNotLocal) {
+        List<Query> filters = new ArrayList<>();
+
+        if (isOfflineOnly) {
+            filters.add(TermQuery.of(t -> t.field("isOnline").value(false))._toQuery());
+        }
+
+        if (isNotLocal) {
+            filters.add(TermQuery.of(t -> t.field("isLocal").value(false))._toQuery());
+        }
+
         Query multiMatchQuery = MultiMatchQuery.of(m -> m
             .query(keyword)
             .fields(
@@ -321,15 +331,10 @@ public class CustomSuggestionRepository {
             .type(TextQueryType.BestFields)
         )._toQuery();
 
-        if (isOfflineOnly) {
+        if (!filters.isEmpty()) {
             return BoolQuery.of(b -> b
                 .must(multiMatchQuery)
-                .filter(f -> f
-                    .term(t -> t
-                        .field("isOnline")
-                        .value(false)
-                    )
-                )
+                .filter(filters)
             )._toQuery();
         }
         return multiMatchQuery;

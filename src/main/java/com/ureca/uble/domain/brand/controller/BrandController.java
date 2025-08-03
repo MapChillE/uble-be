@@ -4,6 +4,7 @@ import com.ureca.uble.domain.brand.dto.response.*;
 import com.ureca.uble.domain.brand.service.BrandService;
 import com.ureca.uble.domain.common.dto.response.CommonResponse;
 import com.ureca.uble.domain.common.dto.response.CursorPageRes;
+import com.ureca.uble.entity.enums.BenefitCategory;
 import com.ureca.uble.entity.enums.BenefitType;
 import com.ureca.uble.entity.enums.Season;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,12 +42,14 @@ public class BrandController {
 		@RequestParam(required=false) Season season,
 		@Parameter(description = "필터링할 타입 : VIP 또는 LOCAL 또는 NORMAL", example = "VIP")
 		@RequestParam(required=false) BenefitType type,
+		@Parameter(description = "필터링할 혜택 유형 : GIFT 또는 DISCOUNT", example = "GIFT")
+		@RequestParam(required=false) BenefitCategory benefitCategory,
 		@Parameter(description = "마지막 제휴처 ID")
 		@RequestParam(required = false) Long lastBrandId,
 		@Parameter(description = "한 번에 가져올 크기")
 		@RequestParam(defaultValue = "5") int size
 	){
-		return CommonResponse.success(brandService.getBrandList(userId, categoryId, season, type, lastBrandId, size));
+		return CommonResponse.success(brandService.getBrandList(userId, categoryId, season, type, benefitCategory, lastBrandId, size));
 	}
 
 	@Operation(summary = "(검색) 제휴처 브랜드 전체 리스트 조회")
@@ -92,5 +95,24 @@ public class BrandController {
 			@Parameter(description = "한 번에 가져올 개수", example = "20")
 			@RequestParam(defaultValue = "20") int size) {
 		return CommonResponse.success(brandService.getOfflineBrands(lastBrandId, size));
+	}
+
+	/**
+	 * 가장 가까운 제휴처 매장 위경도 조회
+	 *
+	 * @param latitude 위도
+	 * @param longitude 경도
+	 * @param brandId 제휴처 id
+	 */
+	@Operation(summary = "가장 가까운 제휴처 매장 위경도 조회", description = "가장 가까운 제휴처 매장 위경도 조회")
+	@GetMapping("/{brandId}/stores/nearest")
+	public CommonResponse<GetNearestStoreRes> getNearestStoreCoordination(
+		@Parameter(description = "위도", required = true)
+		@RequestParam double latitude,
+		@Parameter(description = "경도", required = true)
+		@RequestParam double longitude,
+		@Parameter(description = "제휴처 id", required = true)
+		@PathVariable Long brandId) {
+		return CommonResponse.success(brandService.getNearestStoreCoordination(latitude, longitude, brandId));
 	}
 }

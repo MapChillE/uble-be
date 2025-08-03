@@ -28,7 +28,7 @@ public class Store extends BaseEntity {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(columnDefinition = "geography(Point,4326)")
+    @Column(columnDefinition = "geometry(Point,4326)")
     private Point location;
 
     @Column(name = "visit_count", nullable = false)
@@ -42,5 +42,13 @@ public class Store extends BaseEntity {
         this.phoneNumber = phoneNumber;
         this.location = location;
         this.visitCount = visitCount;
+    }
+
+    public static Store createTmpStore(Brand brand) {
+        return Store.builder()
+            .brand(brand)
+            .name("tmp Store")
+            .visitCount(0)
+            .build();
     }
 }

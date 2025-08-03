@@ -8,11 +8,11 @@
 ## 🧑🏻‍💻 팀원 소개
 <div align="center">
   
-|                                         양여은                                          |                                         변하영                                          |                                                       한현우                                                       |
+|                                         👑 양여은                                          |                                         변하영                                          |                                                       한현우                                                       |
 | :-------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------: |
 |       <img width="160px" src="https://avatars.githubusercontent.com/Yyang-YE" />        |       <img width="160px" src="https://avatars.githubusercontent.com/hayong39" />        |                    <img width="160px" src="https://avatars.githubusercontent.com/Eric-HAN-01"/>                    |
 |                        [@Yyang-YE](https://github.com/Yyang-YE)                         |                        [@hayong39](https://github.com/hayong39)                         |                                   [@Eric-HAN-01](https://github.com/Eric-HAN-01)                                   |
-| 👑 BE 개발 팀장 <br>인프라 관리 <br> 검색 기능 <br> 즐겨찾기 기능 <br> 로깅 기능 | 인프라 관리 <br> 소셜 로그인 기능 <br> 제휴처 목록 조회 기능 <br> 제휴처 매장 추천 기능 <br> 로깅 기능 | 데이터 전처리 <br>통계 관리 기능 <br> 피드백 등록 및 조회 기능 <br> 나의 위치 관리 기능 <br> 지도 반경 필터링 기능 |
+|  통계 관리 기능 <br>인프라 관리 <br> 검색 기능 <br> 즐겨찾기 기능 <br> 로깅 기능 | 인프라 관리 <br> 소셜 로그인 기능 <br> 제휴처 목록 조회 기능 <br> 제휴처 매장 추천 기능 <br> 로깅 기능 | 데이터 전처리  <br> 피드백 등록 및 조회 기능 <br> 나의 위치 관리 기능 <br> 지도 반경 필터링 기능 <br> 매장 마커 클러스터링 |
 
 </div>
 
@@ -24,7 +24,10 @@
 - 로그아웃 및 탈퇴 
 - 회원 정보 (멤버십 등급/바코드, 생년월일, 성별, 관심 카테고리) 수정
 - 제휴처 즐겨찾기 등록/삭제/조회
-- (통계) 카테고리 별 즐겨찾기 및 이용 횟수 비율 조회
+- (통계) 가장 많이 사용한 카테고리 및 제휴처 브랜드
+- (통계) 가장 많이 사용한 날짜, 요일, 시간
+- (통계) 비슷한 유저 평균 대비 사용량
+- (통계) 월별 사용량 내역
 
 ### 2. 제휴처 조회 기능
 - 제휴처 전체 조회 및 필터링
@@ -32,13 +35,14 @@
 - 제휴처 이름/카테고리 기반 검색 및 자동완성
 
 ### 3. 지도 기반 매장 조회 기능
-- 현재 또는 지정 위치 기반 근처 제휴처 매장 조회
-- 제휴처 매장 상세 조회
+- 현재 또는 지정 위치 기반 근처 제휴처 매장 조회 (클러스터링 적용)
+- 제휴처 매장 상세 조회 
 - 제휴처 이름, 매장 이름, 카테고리 기반 검색 및 자동완성
 - 자주 가는 곳 등록/삭제
 
 ### 4. 로깅 기능
 - 유저별 검색 기록, 제휴처 조회 기록, 매장 조회 기록을 로깅
+- 콘솔 로그 모니터링 및 에러 로그 감지 알림 시스템
 - 오래된 로그를 정기적으로 S3에 업로드하여 관리
 
 ### 5. 추천 기능
@@ -46,22 +50,39 @@
 - 추천 결과 캐싱
 
 ### 6. 관리자 기능
-- (통계) 사용자 이용 내역 카테고리 내 제휴사 순위 조회
-- (통계) 사용자 이용 내역 월단위 조회
-- (통계) 즐겨찾기 카테고리 내 제휴사 순위 조회
+- (통계) 제휴처/카테고리 클릭 순위
+- (통계) 상위 10개 제휴처 대상 관심사 변화 추이
+- (통계) 일별 인기 검색어 순위
+- (통계) 결과 미포함 검색어 순위
+- (통계) 서울 지역구 이용 순위
+- (통계) 제휴처/카테고리 이용 순위
 
 ### 7. 피드백 기능
 - 서비스에 대한 피드백 등록/조회
 
 <br><br><br>
 
-## 💾 ERD
-<img width="2331" height="1821" alt="Uble ERD" src="https://github.com/user-attachments/assets/187e2db7-844b-488f-b829-ede63f6c01e5" />
+## 💾 DB
+### 1. RDB
+<img width="1964" height="1742" alt="ERD_BASIC 1" src="https://github.com/user-attachments/assets/3e7179f7-e7d7-47f2-a7ac-0183c117d7f3" />
+
+<br><br>
+
+### 2. ES
+**1) 검색용 INDEX**
+
+<img width="2062" height="1027" alt="ERD_SEARCH 1" src="https://github.com/user-attachments/assets/9fbde427-7051-4e91-ba2c-d657994315e4" />
+
+<br><br>
+
+**2) 통계용 INDEX**
+   
+<img width="1519" height="1061" alt="ERD_STATISTICS 2" src="https://github.com/user-attachments/assets/f46bba87-5d07-4462-8757-4bf4afef48f7" />
 
 <br><br><br>
 
 ## 🛠️ 시스템 아키텍처
-<img width="9497" height="6106" alt="Group 427320379" src="https://github.com/user-attachments/assets/ca1886db-c0ec-46b5-9e1d-4796caafb603" />
+<img width="10327" height="6106" alt="Group 427320386" src="https://github.com/user-attachments/assets/4ab6df8a-7bd0-4de8-a576-0638e27856b2" />
 
 ---
 
@@ -74,14 +95,13 @@
   |:-----------|:---------------------------------------------------------------|:------------------------------------------|
   |<img src="https://img.shields.io/badge/Spring_Boot-6DB33F?style=flat&logo=spring-boot&logoColor=white"/>| SpringBoot (ver. 3.5.3)                                        | Backend FrameWork                         |
   |<img src="https://img.shields.io/badge/Spring_Security-6DB33F?style=flat&logo=springsecurity&logoColor=white"/><br><img src="https://img.shields.io/badge/OAuth2-000000?style=flat&logo=OAuth2&logoColor=white"/><br><img src="https://img.shields.io/badge/JWT-000000?style=flat&logo=jsonwebtokens&logoColor=white"/>| Spring Security (ver.6.5.1) <br> OAuth2 <br> JWT (ver. 0.12.6) | 인증/인가 시스템 구축<br>소셜 로그인<br>stateless 인증 구현 |
-  | <img src="https://img.shields.io/badge/Spring_Data_JPA-6DB33F?style=flat&logo=spring&logoColor=white"/> | Spring Data JPA (ver. 3.5.1) | 객체 지향적 데이터 처리 로직 구현 |
+  | <img src="https://img.shields.io/badge/Spring_Data_JPA-6DB33F?style=flat&logo=spring&logoColor=white"/> | Spring Data JPA (ver. 3.5.1) | 데이터 접근 계층을 단순화 및 유지보수성 향상 |
   |<img src="https://img.shields.io/badge/QueryDSL-52B0E7?style=flat&logo=querydsl&logoColor=white"/>| QueryDSL (ver. 5.1.0)                                          | 타입 안정성을 보장하는 동적 쿼리 작성                  |
   |<img src="https://img.shields.io/badge/Spring_Batch-6DB33F?style=flat&logo=spring&logoColor=white"/>| Spring Batch (ver. 3.5.3)                                      | 대량 데이터의 정기적 처리 로직 구현                      |
   |<img src="https://img.shields.io/badge/Springdoc_Swagger-6DB33F?style=flat&logo=Springdoc_Swagger&logoColor=white"/>| Springdoc Swagger (ver. 2.2.25)                                | API 명세 문서 자동 생성                           |
   |<img src="https://img.shields.io/badge/Mockito-6DB33F?style=flat&logo=mockito&logoColor=white"/><br><img src="https://img.shields.io/badge/JUnit5-25A162?style=flat&logo=junit5&logoColor=white"/>| Mockito (ver. 5.2.0) <br> JUnit5 (ver. 5.12.2)                 | 테스트 프레임워크                                 |
-  |<img src="https://img.shields.io/badge/ElasticSearch-005571?style=flat&logo=elasticsearch&logoColor=white"/>| Elasticsearch (ver. 8.17.4)                                    | 검색 엔진 및 로깅 시스템 구축                         |
-  |<img src="https://img.shields.io/badge/Kibana-005571?style=flat&logo=kibana&logoColor=white"/>| Kibana (ver. 8.17.4)                                           | 로그/검색 결과 시각화 및 모니터링 지원                    |
   |<img src="https://img.shields.io/badge/fastapi-009688?style=flat&logo=FastAPI&logoColor=white"/>| FastAPI (ver. 0.116.1)                                         | 추천 시스템 서버 구축                              |
+  
 <br>
 
 ### DataBase
@@ -91,6 +111,17 @@
   | <img src="https://img.shields.io/badge/pgvector-%23316192.svg?style=flat&logo=pgvector&logoColor=white"/> | PGVector                | 추천 시스템의 임베딩 기반 유사도 계산 시 vector 정보 저장 |
   |<img src="https://img.shields.io/badge/postgis-%23316192.svg?style=flat&logo=postgis&logoColor=white"/>| PostGIS                 | 특정 거리 내 매장 정보 조회 시 사용                |
   | <img src="https://img.shields.io/badge/Redis-DC382D?style=flat&logo=redis&logoColor=white"/> | Redis                   | 스케줄러 분산 락 적용 및 세션 캐싱을 통한 응답 속도 개선    |
+
+<br>
+
+### Logging
+|                                                                                                              | 사용 기술         | 역할                                                  |
+  |:-------------------------------------------------------------------------------------------------------------|:--------------|:----------------------------------------------------|
+| <img src="https://img.shields.io/badge/Filebeat-3ebeb0?style=flat&logo=filebeat&logoColor=white"/>           | Filebeat      | 컨테이너 내 JSON 로그 파일을 실시간으로 수집하여 Logstash로 전송          |
+| <img src="https://img.shields.io/badge/Logstash-f3bd19?style=flat&logo=logstash&logoColor=white"/>           | Logstash      | Filebeat로부터 전달된 로그를 파싱, 변환, 필터링하여 Elasticsearch에 적재 |
+| <img src="https://img.shields.io/badge/Elasticsearch-07a5de?style=flat&logo=elasticsearch&logoColor=white"/> | Elasticsearch | 검색 엔진 / 인덱스 기반으로 로그를 저장, 빠른 검색 지원                   |
+| <img src="https://img.shields.io/badge/Kibana-ec407a?style=flat&logo=kibana&logoColor=white"/>               | Kibana        | 검색 결과 시각화 및 모니터링 지원 / 로그 시각화를 통해 용이한 로그 분석 가능       |
+
 
 <br>
 
@@ -107,12 +138,22 @@
 
 <br><br><br>
 
+## ⚙️ 기술 선택 근거
+| 선택 기술                                                                                                                                           | 대안                           | 비교 설명                                                                                                                                           |
+|:------------------------------------------------------------------------------------------------------------------------------------------------|:-----------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------|
+| PostgreSQL + PostGIS                                                                                                                            | MySQL                        | PostgreSQL은 PostGIS 확장을 통해 반경 내 매장 검색, 거리 계산 기능을 지원합니다. MySQL도 공간 쿼리를 제공하지만 정확도와 기능이 제한적이라 PostgreSQL을 선택하였습니다.                                 |
+| pgvector                                                                                                                                        | Elasticsearch Vector / Faiss | pgvector는 벡터와 RDB 데이터를 하나의 DB에서 통합 관리할 수 있습니다. ElasticSearch는 텍스트 검색에는 강점이 있지만 벡터 정확도 측면에서 불리하며, Faiss는 별도의 인프라 관리가 필요하여 pgvector를 선택하였습니다. |
+| ELK (Elasticsearch, Logstash, Kibana)                                                                                                           | AWS CloudWatch Agent             | ELK는 오픈소스 기반이고, Logstash을 활용한 커스텀 필드 정규화와 FastAPI와 Spring의 로그 통합이 가능합니다. CloudWatch Agent는 AWS 서비스에 종속적이며 커스텀 처리 유연성이 낮아 ELK를 선택하였습니다.                |
+
+<br><br><br>
+
 ## ⚖️ 컨벤션
 
 ### **[ PACKAGE STRUCTURE ]**
 
 ```
 📁 domain
+ ├─ 📁 admin
  ├─ 📁 auth
  ├─ 📁 bookmark
  │   ├─ 📁 controller
@@ -126,6 +167,7 @@
  ├─ 📁 category
  ├─ 📁 common
  ├─ 📁 feedback
+ ├─ 📁 pin
  ├─ 📁 store
  └─ 📁 users
 
@@ -136,6 +178,7 @@
 📁 global
  ├─ 📁 config
  ├─ 📁 exception
+ ├─ 📁 logging
  ├─ 📁 schedule
  └─ 📁 security
 
@@ -243,12 +286,6 @@ Ex. [UBLE-12] fix: 즐겨찾기 DTO 수정
 <br><br><br>
 
 ## [📚 Github Wiki]()
-**DOCUMENT**
-<ul>
-  <li><a href=""> 🛠️ 프로젝트 수행 현황</a></li>
-  <li><a href=""> 🏗️ DB 설계 </a></li>
-</ul>
-
 **STUDY**
 <ul>
   <li><a href="https://github.com/MapChillE/uble-be/wiki/%5BSTUDY%5D-%EC%9D%B4%EC%9A%A9-%EB%82%B4%EC%97%AD-%EC%B4%88%EA%B8%B0%ED%99%94%EB%A5%BC-%EC%9C%84%ED%95%9C-%EC%8A%A4%EC%BC%80%EC%A4%84%EB%9F%AC-%EC%A0%81%EC%9A%A9%EA%B8%B0"> 📆 이용 내역 초기화를 위한 스케줄러 적용기</a></li>

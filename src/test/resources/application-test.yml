@@ -1,17 +1,47 @@
 spring:
-  datasource:
-    url: jdbc:h2:mem:test
-    driverClassName: org.h2.Driver
-    username: sa
-    password:
   jpa:
+    open-in-view: false
     hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
       ddl-auto: create
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    sql:
+      init:
+        mode: always
+        encoding: UTF-8
+  elasticsearch:
+    uris: http://localhost
+    username: test
+    password: test
+logging:
+  config: classpath:logback-test.xml
+
+dotenv:
+  enabled: false
+
 kakao:
-  client-id: ${KAKAO_CLIENT_ID}
-  redirect-uri: ${KAKAO_REDIRECT_URI}
+  client-id: test-client-id
+  redirect-uri: http://localhost/test
+
 jwt:
-  secret: ${JWT_SECRET}
+  secret: test-secret
   access-token-validity: 1800000
   refresh-token-validity: 604800000
+  cookie:
+    domain: .example.com
+    secure: false
+    same-site: None
+
+fastapi:
+  uris: http://localhost:8000
+
+domain:
+  base-url: example.com
+  dev-base-url: example.com
+
+elasticsearch:
+  backup:
+    bucket-name: test-bucket
+admin:
+  code: test

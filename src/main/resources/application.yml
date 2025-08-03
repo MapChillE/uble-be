@@ -28,6 +28,13 @@ spring:
     username: ${ELASTIC_USERNAME}
     password: ${ELASTIC_PASSWORD}
 
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      ssl:
+        enabled: false
+
 springdoc:
   swagger-ui:
     enabled: true
@@ -58,3 +65,6 @@ domain:
 elasticsearch:
   backup:
       bucket-name: ${BUCKET_NAME}
+
+admin:
+  code: ${ADMIN_CODE}
