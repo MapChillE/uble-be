@@ -1,10 +1,7 @@
 package com.ureca.uble.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.locationtech.jts.geom.Point;
 
 import static lombok.AccessLevel.PRIVATE;
@@ -34,14 +31,18 @@ public class Store extends BaseEntity {
     @Column(name = "visit_count", nullable = false)
     private int visitCount;
 
+    @Column(name = "s2_cell_id")
+    private Long s2CellId;
+
     @Builder(access = PRIVATE)
-    private Store(Brand brand, String name, String address, String phoneNumber, Point location, int visitCount) {
+    private Store(Brand brand, String name, String address, String phoneNumber, Point location, int visitCount, Long s2CellId) {
         this.brand = brand;
         this.name = name;
         this.address = address;
         this.phoneNumber = phoneNumber;
         this.location = location;
         this.visitCount = visitCount;
+        this.s2CellId = s2CellId;
     }
 
     public static Store createTmpStore(Brand brand) {
