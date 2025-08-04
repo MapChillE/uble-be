@@ -8,7 +8,7 @@ import com.ureca.uble.domain.brand.repository.BrandClickLogDocumentRepository;
 import com.ureca.uble.domain.brand.repository.BrandNoriDocumentRepository;
 import com.ureca.uble.domain.brand.repository.BrandRepository;
 import com.ureca.uble.domain.common.dto.response.CursorPageRes;
-import com.ureca.uble.domain.common.repository.CustomSuggestionRepository;
+import com.ureca.uble.domain.common.repository.CustomElasticRepository;
 import com.ureca.uble.domain.store.repository.SearchLogDocumentRepository;
 import com.ureca.uble.domain.store.repository.StoreRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
@@ -45,7 +45,7 @@ public class BrandService {
 	private final BrandClickLogDocumentRepository brandClickLogDocumentRepository;
 	private final UserRepository userRepository;
 	private final SearchLogDocumentRepository searchLogDocumentRepository;
-	private final CustomSuggestionRepository customSuggestionRepository;
+	private final CustomElasticRepository customElasticRepository;
 	private final StoreRepository storeRepository;
 
 	/**
@@ -159,7 +159,7 @@ public class BrandService {
 	public BrandSuggestionListRes getBrandSuggestionList(String keyword, int size) {
 		MsearchResponse<Map> response;
 		try {
-			response = customSuggestionRepository.findBrandSuggestionsByKeywordWithMsearch(keyword, 2, size - 2);
+			response = customElasticRepository.findBrandSuggestionsByKeywordWithMsearch(keyword, 2, size - 2);
 		} catch (Exception e) {
 			throw new GlobalException(ELASTIC_INTERNAL_ERROR);
 		}

@@ -15,7 +15,7 @@ public class GlobalExceptionHandler {
     // GlobalException 발생 시 반환 형태
     @ExceptionHandler(GlobalException.class)
     public ResponseEntity<CommonResponse<Void>> handleException(GlobalException e) {
-        log.warn("GlobalException occurred: code={}, status={}, message={}",
+        log.error("GlobalException occurred: code={}, status={}, message={}",
             e.getResultCode().getCode(),
             e.getResultCode().getStatus(),
             e.getResultCode().getMessage(),

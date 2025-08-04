@@ -1,15 +1,16 @@
 package com.ureca.uble.domain.store.service;
 
 import com.ureca.uble.domain.bookmark.repository.BookmarkRepository;
-import com.ureca.uble.domain.common.repository.CustomSuggestionRepository;
 import com.ureca.uble.domain.store.dto.response.GetStoreDetailRes;
 import com.ureca.uble.domain.store.dto.response.GetStoreListRes;
 import com.ureca.uble.domain.store.dto.response.GetStoreSummaryRes;
 import com.ureca.uble.domain.store.repository.StoreClickLogDocumentRepository;
 import com.ureca.uble.domain.store.repository.StoreRepository;
-import com.ureca.uble.domain.users.repository.UsageCountRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
-import com.ureca.uble.entity.*;
+import com.ureca.uble.entity.Brand;
+import com.ureca.uble.entity.Category;
+import com.ureca.uble.entity.Store;
+import com.ureca.uble.entity.User;
 import com.ureca.uble.entity.document.StoreClickLogDocument;
 import com.ureca.uble.entity.enums.Gender;
 import com.ureca.uble.entity.enums.Rank;
@@ -46,15 +47,11 @@ class StoreServiceTest {
     @Mock
     private UserRepository userRepository;
     @Mock
-    private UsageCountRepository usageCountRepository;
-    @Mock
     private StoreRepository storeRepository;
     @Mock
     private BookmarkRepository bookmarkRepository;
     @Mock
     private StoreClickLogDocumentRepository storeClickLogDocumentRepository;
-    @Mock
-    private CustomSuggestionRepository customSuggestionRepository;
 
     private Store mockStore;
     private User mockUser;
