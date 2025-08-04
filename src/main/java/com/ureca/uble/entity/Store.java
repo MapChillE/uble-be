@@ -1,10 +1,7 @@
 package com.ureca.uble.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.locationtech.jts.geom.Point;
 
 import static lombok.AccessLevel.PRIVATE;
@@ -12,6 +9,7 @@ import static lombok.AccessLevel.PRIVATE;
 @Entity
 @Table(name="store")
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Store extends BaseEntity {
 
@@ -33,6 +31,9 @@ public class Store extends BaseEntity {
 
     @Column(name = "visit_count", nullable = false)
     private int visitCount;
+
+    @Column(name = "s2_cell_id")
+    private Long s2CellId;
 
     @Builder(access = PRIVATE)
     private Store(Brand brand, String name, String address, String phoneNumber, Point location, int visitCount) {

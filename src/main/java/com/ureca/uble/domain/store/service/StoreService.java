@@ -2,6 +2,10 @@ package com.ureca.uble.domain.store.service;
 
 import co.elastic.clients.elasticsearch.core.MsearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
+import com.google.common.geometry.S2CellId;
+import com.google.common.geometry.S2LatLng;
+import com.google.common.geometry.S2LatLngRect;
+import com.google.common.geometry.S2RegionCoverer;
 import com.ureca.uble.domain.bookmark.repository.BookmarkRepository;
 import com.ureca.uble.domain.common.repository.CustomSuggestionRepository;
 import com.ureca.uble.domain.store.dto.response.*;
@@ -39,6 +43,10 @@ public class StoreService {
     private final LocationCoordinationDocumentRepository locationCoordinationDocumentRepository;
     private final CustomSuggestionRepository customSuggestionRepository;
 
+    private static final int MAP_MAX_ZOOM = 21;
+    private static final int FULL_RETURN_ZOOM_THRESHOLD = 16;
+    private static final int MIN_ZOOM_LEVEL = 12;
+
     /**
      * 근처 매장 정보 조회
      */
@@ -46,53 +54,77 @@ public class StoreService {
     public GetStoreListRes getStores(int zoomLevel, double swLat, double swLng, double neLat, double neLng,
                                      Long categoryId, Long brandId, Season season, BenefitType type) {
 
+        // 입력값 검증 (줌 레벨, 좌표 범위)
         validateZoomAndRange(zoomLevel, swLat, swLng, neLat, neLng);
 
-        if (isFullReturnZoom(zoomLevel)) {
-            List<Store> stores = storeRepository.findStoresInBox(
-                    swLng, swLat, neLng, neLat,
-                    categoryId, brandId, season, type
-            );
-
-            List<GetStoreRes> responseList = stores.stream()
-                    .map(GetStoreRes::from)
-                    .toList();
-            return new GetStoreListRes(zoomLevel, responseList);
-        }
-
-        double gridSize = resolveGridSize(zoomLevel);
-
-        List<Store> stores = storeRepository.findClusterRepresentatives(
+        // 지정된 사각형 영역 내의 매장들을 필터 조건에 맞게 조회
+        List<Store> rawStores = storeRepository.findStoresInBox(
                 swLng, swLat, neLng, neLat,
-                categoryId, brandId, season, type,
-                gridSize
+                categoryId, brandId, season, type
         );
 
-        List<GetStoreRes> responseList = stores.stream()
-                .map(GetStoreRes::from)
+        // 클러스터링 없이 모든 매장 반환
+        if (zoomLevel >= FULL_RETURN_ZOOM_THRESHOLD) {
+            List<GetStoreRes> fullList = rawStores.stream()
+                    .map(GetStoreRes::from)
+                    .toList();
+            return new GetStoreListRes(zoomLevel, fullList);
+        }
+
+        // 낮은 줌 레벨: S2 셀 기반 클러스터링으로 대표 매장만 반환 (지도를 넓게 볼 때)
+        return createClusteredStoreListResponseFromDB(zoomLevel, swLat, swLng, neLat, neLng,
+                categoryId, brandId, season, type);
+    }
+
+    /**
+     * S2 셀 기반 클러스터링 후 대표 매장 반환
+     */
+    private GetStoreListRes createClusteredStoreListResponseFromDB(int zoomLevel, double swLat, double swLng,
+                                                                   double neLat, double neLng, Long categoryId,
+                                                                   Long brandId, Season season, BenefitType type) {
+        // 줌 레벨에 따른 S2 셀 크기 결정
+        int cellLevel = getCellLevelFromZoom(zoomLevel);
+
+        // 지도에서 보고 있는 사각형 영역을 덮는 S2 셀 목록 구하기
+        S2LatLng sw = S2LatLng.fromDegrees(swLat, swLng);
+        S2LatLng ne = S2LatLng.fromDegrees(neLat, neLng);
+        S2LatLngRect rect = S2LatLngRect.fromPointPair(sw, ne);
+
+        S2RegionCoverer coverer = S2RegionCoverer.builder()
+                .setMinLevel(cellLevel)
+                .setMaxLevel(cellLevel)
+                .build();
+
+        ArrayList<S2CellId> coveringCells = new ArrayList<>();
+        coverer.getCovering(rect, coveringCells);
+
+        // 각 셀의 대표 매장을 DB에서 직접 조회
+        List<GetStoreRes> responseList = coveringCells.parallelStream()
+                .map(cellId -> {
+                    long rangeMin = cellId.rangeMin().id();
+                    long rangeMax = cellId.rangeMax().id();
+                    return storeRepository.findRepresentativeStoreInCell(
+                            rangeMin, rangeMax, categoryId, brandId, season, type
+                    );
+                })
+                .filter(Optional::isPresent)
+                .map(optStore -> GetStoreRes.from(optStore.get()))
                 .toList();
+
         return new GetStoreListRes(zoomLevel, responseList);
     }
 
+    private int getCellLevelFromZoom(int zoomLevel) {
+        return zoomLevel;
+    }
+
     private void validateZoomAndRange(int zoomLevel, double swLat, double swLng, double neLat, double neLng) {
-        if (zoomLevel > 22 || zoomLevel <= 9) {
-            throw new GlobalException(OUT_OF_RANGE_INPUT);
-        }
         if (swLat >= neLat || swLng >= neLng) {
             throw new GlobalException(OUT_OF_RANGE_INPUT);
         }
-    }
-
-    private boolean isFullReturnZoom(int zoomLevel) {
-        return zoomLevel >= 16;
-    }
-
-    private double resolveGridSize(int zoomLevel) {
-        if (zoomLevel == 15) return 0.004;
-        if (zoomLevel == 14) return 0.01;
-        if (zoomLevel == 13) return 0.014;
-        if (zoomLevel == 12) return 0.025;
-        return 0.05; // zoomLevel 10~11
+        if (zoomLevel < MIN_ZOOM_LEVEL || zoomLevel > MAP_MAX_ZOOM) {
+            throw new GlobalException(OUT_OF_RANGE_INPUT);
+        }
     }
 
     /**

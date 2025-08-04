@@ -5,14 +5,15 @@ import com.ureca.uble.entity.enums.BenefitType;
 import com.ureca.uble.entity.enums.Season;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CustomStoreRepository {
     List<Store> findStoresInBox(double swLng, double swLat, double neLng, double neLat,
                                 Long categoryId, Long brandId, Season season, BenefitType type);
 
-    List<Store> findClusterRepresentatives(double swLng, double swLat, double neLng, double neLat,
-                                           Long categoryId, Long brandId, Season season, BenefitType type,
-                                           double gridSize);
-
     Store findNearestByBrandId(Long brandId, Double latitude, Double longitude);
+
+    Optional<Store> findRepresentativeStoreInCell(long rangeMin, long rangeMax,
+                                                  Long categoryId, Long brandId,
+                                                  Season season, BenefitType type);
 }
