@@ -1,5 +1,6 @@
 package com.ureca.uble.domain.store.repository;
 
+import com.google.common.geometry.S2CellId;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
@@ -27,6 +28,44 @@ public class CustomStoreRepositoryImpl implements CustomStoreRepository {
     private final EntityManager em;
 
     /**
+     * 여러 S2 셀 범위에 포함되는 모든 매장을 한 번의 쿼리로 조회
+     */
+    @Override
+    public List<Store> findStoresInCellRanges(List<S2CellId> cellIds, Long categoryId, Long brandId, Season season, BenefitType type) {
+        if (cellIds == null || cellIds.isEmpty()) {
+            return List.of();
+        }
+
+        return jpaQueryFactory
+                .select(store)
+                .from(store)
+                .innerJoin(store.brand, brand).fetchJoin()
+                .innerJoin(brand.category, category).fetchJoin()
+                .where(
+                        cellsContain(cellIds), // 동적으로 OR 조건 생성
+                        categoryIdEq(categoryId),
+                        brandIdEq(brandId),
+                        seasonEq(season),
+                        typeEq(type)
+                )
+                .fetch();
+    }
+
+    // 여러 S2CellId에 대한 OR 조건을 동적으로 생성하는 메소드
+    private BooleanExpression cellsContain(List<S2CellId> cellIds) {
+        BooleanExpression expression = null;
+        for (S2CellId cellId : cellIds) {
+            BooleanExpression rangeCondition = store.s2CellId.between(cellId.rangeMin().id(), cellId.rangeMax().id());
+            if (expression == null) {
+                expression = rangeCondition;
+            } else {
+                expression = expression.or(rangeCondition);
+            }
+        }
+        return expression;
+    }
+
+    /**
      * 근처 매장 정보 조회
      */
     @Override
@@ -45,28 +84,6 @@ public class CustomStoreRepositoryImpl implements CustomStoreRepository {
                 categoryIdEq(categoryId), brandIdEq(brandId), seasonEq(season), typeEq(type)
             )
             .fetch();
-    }
-
-    @Override
-    public Optional<Store> findRepresentativeStoreInCell(
-            long rangeMin, long rangeMax, Long categoryId,
-            Long brandId, Season season, BenefitType type) {
-        Store result = jpaQueryFactory
-                .selectFrom(store)
-                .innerJoin(store.brand, brand).fetchJoin()
-                .innerJoin(brand.category, category).fetchJoin()
-                .where(
-                        store.s2CellId.between(rangeMin, rangeMax),
-                        categoryIdEq(categoryId),
-                        brandIdEq(brandId),
-                        seasonEq(season),
-                        typeEq(type)
-                )
-                .orderBy(store.visitCount.desc(), store.id.asc())
-                .limit(1)
-                .fetchOne();
-
-        return Optional.ofNullable(result);
     }
 
     @Override
