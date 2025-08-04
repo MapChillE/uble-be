@@ -7,6 +7,7 @@ import co.elastic.clients.elasticsearch._types.aggregations.CalendarInterval;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.MsearchRequest;
 import co.elastic.clients.elasticsearch.core.MsearchResponse;
+import co.elastic.clients.elasticsearch.core.msearch.MultisearchBody;
 import co.elastic.clients.util.NamedValue;
 import com.ureca.uble.domain.common.util.SearchFilterUtils;
 import com.ureca.uble.domain.store.dto.response.GetGlobalSuggestionRes;
@@ -238,6 +239,127 @@ public class CustomElasticRepository {
         return (ElasticsearchAggregations) elasticsearchOperations
             .search(query, classType)
             .getAggregations();
+    }
+
+    /**
+     * 어드민 대시보드 조회
+     */
+    public MsearchResponse<Map> getDashboardInfo() throws IOException {
+        MsearchRequest request = new MsearchRequest.Builder()
+            .searches(s -> s // MAU, Usage Count, top brand, top local
+                .header(h -> h.index("usage-history-log"))
+                .body(getMauAndUsageCountAndBrandRankAndLocalRank())
+            )
+            .searches(s -> s // brand count
+                .header(h -> h.index("brand-suggestion"))
+                .body(getBrandCountQuery())
+            )
+            .searches(s -> s // store count
+                .header(h -> h.index("store-suggestion"))
+                .body(getStoreCountQuery())
+            )
+            .searches(s -> s // 인기 검색어
+                .header(h -> h.index("search-log"))
+                .body(getSearchKeywordRank())
+            )
+            .build();
+        return elasticsearchClient.msearch(request, Map.class);
+    }
+
+    private MultisearchBody getMauAndUsageCountAndBrandRankAndLocalRank() {
+        // 이번 달 MAU, Usage
+        Aggregation curMauAgg = Aggregation.of(a -> a
+            .filter(f -> f.bool(b -> b.filter(getCurMonthFilter())))
+            .aggregations("total_user_count", Aggregation.of(sub -> sub
+                .cardinality(c -> c.field("userId"))
+            ))
+        );
+
+        // 저번 달 MAU, Usage
+        Aggregation lastMauAgg = Aggregation.of(a -> a
+            .filter(f -> f.bool(b -> b.filter(getLastMonthFilter())))
+            .aggregations("total_user_count", Aggregation.of(sub -> sub
+                .cardinality(c -> c.field("userId"))
+            ))
+        );
+
+        // 이번 달 top 이용 Brand
+        Aggregation topBrandAgg = Aggregation.of(a -> a
+            .filter(f -> f.bool(b -> b.filter(getTodayFilter())))
+            .aggregations("top_usage_brand", sub -> sub
+                .terms(t -> t
+                    .field("brandName")
+                    .size(5)
+                )
+            )
+        );
+
+        // 이번 달 top 이용 지역
+        Aggregation topLocalAgg = Aggregation.of(a -> a
+            .filter(f -> f.bool(b -> b
+                .filter(getTodayFilter())
+                .mustNot(TermQuery.of(t -> t.field("storeLocal").value(""))._toQuery())
+            ))
+            .aggregations("top_usage_local", sub -> sub
+                .terms(t -> t
+                    .field("storeLocal")
+                    .size(5)
+                )
+            )
+        );
+
+        return new MultisearchBody.Builder()
+            .size(0)
+            .aggregations("cur_mau", curMauAgg)
+            .aggregations("last_mau", lastMauAgg)
+            .aggregations("top_usage_brand", topBrandAgg)
+            .aggregations("top_usage_local", topLocalAgg)
+            .build();
+    }
+
+    private MultisearchBody getBrandCountQuery() {
+        return new MultisearchBody.Builder().size(0).build();
+    }
+
+    private MultisearchBody getStoreCountQuery() {
+        return new MultisearchBody.Builder().size(0).build();
+    }
+
+    private MultisearchBody getSearchKeywordRank() {
+        return new MultisearchBody.Builder()
+            .size(0)
+            .query(getTodayFilter())
+            .aggregations("top_keyword", a -> a
+                .terms(t -> t
+                    .field("searchKeyword.raw")
+                    .size(10)
+                )
+            )
+            .build();
+    }
+
+    private Query getCurMonthFilter() {
+        return DateRangeQuery.of(r -> r
+            .field("createdAt")
+            .gte("now/M")
+            .lte("now")
+        )._toRangeQuery()._toQuery();
+    }
+
+    private Query getLastMonthFilter() {
+        return DateRangeQuery.of(r -> r
+            .field("createdAt")
+            .gte("now-1M/M")
+            .lt("now/M")
+        )._toRangeQuery()._toQuery();
+    }
+
+    private Query getTodayFilter() {
+        return DateRangeQuery.of(r -> r
+            .field("createdAt")
+            .gte("now/d")
+            .lte("now")
+        )._toRangeQuery()._toQuery();
     }
 
     private Query getNearestStoreQuery(SuggestionType type, String name) {

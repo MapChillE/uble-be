@@ -1,5 +1,6 @@
 package com.ureca.uble.domain.admin.controller;
 
+import com.ureca.uble.domain.admin.dto.response.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -8,13 +9,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ureca.uble.domain.admin.dto.request.AdminCodeReq;
-import com.ureca.uble.domain.admin.dto.response.AdminCodeRes;
-import com.ureca.uble.domain.admin.dto.response.GetClickRankListRes;
-import com.ureca.uble.domain.admin.dto.response.GetDailySearchRankListRes;
-import com.ureca.uble.domain.admin.dto.response.GetEmptySearchRankListRes;
-import com.ureca.uble.domain.admin.dto.response.GetInterestChangeRes;
-import com.ureca.uble.domain.admin.dto.response.GetLocalRankListRes;
-import com.ureca.uble.domain.admin.dto.response.GetUsageRankListRes;
 import com.ureca.uble.domain.admin.service.AdminService;
 import com.ureca.uble.domain.common.dto.response.CommonResponse;
 import com.ureca.uble.entity.enums.BenefitType;
@@ -183,5 +177,14 @@ public class AdminController {
         @Parameter(description = "혜택 타입 ")
         @RequestParam(required = false) BenefitType benefitType) {
         return CommonResponse.success(adminService.getInterestChange(gender, ageRange, rank, benefitType));
+    }
+
+    /**
+     * 대시보드 조회
+     */
+    @Operation(summary = "대시보드 조회", description = "대시보드 조회")
+    @GetMapping("/dashboard")
+    public CommonResponse<GetDashBoardRes> getDashboardInfo () {
+        return CommonResponse.success(adminService.getDashboardInfo());
     }
 }
