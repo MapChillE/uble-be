@@ -9,7 +9,6 @@ import static lombok.AccessLevel.PRIVATE;
 @Entity
 @Table(name="store")
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Store extends BaseEntity {
 
@@ -36,13 +35,14 @@ public class Store extends BaseEntity {
     private Long s2CellId;
 
     @Builder(access = PRIVATE)
-    private Store(Brand brand, String name, String address, String phoneNumber, Point location, int visitCount) {
+    private Store(Brand brand, String name, String address, String phoneNumber, Point location, int visitCount, Long s2CellId) {
         this.brand = brand;
         this.name = name;
         this.address = address;
         this.phoneNumber = phoneNumber;
         this.location = location;
         this.visitCount = visitCount;
+        this.s2CellId = s2CellId;
     }
 
     public static Store createTmpStore(Brand brand) {
