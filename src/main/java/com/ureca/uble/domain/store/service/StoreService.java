@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.ureca.uble.domain.common.exception.CommonErrorCode.ELASTIC_INTERNAL_ERROR;
 import static com.ureca.uble.domain.store.exception.StoreErrorCode.OUT_OF_RANGE_INPUT;
@@ -57,14 +58,12 @@ public class StoreService {
         // 입력값 검증 (줌 레벨, 좌표 범위)
         validateZoomAndRange(zoomLevel, swLat, swLng, neLat, neLng);
 
-        // 지정된 사각형 영역 내의 매장들을 필터 조건에 맞게 조회
-        List<Store> rawStores = storeRepository.findStoresInBox(
-                swLng, swLat, neLng, neLat,
-                categoryId, brandId, season, type
-        );
-
         // 클러스터링 없이 모든 매장 반환
         if (zoomLevel >= FULL_RETURN_ZOOM_THRESHOLD) {
+            List<Store> rawStores = storeRepository.findStoresInBox(
+                    swLng, swLat, neLng, neLat,
+                    categoryId, brandId, season, type
+            );
             List<GetStoreRes> fullList = rawStores.stream()
                     .map(GetStoreRes::from)
                     .toList();
@@ -77,39 +76,37 @@ public class StoreService {
     }
 
     /**
-     * S2 셀 기반 클러스터링 후 대표 매장 반환
+     * S2 셀 기반 클러스터링 후 대표 매장 반환 (DB 접근 1회)
      */
     private GetStoreListRes createClusteredStoreListResponseFromDB(int zoomLevel, double swLat, double swLng,
                                                                    double neLat, double neLng, Long categoryId,
                                                                    Long brandId, Season season, BenefitType type) {
         // 줌 레벨에 따른 S2 셀 크기 결정
         int cellLevel = getCellLevelFromZoom(zoomLevel);
-
-        // 지도에서 보고 있는 사각형 영역을 덮는 S2 셀 목록 구하기
-        S2LatLng sw = S2LatLng.fromDegrees(swLat, swLng);
-        S2LatLng ne = S2LatLng.fromDegrees(neLat, neLng);
-        S2LatLngRect rect = S2LatLngRect.fromPointPair(sw, ne);
-
-        S2RegionCoverer coverer = S2RegionCoverer.builder()
-                .setMinLevel(cellLevel)
-                .setMaxLevel(cellLevel)
-                .build();
-
+        // 지도 화면의 남서쪽(sw)과 북동쪽(ne) 모서리 좌표를 이용해 사각형 영역 객체를 생성
+        S2LatLngRect rect = S2LatLngRect.fromPointPair(S2LatLng.fromDegrees(swLat, swLng), S2LatLng.fromDegrees(neLat, neLng));
+        S2RegionCoverer coverer = S2RegionCoverer.builder().setMinLevel(cellLevel).setMaxLevel(cellLevel).build();
         ArrayList<S2CellId> coveringCells = new ArrayList<>();
         coverer.getCovering(rect, coveringCells);
 
-        // 각 셀의 대표 매장을 DB에서 직접 조회
-        List<GetStoreRes> responseList = coveringCells.parallelStream()
-                .map(cellId -> {
-                    long rangeMin = cellId.rangeMin().id();
-                    long rangeMax = cellId.rangeMax().id();
-                    return storeRepository.findRepresentativeStoreInCell(
-                            rangeMin, rangeMax, categoryId, brandId, season, type
-                    );
-                })
-                .filter(Optional::isPresent)
-                .map(optStore -> GetStoreRes.from(optStore.get()))
-                .toList();
+        // 셀 목록에 포함되는 모든 매장 정보를 한 번에 조회
+        List<Store> storesInCells = storeRepository.findStoresInCellRanges(coveringCells, categoryId, brandId, season, type);
+
+        // 애플리케이션에서 대표 매장 그룹화
+        Map<Long, Store> representativeStores = new HashMap<>();
+        for (Store store : storesInCells) {
+            S2LatLng latLng = S2LatLng.fromDegrees(store.getLocation().getY(), store.getLocation().getX());
+            S2CellId parentCellId = S2CellId.fromLatLng(latLng).parent(cellLevel);
+
+            Store existingRepresentative = representativeStores.get(parentCellId.id());
+            if (existingRepresentative == null || store.getVisitCount() > existingRepresentative.getVisitCount()) {
+                representativeStores.put(parentCellId.id(), store);
+            }
+        }
+
+        List<GetStoreRes> responseList = representativeStores.values().stream()
+                .map(GetStoreRes::from)
+                .collect(Collectors.toList());
 
         return new GetStoreListRes(zoomLevel, responseList);
     }
