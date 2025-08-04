@@ -31,7 +31,7 @@ import java.util.Map;
 
 @Repository
 @RequiredArgsConstructor
-public class CustomSuggestionRepository {
+public class CustomElasticRepository {
 
     private final ElasticsearchOperations elasticsearchOperations;
     private final ElasticsearchClient elasticsearchClient;

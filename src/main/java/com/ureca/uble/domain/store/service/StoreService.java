@@ -3,7 +3,7 @@ package com.ureca.uble.domain.store.service;
 import co.elastic.clients.elasticsearch.core.MsearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.ureca.uble.domain.bookmark.repository.BookmarkRepository;
-import com.ureca.uble.domain.common.repository.CustomSuggestionRepository;
+import com.ureca.uble.domain.common.repository.CustomElasticRepository;
 import com.ureca.uble.domain.store.dto.response.*;
 import com.ureca.uble.domain.store.repository.LocationCoordinationDocumentRepository;
 import com.ureca.uble.domain.store.repository.StoreClickLogDocumentRepository;
@@ -37,7 +37,7 @@ public class StoreService {
     private final BookmarkRepository bookmarkRepository;
     private final StoreClickLogDocumentRepository storeClickLogDocumentRepository;
     private final LocationCoordinationDocumentRepository locationCoordinationDocumentRepository;
-    private final CustomSuggestionRepository customSuggestionRepository;
+    private final CustomElasticRepository customElasticRepository;
 
     /**
      * 근처 매장 정보 조회
@@ -158,7 +158,7 @@ public class StoreService {
         int BRAND_SUGGESTION_SIZE = 2;
         MsearchResponse<Map> firstResponse;
         try {
-            firstResponse = customSuggestionRepository.findCoordinationAndBrandAndCategoryWithMSearch(keyword, CATEGORY_SUGGESTION_SIZE, BRAND_SUGGESTION_SIZE);
+            firstResponse = customElasticRepository.findCoordinationAndBrandAndCategoryWithMSearch(keyword, CATEGORY_SUGGESTION_SIZE, BRAND_SUGGESTION_SIZE);
         } catch (Exception e) {
             throw new GlobalException(ELASTIC_INTERNAL_ERROR);
         }
@@ -205,7 +205,7 @@ public class StoreService {
         // 최종 검색 실행
         MsearchResponse<Map> secondResponse;
         try {
-            secondResponse = customSuggestionRepository.findMapSuggestionsByKeywordWithMsearch(keyword, size - (res.size()), latitude, longitude, res);
+            secondResponse = customElasticRepository.findMapSuggestionsByKeywordWithMsearch(keyword, size - (res.size()), latitude, longitude, res);
         } catch (Exception e) {
             throw new GlobalException(ELASTIC_INTERNAL_ERROR);
         }
