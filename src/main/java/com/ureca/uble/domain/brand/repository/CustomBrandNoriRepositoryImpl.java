@@ -29,7 +29,7 @@ public class CustomBrandNoriRepositoryImpl implements CustomBrandNoriRepository 
         // 쿼리 작성
         Query multiMatchQuery = MultiMatchQuery.of(m -> m
             .query(keyword)
-            .fields("brandName^10","category^20", "season^20")
+            .fields("brandName.raw","brandName","category^2", "season^2")
             .fuzziness("AUTO")
         )._toQuery();
 
