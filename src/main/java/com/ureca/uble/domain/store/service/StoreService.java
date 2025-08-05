@@ -2,8 +2,12 @@ package com.ureca.uble.domain.store.service;
 
 import co.elastic.clients.elasticsearch.core.MsearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
+import com.google.common.geometry.S2CellId;
+import com.google.common.geometry.S2LatLng;
+import com.google.common.geometry.S2LatLngRect;
+import com.google.common.geometry.S2RegionCoverer;
 import com.ureca.uble.domain.bookmark.repository.BookmarkRepository;
-import com.ureca.uble.domain.common.repository.CustomSuggestionRepository;
+import com.ureca.uble.domain.common.repository.CustomElasticRepository;
 import com.ureca.uble.domain.store.dto.response.*;
 import com.ureca.uble.domain.store.repository.LocationCoordinationDocumentRepository;
 import com.ureca.uble.domain.store.repository.StoreClickLogDocumentRepository;
@@ -20,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.ureca.uble.domain.common.exception.CommonErrorCode.ELASTIC_INTERNAL_ERROR;
 import static com.ureca.uble.domain.store.exception.StoreErrorCode.OUT_OF_RANGE_INPUT;
@@ -37,7 +42,11 @@ public class StoreService {
     private final BookmarkRepository bookmarkRepository;
     private final StoreClickLogDocumentRepository storeClickLogDocumentRepository;
     private final LocationCoordinationDocumentRepository locationCoordinationDocumentRepository;
-    private final CustomSuggestionRepository customSuggestionRepository;
+    private final CustomElasticRepository customElasticRepository;
+
+    private static final int MAP_MAX_ZOOM = 21;
+    private static final int FULL_RETURN_ZOOM_THRESHOLD = 16;
+    private static final int MIN_ZOOM_LEVEL = 12;
 
     /**
      * 근처 매장 정보 조회
@@ -46,53 +55,73 @@ public class StoreService {
     public GetStoreListRes getStores(int zoomLevel, double swLat, double swLng, double neLat, double neLng,
                                      Long categoryId, Long brandId, Season season, BenefitType type) {
 
+        // 입력값 검증 (줌 레벨, 좌표 범위)
         validateZoomAndRange(zoomLevel, swLat, swLng, neLat, neLng);
 
-        if (isFullReturnZoom(zoomLevel)) {
-            List<Store> stores = storeRepository.findStoresInBox(
+        // 클러스터링 없이 모든 매장 반환
+        if (zoomLevel >= FULL_RETURN_ZOOM_THRESHOLD) {
+            List<Store> rawStores = storeRepository.findStoresInBox(
                     swLng, swLat, neLng, neLat,
                     categoryId, brandId, season, type
             );
-
-            List<GetStoreRes> responseList = stores.stream()
+            List<GetStoreRes> fullList = rawStores.stream()
                     .map(GetStoreRes::from)
                     .toList();
-            return new GetStoreListRes(zoomLevel, responseList);
+            return new GetStoreListRes(zoomLevel, fullList);
         }
 
-        double gridSize = resolveGridSize(zoomLevel);
+        // 낮은 줌 레벨: S2 셀 기반 클러스터링으로 대표 매장만 반환 (지도를 넓게 볼 때)
+        return createClusteredStoreListResponseFromDB(zoomLevel, swLat, swLng, neLat, neLng,
+                categoryId, brandId, season, type);
+    }
 
-        List<Store> stores = storeRepository.findClusterRepresentatives(
-                swLng, swLat, neLng, neLat,
-                categoryId, brandId, season, type,
-                gridSize
-        );
+    /**
+     * S2 셀 기반 클러스터링 후 대표 매장 반환 (DB 접근 1회)
+     */
+    private GetStoreListRes createClusteredStoreListResponseFromDB(int zoomLevel, double swLat, double swLng,
+                                                                   double neLat, double neLng, Long categoryId,
+                                                                   Long brandId, Season season, BenefitType type) {
+        // 줌 레벨에 따른 S2 셀 크기 결정
+        int cellLevel = getCellLevelFromZoom(zoomLevel);
+        // 지도 화면의 남서쪽(sw)과 북동쪽(ne) 모서리 좌표를 이용해 사각형 영역 객체를 생성
+        S2LatLngRect rect = S2LatLngRect.fromPointPair(S2LatLng.fromDegrees(swLat, swLng), S2LatLng.fromDegrees(neLat, neLng));
+        S2RegionCoverer coverer = S2RegionCoverer.builder().setMinLevel(cellLevel).setMaxLevel(cellLevel).build();
+        ArrayList<S2CellId> coveringCells = new ArrayList<>();
+        coverer.getCovering(rect, coveringCells);
 
-        List<GetStoreRes> responseList = stores.stream()
+        // 셀 목록에 포함되는 모든 매장 정보를 한 번에 조회
+        List<Store> storesInCells = storeRepository.findStoresInCellRanges(coveringCells, categoryId, brandId, season, type);
+
+        // 애플리케이션에서 대표 매장 그룹화
+        Map<Long, Store> representativeStores = new HashMap<>();
+        for (Store store : storesInCells) {
+            S2LatLng latLng = S2LatLng.fromDegrees(store.getLocation().getY(), store.getLocation().getX());
+            S2CellId parentCellId = S2CellId.fromLatLng(latLng).parent(cellLevel);
+
+            Store existingRepresentative = representativeStores.get(parentCellId.id());
+            if (existingRepresentative == null || store.getVisitCount() > existingRepresentative.getVisitCount()) {
+                representativeStores.put(parentCellId.id(), store);
+            }
+        }
+
+        List<GetStoreRes> responseList = representativeStores.values().stream()
                 .map(GetStoreRes::from)
-                .toList();
+                .collect(Collectors.toList());
+
         return new GetStoreListRes(zoomLevel, responseList);
     }
 
+    private int getCellLevelFromZoom(int zoomLevel) {
+        return zoomLevel;
+    }
+
     private void validateZoomAndRange(int zoomLevel, double swLat, double swLng, double neLat, double neLng) {
-        if (zoomLevel > 22 || zoomLevel <= 9) {
-            throw new GlobalException(OUT_OF_RANGE_INPUT);
-        }
         if (swLat >= neLat || swLng >= neLng) {
             throw new GlobalException(OUT_OF_RANGE_INPUT);
         }
-    }
-
-    private boolean isFullReturnZoom(int zoomLevel) {
-        return zoomLevel >= 16;
-    }
-
-    private double resolveGridSize(int zoomLevel) {
-        if (zoomLevel == 15) return 0.004;
-        if (zoomLevel == 14) return 0.01;
-        if (zoomLevel == 13) return 0.014;
-        if (zoomLevel == 12) return 0.025;
-        return 0.05; // zoomLevel 10~11
+        if (zoomLevel < MIN_ZOOM_LEVEL || zoomLevel > MAP_MAX_ZOOM) {
+            throw new GlobalException(OUT_OF_RANGE_INPUT);
+        }
     }
 
     /**
@@ -158,7 +187,7 @@ public class StoreService {
         int BRAND_SUGGESTION_SIZE = 2;
         MsearchResponse<Map> firstResponse;
         try {
-            firstResponse = customSuggestionRepository.findCoordinationAndBrandAndCategoryWithMSearch(keyword, CATEGORY_SUGGESTION_SIZE, BRAND_SUGGESTION_SIZE);
+            firstResponse = customElasticRepository.findCoordinationAndBrandAndCategoryWithMSearch(keyword, CATEGORY_SUGGESTION_SIZE, BRAND_SUGGESTION_SIZE);
         } catch (Exception e) {
             throw new GlobalException(ELASTIC_INTERNAL_ERROR);
         }
@@ -205,7 +234,7 @@ public class StoreService {
         // 최종 검색 실행
         MsearchResponse<Map> secondResponse;
         try {
-            secondResponse = customSuggestionRepository.findMapSuggestionsByKeywordWithMsearch(keyword, size - (res.size()), latitude, longitude, res);
+            secondResponse = customElasticRepository.findMapSuggestionsByKeywordWithMsearch(keyword, size - (res.size()), latitude, longitude, res);
         } catch (Exception e) {
             throw new GlobalException(ELASTIC_INTERNAL_ERROR);
         }

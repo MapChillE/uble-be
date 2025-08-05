@@ -244,6 +244,11 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
         // filter 설정
         List<Query> filters = SearchFilterUtils.getAdminStatisticFilters(gender, ageRange, rank, benefitType);
 
+        Query excludeBlankStoreLocal = TermQuery.of(t -> t
+            .field("storeLocal")
+            .value("")
+        )._toQuery();
+
         // 통계 쿼리
         Aggregation aggregation = Aggregation.of(a -> a
             .filter(f -> f
@@ -260,6 +265,7 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
 
         // 최종 쿼리 생성
         NativeQuery query = NativeQuery.builder()
+            .withQuery(q -> q.bool(b -> b.mustNot(excludeBlankStoreLocal)))
             .withAggregation("local_rank", aggregation)
             .withMaxResults(0)
             .build();
