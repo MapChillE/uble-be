@@ -23,6 +23,7 @@ import com.ureca.uble.entity.enums.*;
 import com.ureca.uble.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -135,13 +136,18 @@ public class BrandService {
 		// 최종 결과 반환
 		long totalCnt = searchHits.getTotalHits();
 		long totalPage = totalCnt % size == 0 ? totalCnt / size : totalCnt / size + 1;
-		List<BrandListRes> brandList = searchHits.stream()
-			.map(hit -> {
-				BrandNoriDocument document = hit.getContent();
-				boolean isBookmarked = bookmarkedBrandIdSet.contains(document.getBrandId());
-				return BrandListRes.of(document, isBookmarked);
-			})
-			.toList();
+
+		List<BrandListRes> brandList = new ArrayList<>();
+		double topScore = 0;
+
+		for (SearchHit<BrandNoriDocument> hit : searchHits) {
+			double score = hit.getScore();
+			if (topScore == 0) topScore = score;
+			else if (score < topScore / 3.0) break;
+
+			BrandNoriDocument document = hit.getContent();
+			brandList.add(BrandListRes.of(document, bookmarkedBrandIdSet.contains(document.getBrandId())));
+		}
 
 		// 로그 기록
 		try {
