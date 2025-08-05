@@ -24,7 +24,7 @@ import com.ureca.uble.global.security.jwt.filter.JwtAuthenticationFilter;
 @EnableWebSecurity
 public class SecurityConfig {
 
-	@Value("#{'${cors.allowed-origins}'.split(',')}")
+	@Value("${cors.allowed-origins}")
 	private List<String> allowedOrigins;
 
 	@Bean
