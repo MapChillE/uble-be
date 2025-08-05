@@ -65,6 +65,8 @@ domain:
 elasticsearch:
   backup:
       bucket-name: ${BUCKET_NAME}
-
 admin:
   code: ${ADMIN_CODE}
+cors:
+  allowed-origins:
+    - ${LOCAL_URL}
