@@ -67,7 +67,8 @@ public class SecurityConfig {
 			"https://u-ble.com",
 			"https://www.u-ble.com",
 			"https://dev.u-ble.com",
-			"https://api.u-ble.com"
+			"https://api.u-ble.com",
+			"https://admin.u-ble.com"
 		));
 		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
 		configuration.setAllowCredentials(true);
