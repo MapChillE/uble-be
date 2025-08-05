@@ -12,6 +12,10 @@
       "season_synonym_filter": {
         "type": "synonym",
         "synonyms_path": "analysis/season-synonyms.txt"
+      },
+      "brand_stop_filter": {
+        "type": "stop",
+        "stopwords": ["점", "이", "은", "는", "의", "가", "스", "관", "오"]
       }
     },
     "tokenizer": {
@@ -24,7 +28,7 @@
       "brand_nori_synonym_analyzer": {
         "type": "custom",
         "tokenizer": "my_nori_tokenizer",
-        "filter": ["lowercase", "brand_synonym_filter"]
+        "filter": ["lowercase", "brand_synonym_filter", "brand_stop_filter"]
       },
       "category_nori_synonym_analyzer": {
         "type": "custom",
