@@ -2,6 +2,7 @@ package com.ureca.uble.global.config;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -22,6 +23,9 @@ import com.ureca.uble.global.security.jwt.filter.JwtAuthenticationFilter;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+	@Value("#{'${cors.allowed-origins}'.split(',')}")
+	private List<String> allowedOrigins;
 
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer(){
@@ -55,21 +59,7 @@ public class SecurityConfig {
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOrigins(List.of(
-			"http://localhost:3000",
-			"http://localhost:3001",
-			"http://localhost:3002",
-			"http://localhost:3003",
-			"https://localhost:3000",
-			"https://localhost:3001",
-			"https://localhost:3002",
-			"https://localhost:3003",
-			"https://u-ble.com",
-			"https://www.u-ble.com",
-			"https://dev.u-ble.com",
-			"https://api.u-ble.com",
-			"https://admin.u-ble.com"
-		));
+		configuration.setAllowedOrigins(allowedOrigins);
 		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
 		configuration.setAllowCredentials(true);
 		configuration.setAllowedHeaders(List.of("*"));
