@@ -93,13 +93,12 @@ public class StoreService {
 
         // 캐시 조회 및 분류
         List<String> cacheKeys = buildCacheKeys(coveringCells, categoryId, brandId, season, type);
-        CacheScanResult scan = scanCache(coveringCells, cacheKeys);
+        StoreCacheResult scan = scanCache(coveringCells, cacheKeys);
 
-        List<GetStoreRes> finalStoreList = new ArrayList<>(scan.hitStores);
-
+        List<GetStoreRes> finalStoreList = new ArrayList<>(scan.getHitStores());
         // 캐시 미스 셀에 대해서만 DB 조회 및 대표 매장 선출
-        if (!scan.missedCells.isEmpty()) {
-            Map<Long, Store> representatives = findRepresentativesByCells(scan.missedCells, cellLevel, categoryId, brandId, season, type);
+        if (!scan.getMissCells().isEmpty()) {
+            Map<Long, Store> representatives = findRepresentativesByCells(scan.getMissCells(), cellLevel, categoryId, brandId, season, type);
 
             // 대표 매장 응답 변환 및 캐시 저장
             if (!representatives.isEmpty()) {
@@ -115,7 +114,7 @@ public class StoreService {
 
             // 빈 셀 마커 캐시 저장
             Map<String, EmptyStoreRes> emptyMarkers = new HashMap<>();
-            for (S2CellId missed : scan.missedCells) {
+            for (S2CellId missed : scan.getMissCells()) {
                 if (!representatives.containsKey(missed.id())) {
                     String key = buildCacheKey(missed, categoryId, brandId, season, type);
                     emptyMarkers.put(key, new EmptyStoreRes());
@@ -152,24 +151,13 @@ public class StoreService {
                 .toList();
     }
 
-    private static final class CacheScanResult {
-        final List<GetStoreRes> hitStores;
-        final List<S2CellId> missedCells;
-
-        CacheScanResult(List<GetStoreRes> hitStores, List<S2CellId> missedCells) {
-            this.hitStores = hitStores;
-            this.missedCells = missedCells;
-        }
-    }
-
     //Hit/Miss된 셀 목록으로 분류
-    private CacheScanResult scanCache(List<S2CellId> coveringCells, List<String> cacheKeys) {
+    private StoreCacheResult scanCache(List<S2CellId> coveringCells, List<String> cacheKeys) {
         List<Object> cached = redisTemplate.opsForValue().multiGet(cacheKeys);
-
         List<GetStoreRes> hits = new ArrayList<>();
         List<S2CellId> misses = new ArrayList<>();
-
         List<Object> safeCached = Objects.requireNonNullElseGet(cached, List::of);
+
         for (int i = 0; i < safeCached.size(); i++) {
             Object obj = safeCached.get(i);
             if (obj instanceof GetStoreRes res) {
@@ -182,7 +170,7 @@ public class StoreService {
                 log.info("Map-Cache Miss for cellId: {}", coveringCells.get(i).toToken());
             }
         }
-        return new CacheScanResult(hits, misses);
+        return new StoreCacheResult(hits, misses);
     }
 
     //대표 매장 선정
