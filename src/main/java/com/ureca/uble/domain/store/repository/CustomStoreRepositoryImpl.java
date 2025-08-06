@@ -42,7 +42,7 @@ public class CustomStoreRepositoryImpl implements CustomStoreRepository {
                 .innerJoin(store.brand, brand).fetchJoin()
                 .innerJoin(brand.category, category).fetchJoin()
                 .where(
-                        cellsContain(cellIds), // 동적으로 OR 조건 생성
+                        cellsContain(cellIds),
                         categoryIdEq(categoryId),
                         brandIdEq(brandId),
                         seasonEq(season),
