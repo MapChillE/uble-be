@@ -1,8 +1,11 @@
 package com.ureca.uble.domain.store.service;
 
+import com.google.common.geometry.S2CellId;
+import com.google.common.geometry.S2LatLng;
 import com.ureca.uble.domain.bookmark.repository.BookmarkRepository;
 import com.ureca.uble.domain.store.dto.response.GetStoreDetailRes;
 import com.ureca.uble.domain.store.dto.response.GetStoreListRes;
+import com.ureca.uble.domain.store.dto.response.GetStoreRes;
 import com.ureca.uble.domain.store.dto.response.GetStoreSummaryRes;
 import com.ureca.uble.domain.store.repository.StoreClickLogDocumentRepository;
 import com.ureca.uble.domain.store.repository.StoreRepository;
@@ -26,6 +29,10 @@ import org.locationtech.jts.geom.Point;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 
 import java.util.Collections;
 import java.util.List;
@@ -39,6 +46,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class StoreServiceTest {
 
     @InjectMocks
@@ -52,6 +60,12 @@ class StoreServiceTest {
     private BookmarkRepository bookmarkRepository;
     @Mock
     private StoreClickLogDocumentRepository storeClickLogDocumentRepository;
+
+    @Mock
+    private RedisTemplate<String, Object> redisTemplate;
+
+    @Mock
+    private ValueOperations<String, Object> valueOperations;
 
     private Store mockStore;
     private User mockUser;
@@ -71,8 +85,12 @@ class StoreServiceTest {
         lenient().when(mockStore.getId()).thenReturn(1L);
         lenient().when(mockStore.getName()).thenReturn("테스트 매장");
         lenient().when(mockStore.getLocation()).thenReturn(location);
+        lenient().when(mockStore.getVisitCount()).thenReturn(100);
         lenient().when(mockStore.getBrand()).thenReturn(mockBrand);
         lenient().when(mockBrand.getId()).thenReturn(10L);
+
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.multiGet(anyList())).thenReturn(Collections.emptyList());
     }
 
     private void setupCompleteDtoDependencies() {
@@ -110,19 +128,36 @@ class StoreServiceTest {
         // given
         setupCompleteDtoDependencies();
         int zoomLevel = 14;
-        double swLat = 37.0, swLng = 127.0, neLat = 38.0, neLng = 128.0;
-        List<Store> storesInCells = List.of(mockStore);
+        int cellLevel = zoomLevel;
+        double lat = 37.4979;
+        double lng = 127.0276;
 
+        Point location = geometryFactory.createPoint(new Coordinate(lng, lat));
+        when(mockStore.getLocation()).thenReturn(location);
+        when(mockStore.getVisitCount()).thenReturn(999);
+
+        S2LatLng latLng = S2LatLng.fromDegrees(lat, lng);
+        S2CellId cell = S2CellId.fromLatLng(latLng).parent(cellLevel);
+        List<S2CellId> cellList = List.of(cell);
+
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.multiGet(anyList())).thenReturn(Collections.singletonList(null));
         when(storeRepository.findStoresInCellRanges(anyList(), any(), any(), any(), any()))
-                .thenReturn(storesInCells);
+                .thenReturn(List.of(mockStore));
 
         // when
-        GetStoreListRes result = storeService.getStores(zoomLevel, swLat, swLng, neLat, neLng, null, null, null, null);
+        GetStoreListRes result = storeService.getStores(
+                zoomLevel,
+                lat - 0.01, lng - 0.01,
+                lat + 0.01, lng + 0.01,
+                null, null, null, null
+        );
 
         // then
         assertThat(result.getZoomLevel()).isEqualTo(zoomLevel);
         assertThat(result.getStoreList()).hasSize(1);
-        assertThat(result.getStoreList().get(0).getStoreId()).isEqualTo(mockStore.getId());
+        GetStoreRes storeRes = result.getStoreList().get(0);
+        assertThat(storeRes.getStoreId()).isEqualTo(mockStore.getId());
     }
 
     @Test
