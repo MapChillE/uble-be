@@ -168,10 +168,10 @@ public class AuthServiceTest {
 		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
 		//when
-		WithdrawRes res = authService.withdraw(userId);
+		WithdrawRes res = authService.withdraw(userId, response);
 
 		//then
-		verify(user).updateIsDeleted();
+		verify(user).updateIsDeletedAndRole();
 		verify(tokenRepository).deleteByUser(user);
 		verify(pinRepository).deleteByUser(user);
 		verify(userCategoryRepository).deleteByUser(user);
@@ -191,7 +191,7 @@ public class AuthServiceTest {
 		when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
 		//when, then
-		assertThrows(GlobalException.class, () -> authService.withdraw(userId));
+		assertThrows(GlobalException.class, () -> authService.withdraw(userId, response));
 		verify(tokenRepository, never()).deleteByUser(any());
 	}
 }

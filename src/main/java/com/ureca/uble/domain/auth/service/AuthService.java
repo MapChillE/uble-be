@@ -54,6 +54,10 @@ public class AuthService {
 		User user = userRepository.findByProviderId(kakaoId)
 				.orElseGet(() -> userRepository.save(User.createTmpUser(kakaoId, nickname)));
 
+		if(user.getIsDeleted()) {
+			user.reactivate();
+		}
+
 		String accessToken = jwtProvider.createAccessToken(user);
 		String refreshToken = jwtProvider.createRefreshToken(user);
 		LocalDateTime expiryTime = jwtProvider.getRefreshTokenExpiry(refreshToken);
@@ -120,14 +124,14 @@ public class AuthService {
 	}
 
 	@Transactional
-	public WithdrawRes withdraw(Long userId) {
+	public WithdrawRes withdraw(Long userId, HttpServletResponse response) {
 		User user = findUser(userId);
 
 		if(user.getIsDeleted()){
 			throw new GlobalException(UserErrorCode.USER_ALREADY_DELETED);
 		}
 
-		user.updateIsDeleted();
+		user.updateIsDeletedAndRole();
 
 		tokenRepository.deleteByUser(user);
 		pinRepository.deleteByUser(user);
@@ -136,6 +140,9 @@ public class AuthService {
 		usageCountRepository.deleteByUser(user);
 		feedbackRepository.deleteByUser(user);
 		bookmarkRepository.deleteByUser(user);
+
+		jwtProvider.deleteRefreshTokenCookie(response);
+		jwtProvider.deleteAuthCheckCookie(response);
 
 		return new WithdrawRes();
 	}
