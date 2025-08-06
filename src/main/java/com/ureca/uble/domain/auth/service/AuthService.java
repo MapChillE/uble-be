@@ -131,8 +131,7 @@ public class AuthService {
 			throw new GlobalException(UserErrorCode.USER_ALREADY_DELETED);
 		}
 
-		user.updateIsDeleted();
-		user.updateRole();
+		user.updateIsDeletedAndRole();
 
 		tokenRepository.deleteByUser(user);
 		pinRepository.deleteByUser(user);
