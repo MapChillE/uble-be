@@ -20,11 +20,13 @@ import com.ureca.uble.entity.enums.*;
 import com.ureca.uble.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.ureca.uble.domain.common.exception.CommonErrorCode.ELASTIC_INTERNAL_ERROR;
 import static com.ureca.uble.domain.store.exception.StoreErrorCode.OUT_OF_RANGE_INPUT;
@@ -43,6 +45,7 @@ public class StoreService {
     private final StoreClickLogDocumentRepository storeClickLogDocumentRepository;
     private final LocationCoordinationDocumentRepository locationCoordinationDocumentRepository;
     private final CustomElasticRepository customElasticRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     private static final int MAP_MAX_ZOOM = 21;
     private static final int FULL_RETURN_ZOOM_THRESHOLD = 16;
@@ -70,7 +73,7 @@ public class StoreService {
             return new GetStoreListRes(zoomLevel, fullList);
         }
 
-        // 낮은 줌 레벨: S2 셀 기반 클러스터링으로 대표 매장만 반환 (지도를 넓게 볼 때)
+        // 낮은 줌 레벨
         return createClusteredStoreListResponseFromDB(zoomLevel, swLat, swLng, neLat, neLng,
                 categoryId, brandId, season, type);
     }
@@ -81,34 +84,138 @@ public class StoreService {
     private GetStoreListRes createClusteredStoreListResponseFromDB(int zoomLevel, double swLat, double swLng,
                                                                    double neLat, double neLng, Long categoryId,
                                                                    Long brandId, Season season, BenefitType type) {
-        // 줌 레벨에 따른 S2 셀 크기 결정
+        // 커버링 셀 계산
         int cellLevel = getCellLevelFromZoom(zoomLevel);
-        // 지도 화면의 남서쪽(sw)과 북동쪽(ne) 모서리 좌표를 이용해 사각형 영역 객체를 생성
-        S2LatLngRect rect = S2LatLngRect.fromPointPair(S2LatLng.fromDegrees(swLat, swLng), S2LatLng.fromDegrees(neLat, neLng));
-        S2RegionCoverer coverer = S2RegionCoverer.builder().setMinLevel(cellLevel).setMaxLevel(cellLevel).build();
-        ArrayList<S2CellId> coveringCells = new ArrayList<>();
-        coverer.getCovering(rect, coveringCells);
+        List<S2CellId> coveringCells = getCoveringCells(swLat, swLng, neLat, neLng, cellLevel);
+        if (coveringCells.isEmpty()) {
+            return new GetStoreListRes(zoomLevel, List.of());
+        }
 
-        // 셀 목록에 포함되는 모든 매장 정보를 한 번에 조회
-        List<Store> storesInCells = storeRepository.findStoresInCellRanges(coveringCells, categoryId, brandId, season, type);
+        // 캐시 조회 및 분류
+        List<String> cacheKeys = buildCacheKeys(coveringCells, categoryId, brandId, season, type);
+        StoreCacheResult scan = scanCache(coveringCells, cacheKeys);
 
-        // 애플리케이션에서 대표 매장 그룹화
-        Map<Long, Store> representativeStores = new HashMap<>();
-        for (Store store : storesInCells) {
-            S2LatLng latLng = S2LatLng.fromDegrees(store.getLocation().getY(), store.getLocation().getX());
-            S2CellId parentCellId = S2CellId.fromLatLng(latLng).parent(cellLevel);
+        List<GetStoreRes> finalStoreList = new ArrayList<>(scan.getHitStores());
+        // 캐시 미스 셀에 대해서만 DB 조회 및 대표 매장 선출
+        if (!scan.getMissCells().isEmpty()) {
+            Map<Long, Store> representatives = findRepresentativesByCells(scan.getMissCells(), cellLevel, categoryId, brandId, season, type);
 
-            Store existingRepresentative = representativeStores.get(parentCellId.id());
-            if (existingRepresentative == null || store.getVisitCount() > existingRepresentative.getVisitCount()) {
-                representativeStores.put(parentCellId.id(), store);
+            // 대표 매장 응답 변환 및 캐시 저장
+            if (!representatives.isEmpty()) {
+                Map<String, GetStoreRes> toCache = new HashMap<>();
+                for (Map.Entry<Long, Store> e : representatives.entrySet()) {
+                    Store store = e.getValue();
+                    String key = buildCacheKey(new S2CellId(e.getKey()), categoryId, brandId, season, type);
+                    toCache.put(key, GetStoreRes.from(store));
+                    finalStoreList.add(GetStoreRes.from(store));
+                }
+                cacheMultiSetWithTtl(toCache);
+            }
+
+            // 빈 셀 마커 캐시 저장
+            Map<String, EmptyStoreRes> emptyMarkers = new HashMap<>();
+            for (S2CellId missed : scan.getMissCells()) {
+                if (!representatives.containsKey(missed.id())) {
+                    String key = buildCacheKey(missed, categoryId, brandId, season, type);
+                    emptyMarkers.put(key, new EmptyStoreRes());
+                }
+            }
+            if (!emptyMarkers.isEmpty()) {
+                cacheMultiSetEmptyWithTtl(emptyMarkers);
             }
         }
 
-        List<GetStoreRes> responseList = representativeStores.values().stream()
-                .map(GetStoreRes::from)
-                .collect(Collectors.toList());
+        return new GetStoreListRes(zoomLevel, finalStoreList);
+    }
 
-        return new GetStoreListRes(zoomLevel, responseList);
+    // 줌 레벨에 맞는 s2 셀로 영역 생성
+    private List<S2CellId> getCoveringCells(double swLat, double swLng, double neLat, double neLng, int cellLevel) {
+        S2LatLngRect rect = S2LatLngRect.fromPointPair(
+                S2LatLng.fromDegrees(swLat, swLng),
+                S2LatLng.fromDegrees(neLat, neLng)
+        );
+        S2RegionCoverer coverer = S2RegionCoverer.builder()
+                .setMinLevel(cellLevel)
+                .setMaxLevel(cellLevel)
+                .build();
+
+        ArrayList<S2CellId> cells = new ArrayList<>();
+        coverer.getCovering(rect, cells);
+        return cells;
+    }
+
+    //각 셀 ID에 Redis 캐시 키 생성
+    private List<String> buildCacheKeys(List<S2CellId> cells, Long categoryId, Long brandId, Season season, BenefitType type) {
+        return cells.stream()
+                .map(cell -> buildCacheKey(cell, categoryId, brandId, season, type))
+                .toList();
+    }
+
+    //Hit/Miss된 셀 목록으로 분류
+    private StoreCacheResult scanCache(List<S2CellId> coveringCells, List<String> cacheKeys) {
+        List<Object> cached = redisTemplate.opsForValue().multiGet(cacheKeys);
+        List<GetStoreRes> hits = new ArrayList<>();
+        List<S2CellId> misses = new ArrayList<>();
+        List<Object> safeCached = Objects.requireNonNullElseGet(cached, List::of);
+
+        for (int i = 0; i < safeCached.size(); i++) {
+            Object obj = safeCached.get(i);
+            if (obj instanceof GetStoreRes res) {
+                hits.add(res);
+                log.info("Map-Cache Hit for key: {}", cacheKeys.get(i));
+            } else if (obj instanceof EmptyStoreRes) {
+                log.info("Map-Cache Empty hit for cellId: {}", coveringCells.get(i).toToken());
+            } else {
+                misses.add(coveringCells.get(i));
+                log.info("Map-Cache Miss for cellId: {}", coveringCells.get(i).toToken());
+            }
+        }
+        return new StoreCacheResult(hits, misses);
+    }
+
+    //대표 매장 선정
+    private Map<Long, Store> findRepresentativesByCells(
+            List<S2CellId> missedCells, int cellLevel,
+            Long categoryId, Long brandId, Season season, BenefitType type
+    ) {
+        List<Store> stores = storeRepository.findStoresInCellRanges(missedCells, categoryId, brandId, season, type);
+
+        Map<Long, Store> representatives = new HashMap<>();
+        for (Store store : stores) {
+            S2LatLng latLng = S2LatLng.fromDegrees(store.getLocation().getY(), store.getLocation().getX());
+            S2CellId parent = S2CellId.fromLatLng(latLng).parent(cellLevel);
+
+            Store current = representatives.get(parent.id());
+            if (current == null || store.getVisitCount() > current.getVisitCount()) {
+                representatives.put(parent.id(), store);
+            }
+        }
+        return representatives;
+    }
+
+    private void cacheMultiSetWithTtl(Map<String, GetStoreRes> data) {
+        redisTemplate.opsForValue().multiSet(data);
+        redisTemplate.executePipelined((RedisCallback<Object>) conn -> {
+            for (String key : data.keySet()) {
+                conn.keyCommands().expire(key.getBytes(), Duration.ofDays(7).getSeconds());
+            }
+            return null;
+        });
+    }
+
+    private void cacheMultiSetEmptyWithTtl(Map<String, EmptyStoreRes> empties) {
+        redisTemplate.opsForValue().multiSet(empties);
+        redisTemplate.executePipelined((RedisCallback<Object>) conn -> {
+            for (String key : empties.keySet()) {
+                conn.keyCommands().expire(key.getBytes(), Duration.ofMinutes(10).getSeconds());
+            }
+            return null;
+        });
+    }
+
+    private String buildCacheKey(S2CellId cellId, Long categoryId, Long brandId, Season season, BenefitType type) {
+        return String.format("stores:cell:%d:cat:%s:brand:%s:season:%s:type:%s",
+                cellId.id(), categoryId, brandId, season, type);
     }
 
     private int getCellLevelFromZoom(int zoomLevel) {

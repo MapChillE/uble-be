@@ -2,13 +2,16 @@ package com.ureca.uble.domain.store.dto.response;
 
 import com.ureca.uble.entity.Store;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
+
+import java.io.Serializable;
 
 @Getter
 @Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Schema(description = "매장 정보 반환 DTO")
-public class GetStoreRes {
+public class GetStoreRes implements Serializable {
     @Schema(description = "매장 id", example = "1")
     private Long storeId;
 
