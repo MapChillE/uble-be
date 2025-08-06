@@ -64,9 +64,10 @@ public class AuthController {
 	@Operation(summary = "회원탈퇴", description = "isDeleted값을 true로 바꾸고 관련 정보를 삭제합니다.")
 	public CommonResponse<WithdrawRes> withdraw(
 		@Parameter(description = "사용자정보", required = true)
-		@AuthenticationPrincipal Long userId
+		@AuthenticationPrincipal Long userId,
+		HttpServletResponse response
 	){
-		return CommonResponse.success(authService.withdraw(userId));
+		return CommonResponse.success(authService.withdraw(userId, response));
 	}
 
 }

@@ -129,4 +129,6 @@ public class User extends BaseEntity {
     }
 
     public void updateIsDeleted() { this.isDeleted = true; }
+    public void updateRole() { this.role = Role.TMP_USER; }
+    public void reactivate() { this.isDeleted = false; }
 }
