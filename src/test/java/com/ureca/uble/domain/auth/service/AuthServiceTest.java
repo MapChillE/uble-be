@@ -171,7 +171,7 @@ public class AuthServiceTest {
 		WithdrawRes res = authService.withdraw(userId, response);
 
 		//then
-		verify(user).updateIsDeleted();
+		verify(user).updateIsDeletedAndRole();
 		verify(tokenRepository).deleteByUser(user);
 		verify(pinRepository).deleteByUser(user);
 		verify(userCategoryRepository).deleteByUser(user);
