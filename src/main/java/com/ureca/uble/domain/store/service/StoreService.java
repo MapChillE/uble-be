@@ -197,7 +197,7 @@ public class StoreService {
         redisTemplate.opsForValue().multiSet(data);
         redisTemplate.executePipelined((RedisCallback<Object>) conn -> {
             for (String key : data.keySet()) {
-                conn.keyCommands().expire(key.getBytes(), Duration.ofMinutes(10).getSeconds());
+                conn.keyCommands().expire(key.getBytes(), Duration.ofDays(7).getSeconds());
             }
             return null;
         });
