@@ -49,6 +49,7 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
 
         // userId 필터
         Query userFilter = getUserFilter(userId);
+        Query curMonthFilter = getCurMonthFilter();
 
         // 사용자 성별, 연령대의 평균 사용량 정보
         int userAgeRange = ((currentYear - user.getBirthDate().getYear() + 1) / 10) * 10;
@@ -70,18 +71,29 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
 
         // 카테고리 순위
         Aggregation categoryAggregation = Aggregation.of(a -> a
-            .terms(t -> t
-                .field("category")
-                .order(List.of(NamedValue.of("_count", SortOrder.Desc)))
+            .filter(f -> f
+                .bool(b -> b.filter(List.of(userFilter, curMonthFilter)))
+            )
+            .aggregations("rank", subAgg -> subAgg
+                .terms(t -> t
+                    .field("category")
+                    .size(5)
+                    .order(List.of(NamedValue.of("_count", SortOrder.Desc)))
+                )
             )
         );
 
         // 제휴처 순위
         Aggregation brandAggregation = Aggregation.of(a -> a
-            .terms(t -> t
-                .field("brandName")
-                .size(10)
-                .order(List.of(NamedValue.of("_count", SortOrder.Desc)))
+            .filter(f -> f
+                .bool(b -> b.filter(List.of(userFilter, curMonthFilter)))
+            )
+            .aggregations("rank", subAgg -> subAgg
+                .terms(t -> t
+                    .field("brandName")
+                    .size(5)
+                    .order(List.of(NamedValue.of("_count", SortOrder.Desc)))
+                )
             )
         );
 
@@ -464,5 +476,13 @@ public class CustomUsageHistoryDocumentRepositoryImpl implements CustomUsageHist
                 }
             ))
         )._toQuery();
+    }
+
+    private Query getCurMonthFilter() {
+        return DateRangeQuery.of(r -> r
+            .field("createdAt")
+            .gte("now/M")
+            .lte("now")
+        )._toRangeQuery()._toQuery();
     }
 }
