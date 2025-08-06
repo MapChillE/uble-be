@@ -17,7 +17,6 @@ import com.ureca.uble.entity.UserCategory;
 import com.ureca.uble.entity.document.UsageHistoryDocument;
 import com.ureca.uble.global.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
-
 import org.slf4j.MDC;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchAggregations;
 import org.springframework.data.elasticsearch.core.SearchHits;
@@ -214,14 +213,16 @@ public class UserService {
 
 	private List<CategoryRankRes> getCategoryRankList(ElasticsearchAggregations rankResult) {
 		return rankResult.aggregationsAsMap().get("category_rank").aggregation()
-			.getAggregate().sterms().buckets().array().stream()
+			.getAggregate().filter().aggregations()
+			.get("rank").sterms().buckets().array().stream()
 			.map(b -> CategoryRankRes.of(b.key().stringValue(), b.docCount()))
 			.toList();
 	}
 
 	private List<BrandRankRes> getBrandRankList(ElasticsearchAggregations rankResult) {
 		return rankResult.aggregationsAsMap().get("brand_rank").aggregation()
-			.getAggregate().sterms().buckets().array().stream()
+			.getAggregate().filter().aggregations()
+			.get("rank").sterms().buckets().array().stream()
 			.map(b -> BrandRankRes.of(b.key().stringValue(), b.docCount()))
 			.toList();
 	}
