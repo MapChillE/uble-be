@@ -19,6 +19,7 @@ import com.ureca.uble.domain.users.repository.UserCategoryRepository;
 import com.ureca.uble.domain.users.repository.UserRepository;
 import com.ureca.uble.entity.Token;
 import com.ureca.uble.entity.User;
+import com.ureca.uble.entity.enums.Role;
 import com.ureca.uble.global.exception.GlobalException;
 import com.ureca.uble.global.security.jwt.JwtProvider;
 import com.ureca.uble.global.security.jwt.JwtValidator;
@@ -70,6 +71,10 @@ public class AuthService {
 
 		jwtProvider.addAccessTokenHeader(response, accessToken);
 		jwtProvider.addRefreshTokenCookie(response, refreshToken);
+
+		if (user.getRole() == Role.TMP_USER){
+			jwtProvider.addTmpCheckCookie(response);
+		}
 		jwtProvider.addAuthCheckCookie(response);
 
 		return user;

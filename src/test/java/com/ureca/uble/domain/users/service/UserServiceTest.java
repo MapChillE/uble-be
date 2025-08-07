@@ -28,6 +28,9 @@ import com.ureca.uble.entity.UserCategory;
 import com.ureca.uble.entity.enums.Gender;
 import com.ureca.uble.entity.enums.Rank;
 import com.ureca.uble.global.exception.GlobalException;
+import com.ureca.uble.global.security.jwt.JwtProvider;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -43,6 +46,12 @@ public class UserServiceTest {
 
 	@InjectMocks
 	private UserService userService;
+
+	@Mock
+	private HttpServletResponse response;
+
+	@Mock
+	private JwtProvider jwtProvider;
 
 	@Test
 	@DisplayName("사용자 ID로 사용자 정보를 조회한다.")
@@ -105,9 +114,10 @@ public class UserServiceTest {
 		when(categoryRepository.findAllById(categoryIds)).thenReturn(List.of(cat1, cat2));
 
 		//when
-		UpdateUserInfoRes result = userService.updateUserInfo(userId, request);
+		UpdateUserInfoRes result = userService.updateUserInfo(response, userId, request);
 
 		//then
+		verify(jwtProvider).deleteTmpCheckCookie(response);
 		verify(user).updateUserInfo(Rank.VIP, Gender.FEMALE, LocalDate.of(1999, 1, 1), "123456787654321");
 		verify(userCategoryRepository).deleteByUser(user);
 		verify(userCategoryRepository, times(2)).save(any(UserCategory.class));
@@ -126,7 +136,7 @@ public class UserServiceTest {
 
 		//when, then
 		GlobalException ex = assertThrows(GlobalException.class, () ->
-			userService.updateUserInfo(123L, req)
+			userService.updateUserInfo(response,123L, req)
 		);
 		assertThat(ex.getResultCode()).isEqualTo(UserErrorCode.USER_NOT_FOUND);
 	}
