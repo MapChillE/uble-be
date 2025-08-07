@@ -117,6 +117,7 @@ public class UserServiceTest {
 		UpdateUserInfoRes result = userService.updateUserInfo(response, userId, request);
 
 		//then
+		verify(jwtProvider).deleteTmpCheckCookie(response);
 		verify(user).updateUserInfo(Rank.VIP, Gender.FEMALE, LocalDate.of(1999, 1, 1), "123456787654321");
 		verify(userCategoryRepository).deleteByUser(user);
 		verify(userCategoryRepository, times(2)).save(any(UserCategory.class));
