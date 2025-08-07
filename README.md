@@ -2,9 +2,21 @@
 
 ## 프로젝트 소개
 
-- 프로젝트명 : Uble
-- 프로젝트 주제 : LG U+ 멤버십 제휴처 안내 지도 서비스
-- 프로젝트 기간 : 2025.06.30 - 2025.08.08
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/3c016595-0424-404d-bfdb-c8068c1e1e37" alt="탐험하는 귀여운 마스코트" width="600" />
+</div>
+
+**🌐 서비스 바로가기** : https://www.u-ble.com
+
+**💡 UBLE 이란?** : https://www.u-ble.com/intro
+
+
+<br>
+
+- **프로젝트명** : UBLE
+- **프로젝트 주제** : LG U+ 멤버십 제휴처 안내 지도 서비스
+- **프로젝트 기간** : 2025.06.30 - 2025.08.08
+
 
 ## 🧑🏻‍💻 팀원 소개
 <div align="center">
