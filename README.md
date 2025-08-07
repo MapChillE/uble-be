@@ -1,6 +1,7 @@
-# UBLE BACK-END
+# UBLE BACK-END REPOSITORY
 
 ## 프로젝트 소개
+
 - 프로젝트명 : Uble
 - 프로젝트 주제 : LG U+ 멤버십 제휴처 안내 지도 서비스
 - 프로젝트 기간 : 2025.06.30 - 2025.08.08
@@ -63,12 +64,13 @@
 <br><br><br>
 
 ## 💾 DB
-### 1. RDB
-<img width="1964" height="1742" alt="ERD_BASIC 1" src="https://github.com/user-attachments/assets/3e7179f7-e7d7-47f2-a7ac-0183c117d7f3" />
+📸 ERD : https://www.erdcloud.com/d/C9vcCB4kCHXRWWczR
+### 1. PostgreSQL
+<img width="2018" height="1799" alt="Uble ERD (2)" src="https://github.com/user-attachments/assets/bbdd5306-1e79-46ac-9e53-1125e1546ba1" />
 
 <br><br>
 
-### 2. ES
+### 2. Elasticsearch
 **1) 검색용 INDEX**
 
 <img width="2062" height="1027" alt="ERD_SEARCH 1" src="https://github.com/user-attachments/assets/9fbde427-7051-4e91-ba2c-d657994315e4" />
@@ -82,7 +84,8 @@
 <br><br><br>
 
 ## 🛠️ 시스템 아키텍처
-<img width="10327" height="6106" alt="Group 427320386" src="https://github.com/user-attachments/assets/4ab6df8a-7bd0-4de8-a576-0638e27856b2" />
+<img width="9888" height="6041" alt="Group 427320387" src="https://github.com/user-attachments/assets/80a2e554-64f7-4b73-bb20-37dbc553990b" />
+
 
 ---
 
@@ -147,6 +150,18 @@
 
 <br><br><br>
 
+## 📚 스터디
+
+<ul>
+  <li><a href="https://github.com/MapChillE/uble-be/wiki/%5BSTUDY%5D-%EC%9D%B4%EC%9A%A9-%EB%82%B4%EC%97%AD-%EC%B4%88%EA%B8%B0%ED%99%94%EB%A5%BC-%EC%9C%84%ED%95%9C-%EC%8A%A4%EC%BC%80%EC%A4%84%EB%9F%AC-%EC%A0%81%EC%9A%A9%EA%B8%B0"> 📆 이용 내역 초기화를 위한 스케줄러 적용기</a></li>
+  <li><a href="http://github.com/MapChillE/uble-be/wiki/%5BSTUDY%5D-%EC%A0%9C%ED%9C%B4%EC%B2%98-%EC%B6%94%EC%B2%9C-%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98-%EA%B0%9C%EB%B0%9C"> ⛓️ 제휴처 추천 알고리즘 개발 </a></li>
+  <li><a href="https://github.com/MapChillE/uble-be/wiki/%5BSTUDY%5D-Redis-%EC%BA%90%EC%8B%B1%EC%9D%84-%ED%86%B5%ED%95%9C-%EC%B6%94%EC%B2%9C-%EA%B2%B0%EA%B3%BC-%EC%9D%91%EB%8B%B5-%EC%86%8D%EB%8F%84-%EA%B0%9C%EC%84%A0"> ⛓️ Redis 캐싱을 통한 추천 결과 응답 속도 개선 </a></li>
+  <li><a href="https://github.com/MapChillE/uble-be/wiki/%5BSTUDY%5D-%EB%A7%A4%EC%9E%A5-%ED%83%90%EC%83%89-%EA%B8%B0%EB%8A%A5-%EC%84%B1%EB%8A%A5-%EA%B0%9C%EC%84%A0"> 🗺️ 매장 탐색 기능 성능 개선 </a></li>
+  <li><a href="https://github.com/MapChillE/uble-be/wiki/%5BSTUDY%5D-Elasticsearch%EB%A5%BC-%ED%99%9C%EC%9A%A9%ED%95%9C-%EA%B2%80%EC%83%89-%EA%B8%B0%EB%8A%A5-%EA%B5%AC%ED%98%84"> 🔎 Elasticsearch를 활용한 검색 기능 구현 </a></li>
+</ul>
+
+<br><br><br>
+
 ## ⚖️ 컨벤션
 
 ### **[ PACKAGE STRUCTURE ]**
@@ -168,6 +183,7 @@
  ├─ 📁 common
  ├─ 📁 feedback
  ├─ 📁 pin
+ ├─ 📁 search
  ├─ 📁 store
  └─ 📁 users
 
@@ -282,14 +298,7 @@ Ex. [UBLE-12] fix: 즐겨찾기 DTO 수정
 | 스토어 | `5000`    |
 | 북마크 | `6000`    |
 | 피드백 | `7000`    |
-
-<br><br><br>
-
-## [📚 Github Wiki]()
-**STUDY**
-<ul>
-  <li><a href="https://github.com/MapChillE/uble-be/wiki/%5BSTUDY%5D-%EC%9D%B4%EC%9A%A9-%EB%82%B4%EC%97%AD-%EC%B4%88%EA%B8%B0%ED%99%94%EB%A5%BC-%EC%9C%84%ED%95%9C-%EC%8A%A4%EC%BC%80%EC%A4%84%EB%9F%AC-%EC%A0%81%EC%9A%A9%EA%B8%B0"> 📆 이용 내역 초기화를 위한 스케줄러 적용기</a></li>
-  <li><a href="http://github.com/MapChillE/uble-be/wiki/%5BSTUDY%5D-%EC%A0%9C%ED%9C%B4%EC%B2%98-%EC%B6%94%EC%B2%9C-%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98-%EA%B0%9C%EB%B0%9C"> ⛓️ 제휴처 추천 알고리즘 개발 </a></li>
-</ul>
+| 핀 | `8000`    |
+| 공통 | `9000`    |
 
 ---
