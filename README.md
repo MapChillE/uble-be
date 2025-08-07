@@ -8,6 +8,8 @@
 
 **🌐 서비스 바로가기** : https://www.u-ble.com
 
+**📊 관리자 페이지 바로가기** : https://admin.u-ble.com
+
 **💡 UBLE 이란?** : https://www.u-ble.com/intro
 
 
