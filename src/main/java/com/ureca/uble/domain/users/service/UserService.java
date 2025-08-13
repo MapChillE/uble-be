@@ -16,6 +16,9 @@ import com.ureca.uble.entity.User;
 import com.ureca.uble.entity.UserCategory;
 import com.ureca.uble.entity.document.UsageHistoryDocument;
 import com.ureca.uble.global.exception.GlobalException;
+import com.ureca.uble.global.security.jwt.JwtProvider;
+
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.MDC;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchAggregations;
@@ -43,6 +46,7 @@ public class UserService {
 	private final UsageHistoryDocumentRepository usageHistoryDocumentRepository;
 	private final BrandRepository brandRepository;
 	private final BookmarkRepository bookmarkRepository;
+	private final JwtProvider jwtProvider;
 
 	/**
 	 * 사용자 정보 조회
@@ -62,7 +66,7 @@ public class UserService {
 	 * 사용자 정보 갱신
 	 */
 	@Transactional
-	public UpdateUserInfoRes updateUserInfo(Long userId, UpdateUserInfoReq request) {
+	public UpdateUserInfoRes updateUserInfo(HttpServletResponse response, Long userId, UpdateUserInfoReq request) {
 		User user = findUser(userId);
 
 		user.updateUserInfo(
@@ -79,6 +83,8 @@ public class UserService {
 			UserCategory userCategory = UserCategory.of(user, category);
 			userCategoryRepository.save(userCategory);
 		});
+
+		jwtProvider.deleteTmpCheckCookie(response);
 
 		return UpdateUserInfoRes.of(user, request.getCategoryIds());
 	}
