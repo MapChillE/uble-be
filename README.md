@@ -3,9 +3,9 @@
 ## 프로젝트 소개
 
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/3c016595-0424-404d-bfdb-c8068c1e1e37" alt="탐험하는 귀여운 마스코트" width="600" />
-  
   🏆LG 유플러스 유레카 SW 아카데미 2기 융합프로젝트 우수상🏅
+  
+  <img src="https://github.com/user-attachments/assets/3c016595-0424-404d-bfdb-c8068c1e1e37" alt="탐험하는 귀여운 마스코트" width="600" />
 </div><br>
 
 **🌐 서비스 바로가기** : https://www.u-ble.com
@@ -179,6 +179,13 @@
 
 <br><br><br>
 
+## ⚖️ 컨벤션
+- 🗂️ [패키지 구조 컨벤션](https://github.com/MapChillE/uble-be/wiki/CONVENTION#-package-structure-)
+- ⚙️ [GIT 컨벤션](https://github.com/MapChillE/uble-be/wiki/CONVENTION#-git-)
+- 💻 [CODE 컨벤션](https://github.com/MapChillE/uble-be/wiki/CONVENTION#-code-)
+
+<br><br><br>
+
 ## 💻 Screens
 
 | 화면 | 기능                                                                                                                     |
@@ -195,10 +202,3 @@
 | <img src="https://github.com/user-attachments/assets/35685677-aa6f-4b41-9a97-42cfe27036aa" width="250" /> | 🎫 **바코드 기반 멤버십 혜택 사용** <br><br> 사용자가 등록한 바코드 번호를 기반으로 실제 사용할 수 있는 멤버십 바코드를 자동 생성하여 제휴처에서 혜택을 받을 수 있도록 지원합니다.          |
 | <img src="https://github.com/user-attachments/assets/43d92131-a5c5-480c-b055-5e438d0016fd" width="250" /> | 📊 **유저 개인 및 전체 사용자 평균 기준 혜택 사용 통계 조회** <br><br> 개인의 혜택 사용량과 전체 사용자 평균 사용량을 비교하여 시각적으로 제공합니다.                          |
 | <img src="https://github.com/user-attachments/assets/08eaa0d0-474e-4597-adb7-b42bf37376be" width="250" /> | 📝 **혜택 사용 내역 조회** <br><br> 사용자가 실제 사용한 제휴처 혜택의 사용 내역과 날짜, 사용처, 할인율 등의 상세 정보를 조회할 수 있도록 제공합니다.                         |
-
-<br><br><br>
-
-## ⚖️ 컨벤션
-- 🗂️ [패키지 구조 컨벤션](https://github.com/MapChillE/uble-be/wiki/CONVENTION#-package-structure-)
-- ⚙️ [GIT 컨벤션](https://github.com/MapChillE/uble-be/wiki/CONVENTION#-git-)
-- 💻 [CODE 컨벤션](https://github.com/MapChillE/uble-be/wiki/CONVENTION#-code-)
