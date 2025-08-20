@@ -4,7 +4,9 @@
 
 <div align="center">
   <img src="https://github.com/user-attachments/assets/3c016595-0424-404d-bfdb-c8068c1e1e37" alt="탐험하는 귀여운 마스코트" width="600" />
-</div>
+  
+  🏆LG 유플러스 유레카 SW 아카데미 2기 융합프로젝트 우수상🏅
+</div><br>
 
 **🌐 서비스 바로가기** : https://www.u-ble.com
 
@@ -19,6 +21,7 @@
 - **프로젝트 주제** : LG U+ 멤버십 제휴처 안내 지도 서비스
 - **프로젝트 기간** : 2025.06.30 - 2025.08.08
 
+<br><br>
 
 ## 🧑🏻‍💻 팀원 소개
 <div align="center">
@@ -74,6 +77,18 @@
 
 ### 7. 피드백 기능
 - 서비스에 대한 피드백 등록/조회
+
+<br><br><br>
+
+## 📚 스터디
+
+<ul>
+  <li><a href="https://github.com/MapChillE/uble-be/wiki/%5BSTUDY%5D-%EC%9D%B4%EC%9A%A9-%EB%82%B4%EC%97%AD-%EC%B4%88%EA%B8%B0%ED%99%94%EB%A5%BC-%EC%9C%84%ED%95%9C-%EC%8A%A4%EC%BC%80%EC%A4%84%EB%9F%AC-%EC%A0%81%EC%9A%A9%EA%B8%B0"> 📆 이용 내역 초기화를 위한 스케줄러 적용기</a></li>
+  <li><a href="http://github.com/MapChillE/uble-be/wiki/%5BSTUDY%5D-%EC%A0%9C%ED%9C%B4%EC%B2%98-%EC%B6%94%EC%B2%9C-%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98-%EA%B0%9C%EB%B0%9C"> ⛓️ 제휴처 추천 알고리즘 개발 </a></li>
+  <li><a href="https://github.com/MapChillE/uble-be/wiki/%5BSTUDY%5D-Redis-%EC%BA%90%EC%8B%B1%EC%9D%84-%ED%86%B5%ED%95%9C-%EC%B6%94%EC%B2%9C-%EA%B2%B0%EA%B3%BC-%EC%9D%91%EB%8B%B5-%EC%86%8D%EB%8F%84-%EA%B0%9C%EC%84%A0"> ⛓️ Redis 캐싱을 통한 추천 결과 응답 속도 개선 </a></li>
+  <li><a href="https://github.com/MapChillE/uble-be/wiki/%5BSTUDY%5D-%EB%A7%A4%EC%9E%A5-%ED%83%90%EC%83%89-%EA%B8%B0%EB%8A%A5-%EC%84%B1%EB%8A%A5-%EA%B0%9C%EC%84%A0"> 🗺️ 매장 탐색 기능 성능 개선 </a></li>
+  <li><a href="https://github.com/MapChillE/uble-be/wiki/%5BSTUDY%5D-Elasticsearch%EB%A5%BC-%ED%99%9C%EC%9A%A9%ED%95%9C-%EA%B2%80%EC%83%89-%EA%B8%B0%EB%8A%A5-%EA%B5%AC%ED%98%84"> 🔎 Elasticsearch를 활용한 검색 기능 구현 </a></li>
+</ul>
 
 <br><br><br>
 
@@ -164,155 +179,26 @@
 
 <br><br><br>
 
-## 📚 스터디
+## 💻 Screens
 
-<ul>
-  <li><a href="https://github.com/MapChillE/uble-be/wiki/%5BSTUDY%5D-%EC%9D%B4%EC%9A%A9-%EB%82%B4%EC%97%AD-%EC%B4%88%EA%B8%B0%ED%99%94%EB%A5%BC-%EC%9C%84%ED%95%9C-%EC%8A%A4%EC%BC%80%EC%A4%84%EB%9F%AC-%EC%A0%81%EC%9A%A9%EA%B8%B0"> 📆 이용 내역 초기화를 위한 스케줄러 적용기</a></li>
-  <li><a href="http://github.com/MapChillE/uble-be/wiki/%5BSTUDY%5D-%EC%A0%9C%ED%9C%B4%EC%B2%98-%EC%B6%94%EC%B2%9C-%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98-%EA%B0%9C%EB%B0%9C"> ⛓️ 제휴처 추천 알고리즘 개발 </a></li>
-  <li><a href="https://github.com/MapChillE/uble-be/wiki/%5BSTUDY%5D-Redis-%EC%BA%90%EC%8B%B1%EC%9D%84-%ED%86%B5%ED%95%9C-%EC%B6%94%EC%B2%9C-%EA%B2%B0%EA%B3%BC-%EC%9D%91%EB%8B%B5-%EC%86%8D%EB%8F%84-%EA%B0%9C%EC%84%A0"> ⛓️ Redis 캐싱을 통한 추천 결과 응답 속도 개선 </a></li>
-  <li><a href="https://github.com/MapChillE/uble-be/wiki/%5BSTUDY%5D-%EB%A7%A4%EC%9E%A5-%ED%83%90%EC%83%89-%EA%B8%B0%EB%8A%A5-%EC%84%B1%EB%8A%A5-%EA%B0%9C%EC%84%A0"> 🗺️ 매장 탐색 기능 성능 개선 </a></li>
-  <li><a href="https://github.com/MapChillE/uble-be/wiki/%5BSTUDY%5D-Elasticsearch%EB%A5%BC-%ED%99%9C%EC%9A%A9%ED%95%9C-%EA%B2%80%EC%83%89-%EA%B8%B0%EB%8A%A5-%EA%B5%AC%ED%98%84"> 🔎 Elasticsearch를 활용한 검색 기능 구현 </a></li>
-</ul>
+| 화면 | 기능                                                                                                                     |
+| ---- |------------------------------------------------------------------------------------------------------------------------|
+| <img src="https://github.com/user-attachments/assets/76b19543-f01b-48cb-9c77-9a878d8a07e9" width="250"/> | ✨ **사용자 정보 및 관심사 기반 제휴처 추천** <br><br> 사용자의 나이, 성별, 관심 카테고리 등 프로필 정보를 분석하여 맞춤형 LGU+ 멤버십 제휴처를 추천합니다.                     |
+| <img src="https://github.com/user-attachments/assets/b3974a9b-e678-4c2b-a7ba-8a0338bff2b8" width="250" /> | 🎁 **LGU+ 멤버십 제휴처 혜택 정보** <br><br> 각 제휴처의 상세한 혜택 정보를 조회하고, 할인 및 이벤트 등의 최신 정보를 제공합니다.                                   |
+| <img width="250" alt="image" src="https://github.com/user-attachments/assets/c08a0d69-2f35-4467-b507-dddccaa658d1" /> | 🔥 **실시간 인기 멤버십 제휴처 정보** <br><br> 현재 시간 기준으로 사용자들이 가장 많이 방문한 인기 제휴처 정보를 실시간으로 제공합니다.                                   |
+| <img width="250" src="https://github.com/user-attachments/assets/2ce870f6-40bf-45b5-9f1a-146292bebb33" /> | 🔍 **자동 완성 기능을 탑재한 검색 기능 (제휴처)** <br><br> 제휴처 및 키워드 검색 시, 사용자 입력에 따라 자동 완성 및 추천 검색어를 실시간으로 제공합니다.                      |
+| <img src="https://github.com/user-attachments/assets/9abc8d76-dcf9-4542-aa60-8b03aed299b9" width="250" /> | 🗺 **지도 기반 제휴처 탐색** <br><br> 사용자의 현재 위치 주변에 존재하는 LGU+ 제휴처를 지도상에서 확인할 수 있으며, 매장 클릭 시 상세 정보가 제공됩니다.                      |
+| <img src="https://github.com/user-attachments/assets/0e38e285-9195-4ac9-815f-aff245c5cc4b" width="250" /> | 📌 **사용자 지정 위치 저장** <br><br> 사용자가 자주 방문하거나 관심 있는 위치를 지정하여 빠르게 탐색할 수 있도록 저장할 수 있습니다.                                    |
+| <img src="https://github.com/user-attachments/assets/52879155-6c4a-416c-8156-6a2dee63c1f1" width="250" /> | ⚡ **자동 완성 기능을 탑재한 제휴처 매장 검색 기능 (지도)** <br><br> 제휴처 이름이나 키워드를 입력할 때, 관련 매장을 자동 완성 형태로 실시간으로 제안하여 빠르게 탐색할 수 있습니다.        |
+| <img src="https://github.com/user-attachments/assets/9d909a53-6c90-441e-8dc3-3321a3d143fe" width="250" /> | ⭐ **제휴처 즐겨찾기** <br><br> 관심 있는 제휴처를 즐겨찾기로 저장하여 언제든지 쉽게 다시 확인할 수 있도록 지원합니다.                                              |
+| <img src="https://github.com/user-attachments/assets/6d8bd429-9338-4e60-afbf-dc447cba1a7a" width="250" /> | ⚙️ **사용자 정보 및 관심 카테고리 등 설정 지원(마이페이지)** <br><br> 사용자 프로필 정보, 관심 카테고리, 멤버십 등급, 바코드 번호 등 다양한 설정을 마이페이지에서 관리할 수 있도록 지원합니다. |
+| <img src="https://github.com/user-attachments/assets/35685677-aa6f-4b41-9a97-42cfe27036aa" width="250" /> | 🎫 **바코드 기반 멤버십 혜택 사용** <br><br> 사용자가 등록한 바코드 번호를 기반으로 실제 사용할 수 있는 멤버십 바코드를 자동 생성하여 제휴처에서 혜택을 받을 수 있도록 지원합니다.          |
+| <img src="https://github.com/user-attachments/assets/43d92131-a5c5-480c-b055-5e438d0016fd" width="250" /> | 📊 **유저 개인 및 전체 사용자 평균 기준 혜택 사용 통계 조회** <br><br> 개인의 혜택 사용량과 전체 사용자 평균 사용량을 비교하여 시각적으로 제공합니다.                          |
+| <img src="https://github.com/user-attachments/assets/08eaa0d0-474e-4597-adb7-b42bf37376be" width="250" /> | 📝 **혜택 사용 내역 조회** <br><br> 사용자가 실제 사용한 제휴처 혜택의 사용 내역과 날짜, 사용처, 할인율 등의 상세 정보를 조회할 수 있도록 제공합니다.                         |
 
 <br><br><br>
 
 ## ⚖️ 컨벤션
-
-### **[ PACKAGE STRUCTURE ]**
-
-```
-📁 domain
- ├─ 📁 admin
- ├─ 📁 auth
- ├─ 📁 bookmark
- │   ├─ 📁 controller
- │   ├─ 📁 dto
- │   │   ├─ 📁 request
- │   │   └─ 📁 response
- │   ├─ 📁 exception
- │   ├─ 📁 repository
- │   └─ 📁 service
- ├─ 📁 brand
- ├─ 📁 category
- ├─ 📁 common
- ├─ 📁 feedback
- ├─ 📁 pin
- ├─ 📁 search
- ├─ 📁 store
- └─ 📁 users
-
-📁 entity
- ├─ 📁 document
- └─ 📁 enums
-
-📁 global
- ├─ 📁 config
- ├─ 📁 exception
- ├─ 📁 logging
- ├─ 📁 schedule
- └─ 📁 security
-
-```
-<br><br>
-
-### **[ GIT ]**
-
-**기초 규칙**
-
-- 모든 변경은 이슈 및 브랜치 생성 후 develop 브랜치으로 병합
-- main 브랜치로의 PR은 develop 브랜치에서만 생성 가능
-- 생성된 PR은 최소 1명의 리뷰어의 확인 이후 병합 가능
-
-<br>
-
-**PR 제목 컨벤션**
-
-| **컨벤션**      | **예시 및 설명**              |
-| --------------- | ----------------------------- |
-| [태그명] 제목   | [Feat] 즐겨찾기 추가 API 구현 |
-| develop -> main | main 브랜치로의 PR            |
-
-<br>
-
-**브랜치 네이밍 컨벤션**
-
-| **브랜치명**          | **설명**              | **예시**             |
-| --------------------- | --------------------- | -------------------- |
-| `main`                | 배포용 브랜치         | main                 |
-| `develop`             | 개발용 브랜치         | develop              |
-| `태그/UBLE-xx-도메인` | 이슈 기반 기능 브랜치 | fix/UBLE-12-bookmark |
-| `태그/도메인`         | 일반 작업용 브랜치    | fix/bookmark         |
-
-<br>
-
-**커밋 컨벤션**
-
-[UBLE-티켓넘버] 태그: 내용
-
-Ex. [UBLE-12] fix: 즐겨찾기 DTO 수정
-
-| 태그       | 설명                                             |
-| ---------- | ------------------------------------------------ |
-| `feat`     | 새로운 기능 추가                                 |
-| `fix`      | 버그 수정                                        |
-| `docs`     | 문서 변경                                        |
-| `style`    | 코드 스타일 변경 (포매팅 수정, 세미콜론 추가 등) |
-| `refactor` | 코드 리팩토링                                    |
-| `test`     | 테스트 코드 추가 및 수정                         |
-| `chore`    | 빌드 프로세스, 도구 설정 변경 등 기타 작업       |
-| `comment`  | 필요한 주석 추가 및 변경                         |
-| `rename`   | 파일 또는 폴더 명을 수정하거나 옮기는 작업       |
-| `remove`   | 파일을 삭제하는 작업                             |
-
-<br><br>
-
-### **[ CODE ]**
-
-**기초 규칙**
-
-- Entity 및 DTO를 생성하는 경우, Builder 패턴을 사용한다.
-
-<br>
-
-**네이밍 컨벤션**
-
-| 항목                   | 규칙                   | 예시                                  |
-| ---------------------- | ---------------------- | ------------------------------------- |
-| **클래스, 인터페이스** | PascalCase             | UserController, AuthService           |
-| **컨트롤러 메소드**    | 메소드+내용            | (리스트) getUsers(), (단일) getUser() |
-| **서비스 메소드**      | 컨트롤러 메소드와 동일 | (리스트) getUsers(), (단일) getUser() |
-| **변수**               | camelCase              | userList, savedUser, isActive         |
-| **상수**               | SNAKE_CASE             | MAX_RETRY_COUNT                       |
-| **DTO**                | 파일명 + Res/Req       | GetStoreRes                           |
-
-<br>
-
-**예외처리 컨벤션**
-
-- 커스텀 예외는 도메인 별로 관리되며, 아래와 같은 구조를 가진다.
-
-```java
-    // 필드
-    private final HttpStatus status;
-    private final int code;
-    private final String message;
-
-    // 예시
-    STORE_NOT_FOUND(HttpStatus.NOT_FOUND, 5000, "매장 정보를 찾을 수 없습니다.")
-```
-
-- 각 도메인에 대해 시작 번호를 부여하여 고유한 에러 코드를 가질 수 있도록 한다.
-
-| 도메인 | 에러 코드 |
-| ------ | --------- |
-| 인증   | `1000`    |
-| 사용자 | `2000`    |
-| 어드민 | `3000`    |
-| 브랜드 | `4000`    |
-| 스토어 | `5000`    |
-| 북마크 | `6000`    |
-| 피드백 | `7000`    |
-| 핀 | `8000`    |
-| 공통 | `9000`    |
-
----
+- 🗂️ [패키지 구조 컨벤션](https://github.com/MapChillE/uble-be/wiki/CONVENTION#-package-structure-)
+- ⚙️ [GIT 컨벤션](https://github.com/MapChillE/uble-be/wiki/CONVENTION#-git-)
+- 💻 [CODE 컨벤션](https://github.com/MapChillE/uble-be/wiki/CONVENTION#-code-)
